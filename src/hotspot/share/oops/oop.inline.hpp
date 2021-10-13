@@ -43,6 +43,29 @@
 // Implementation of all inlined member functions defined in oop.hpp
 // We need a separate file to avoid circular references
 
+uintptr_t oopDesc::access_counter() const {
+  uintptr_t ac = HeapAccess<MO_RELAXED>::load_at(as_oop(), access_counter_offset_in_bytes());
+  return ac;
+}
+
+void oopDesc::set_access_counter(uintptr_t new_value){
+  HeapAccess<MO_RELAXED>::store_at(as_oop(), access_counter_offset_in_bytes(), new_value);
+}
+
+void oopDesc::add_access_counter(uintptr_t increment) {
+  uintptr_t ac = access_counter();
+  // code below prevents overflow
+  if (UINTPTR_MAX - increment > ac){
+    set_access_counter(ac + increment);
+  }
+  else {
+    printf("Access Counter reaches UINTPTR_MAX\n");
+    if (ac < UINTPTR_MAX){
+      set_access_counter(UINTPTR_MAX);
+    }
+  }
+}
+
 markOop  oopDesc::mark()      const {
   return HeapAccess<MO_VOLATILE>::load_at(as_oop(), mark_offset_in_bytes());
 }

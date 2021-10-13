@@ -56,6 +56,7 @@ class oopDesc {
   friend class VMStructs;
   friend class JVMCIVMStructs;
  private:
+  volatile uintptr_t _access_counter = 0;
   volatile markOop _mark;
   union _metadata {
     Klass*      _klass;
@@ -63,9 +64,13 @@ class oopDesc {
   } _metadata;
 
  public:
+  inline uintptr_t access_counter() const;
   inline markOop  mark()          const;
   inline markOop  mark_raw()      const;
   inline markOop* mark_addr_raw() const;
+
+  inline void set_access_counter(uintptr_t new_value);
+  inline void add_access_counter(uintptr_t increment);
 
   inline void set_mark(volatile markOop m);
   inline void set_mark_raw(volatile markOop m);
