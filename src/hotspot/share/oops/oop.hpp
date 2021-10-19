@@ -328,6 +328,7 @@ class oopDesc {
   static bool has_klass_gap();
 
   // for code generation
+  static int access_counter_offset_in_bytes() { return offset_of(oopDesc, _access_counter); }
   static int mark_offset_in_bytes()      { return offset_of(oopDesc, _mark); }
   static int klass_offset_in_bytes()     { return offset_of(oopDesc, _metadata._klass); }
   static int klass_gap_offset_in_bytes() {
