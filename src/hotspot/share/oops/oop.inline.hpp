@@ -76,7 +76,7 @@ void oopDesc::set_gc_epoch(uintptr_t new_value){
 void oopDesc::add_gc_epoch(uintptr_t increment) {
   uintptr_t epoch = gc_epoch();
   // code below prevents overflow
-  if (UINTPTR_MAX - increment > ac){
+  if (UINTPTR_MAX - increment > epoch){
     set_gc_epoch(epoch + increment);
   }
   else {
