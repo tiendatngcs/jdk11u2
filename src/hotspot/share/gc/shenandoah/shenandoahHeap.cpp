@@ -734,7 +734,7 @@ void ShenandoahHeap::decrease_hot_size(size_t bytes) {
   Atomic::sub(bytes, &_hot_size);
 }
 
-void Shenandoah::increase_neutral_to_hot_count(uint32_t increment) {
+void ShenandoahHeap::increase_neutral_to_hot_count(uint32_t increment) {
   Atomic::add(increment, &_neutral_to_hot_count);
 }
 
@@ -742,7 +742,7 @@ void ShenandoahHeap::set_neutral_to_hot_count(uint32_t value) {
   OrderAccess::release_store_fence(&_neutral_to_hot_count, value);
 }
 
-void Shenandoah::increase_neutral_to_cold_count(uint32_t increment) {
+void ShenandoahHeap::increase_neutral_to_cold_count(uint32_t increment) {
   Atomic::add(increment, &_neutral_to_cold_count);
 }
 
@@ -750,7 +750,7 @@ void ShenandoahHeap::set_neutral_to_cold_count(uint32_t value) {
   OrderAccess::release_store_fence(&_neutral_to_cold_count, value);
 }
 
-void Shenandoah::increase_cold_to_hot_count(uint32_t increment) {
+void ShenandoahHeap::increase_cold_to_hot_count(uint32_t increment) {
   Atomic::add(increment, &_cold_to_hot_count);
 }
 
@@ -758,7 +758,7 @@ void ShenandoahHeap::set_cold_to_hot_count(uint32_t value) {
   OrderAccess::release_store_fence(&_cold_to_hot_count, value);
 }
 
-void Shenandoah::increase_hot_to_cold_count(uint32_t increment) {
+void ShenandoahHeap::increase_hot_to_cold_count(uint32_t increment) {
   Atomic::add(increment, &_hot_to_cold_count);
 }
 
