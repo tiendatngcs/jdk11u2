@@ -435,7 +435,7 @@ void ShenandoahControlThread::service_concurrent_normal_cycle(GCCause::Cause cau
                       "\tcapacity: %lu\n"
                       "\tused: %lu\n"
                       "\tcommited: %lu\n"
-                      "\tbytes_allocated_since_gc_start: %lu\n", heap->capacity(), heap->used(), heap->commited(), heap->tbytes_allocated_since_gc_start());
+                      "\tbytes_allocated_since_gc_start: %lu\n", heap->capacity(), heap->used(), heap->commited(), heap->bytes_allocated_since_gc_start());
   heap->heuristics()->record_success_concurrent();
   heap->shenandoah_policy()->record_success_concurrent();
 }
