@@ -430,6 +430,7 @@ void ShenandoahControlThread::service_concurrent_normal_cycle(GCCause::Cause cau
   }
 
   // Cycle is complete
+  log_info(gc)("Test log --- cycle is complete\n");
   heap->heuristics()->record_success_concurrent();
   heap->shenandoah_policy()->record_success_concurrent();
 }
