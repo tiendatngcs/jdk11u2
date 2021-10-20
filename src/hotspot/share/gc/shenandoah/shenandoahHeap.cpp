@@ -453,6 +453,13 @@ ShenandoahHeap::ShenandoahHeap(ShenandoahCollectorPolicy* policy) :
   _used(0),
   _committed(0),
   _bytes_allocated_since_gc_start(0),
+  _neutral_size(0),
+  _cold_size(0),
+  _hot_size(0),
+  _neutral_to_hot_count(0),
+  _neutral_to_cold_count(0),
+  _cold_to_hot_count(0),
+  _hot_to_cold_count(0),
   _max_workers(MAX2(ConcGCThreads, ParallelGCThreads)),
   _workers(NULL),
   _safepoint_workers(NULL),
@@ -630,6 +637,41 @@ size_t ShenandoahHeap::committed() const {
   return _committed;
 }
 
+size_t ShenandoahHeap::neutral_size() const {
+  OrderAccess::acquire();
+  return _neutral_size;
+}
+
+size_t ShenandoahHeap::cold_size() const {
+  OrderAccess::acquire();
+  return _cold_size;
+}
+
+size_t ShenandoahHeap::hot_size() const {
+  OrderAccess::acquire();
+  return _hot_size;
+}
+
+uint32_t ShenandoahHeap::neutral_to_hot_count() const {
+  OrderAccess::acquire();
+  return _neutral_to_hot_count;
+}
+
+uint32_t ShenandoahHeap::neutral_to_cold_count() const {
+  OrderAccess::acquire();
+  return _neutral_to_cold_count;
+}
+
+uint32_t ShenandoahHeap::cold_to_hot_count() const {
+  OrderAccess::acquire();
+  return _cold_to_hot_count;
+}
+
+uint32_t ShenandoahHeap::hot_to_cold_count() const {
+  OrderAccess::acquire();
+  return _hot_to_cold_count;
+}
+
 void ShenandoahHeap::increase_committed(size_t bytes) {
   shenandoah_assert_heaplocked_or_safepoint();
   _committed += bytes;
@@ -651,6 +693,77 @@ void ShenandoahHeap::set_used(size_t bytes) {
 void ShenandoahHeap::decrease_used(size_t bytes) {
   assert(used() >= bytes, "never decrease heap size by more than we've left");
   Atomic::sub(bytes, &_used);
+}
+
+void ShenandoahHeap::increase_neutral_size(size_t bytes) {
+  Atomic::add(bytes, &_neutral_size);
+}
+
+void ShenandoahHeap::set_neutral_size(size_t bytes) {
+  OrderAccess::release_store_fence(&_neutral_size, bytes);
+}
+
+void ShenandoahHeap::decrease_neutral_size(size_t bytes) {
+  assert(neutral_size() >= bytes, "never decrease size by more than we've left");
+  Atomic::sub(bytes, &_neutral_size);
+}
+
+void ShenandoahHeap::increase_cold_size(size_t bytes) {
+  Atomic::add(bytes, &_cold_size);
+}
+
+void ShenandoahHeap::set_cold_size(size_t bytes) {
+  OrderAccess::release_store_fence(&_cold_size, bytes);
+}
+
+void ShenandoahHeap::decrease_cold_size(size_t bytes) {
+  assert(cold_size() >= bytes, "never decrease size by more than we've left");
+  Atomic::sub(bytes, &_cold_size);
+}
+
+void ShenandoahHeap::increase_hot_size(size_t bytes) {
+  Atomic::add(bytes, &_hot_size);
+}
+
+void ShenandoahHeap::set_hot_size(size_t bytes) {
+  OrderAccess::release_store_fence(&_hot_size, bytes);
+}
+
+void ShenandoahHeap::decrease_hot_size(size_t bytes) {
+  assert(hot_size() >= bytes, "never decrease size by more than we've left");
+  Atomic::sub(bytes, &_hot_size);
+}
+
+void Shenandoah::increase_neutral_to_hot_count(uint32_t increment) {
+  Atomic::add(increment, &_neutral_to_hot_count);
+}
+
+void ShenandoahHeap::set_neutral_to_hot_count(uint32_t value) {
+  OrderAccess::release_store_fence(&_neutral_to_hot_count, value);
+}
+
+void Shenandoah::increase_neutral_to_cold_count(uint32_t increment) {
+  Atomic::add(increment, &_neutral_to_cold_count);
+}
+
+void ShenandoahHeap::set_neutral_to_cold_count(uint32_t value) {
+  OrderAccess::release_store_fence(&_neutral_to_cold_count, value);
+}
+
+void Shenandoah::increase_cold_to_hot_count(uint32_t increment) {
+  Atomic::add(increment, &_cold_to_hot_count);
+}
+
+void ShenandoahHeap::set_cold_to_hot_count(uint32_t value) {
+  OrderAccess::release_store_fence(&_cold_to_hot_count, value);
+}
+
+void Shenandoah::increase_hot_to_cold_count(uint32_t increment) {
+  Atomic::add(increment, &_hot_to_cold_count);
+}
+
+void ShenandoahHeap::set_hot_to_cold_count(uint32_t value) {
+  OrderAccess::release_store_fence(&_hot_to_cold_count, value);
 }
 
 void ShenandoahHeap::increase_allocated(size_t bytes) {

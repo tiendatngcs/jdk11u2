@@ -44,12 +44,10 @@
 // We need a separate file to avoid circular references
 
 uintptr_t oopDesc::access_counter() const {
-  uintptr_t ac = HeapAccess<MO_RELAXED>::load_at(as_oop(), access_counter_offset_in_bytes());
-  return ac;
+  return HeapAccess<MO_RELAXED>::load_at(as_oop(), access_counter_offset_in_bytes());
 }
 
 void oopDesc::set_access_counter(uintptr_t new_value){
-  // printf("Setting access counter to %lu, access_counter=%lu\n", new_value, access_counter());
   HeapAccess<MO_RELAXED>::store_at(as_oop(), access_counter_offset_in_bytes(), new_value);
 }
 
@@ -63,6 +61,28 @@ void oopDesc::add_access_counter(uintptr_t increment) {
     printf("Access Counter reaches UINTPTR_MAX\n");
     if (ac < UINTPTR_MAX){
       set_access_counter(UINTPTR_MAX);
+    }
+  }
+}
+
+uintptr_t oopDesc::gc_epoch() const {
+  return HeapAccess<MO_RELAXED>::load_at(as_oop(), gc_epoch_offset_in_bytes());
+}
+
+void oopDesc::set_gc_epoch(uintptr_t new_value){
+  HeapAccess<MO_RELAXED>::store_at(as_oop(), gc_epoch_offset_in_bytes(), new_value);
+}
+
+void oopDesc::add_gc_epoch(uintptr_t increment) {
+  uintptr_t epoch = gc_epoch();
+  // code below prevents overflow
+  if (UINTPTR_MAX - increment > ac){
+    set_gc_epoch(epoch + increment);
+  }
+  else {
+    printf("GC epoch reaches UINTPTR_MAX\n");
+    if (epoch < UINTPTR_MAX){
+      set_gc_epoch(UINTPTR_MAX);
     }
   }
 }

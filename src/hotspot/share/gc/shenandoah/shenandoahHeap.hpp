@@ -168,6 +168,16 @@ private:
   volatile size_t _bytes_allocated_since_gc_start;
   shenandoah_padding(1);
 
+  size_t _neutral_size;
+  size_t _cold_size;
+  size_t _hot_size;
+
+  uint32_t _neutral_to_hot_count;
+  uint32_t _neutral_to_cold_count;
+  uint32_t _cold_to_hot_count;
+  uint32_t _hot_to_cold_count;
+  
+
 public:
   void increase_used(size_t bytes);
   void decrease_used(size_t bytes);
@@ -187,6 +197,40 @@ public:
   size_t capacity()          const;
   size_t used()              const;
   size_t committed()         const;
+
+  void increase_neutral_size(size_t bytes);
+  void decrease_neutral_size(size_t bytes);
+  void set_neutral_size(size_t bytes);
+
+  void increase_cold_size(size_t bytes);
+  void decrease_cold_size(size_t bytes);
+  void set_cold_size(size_t bytes);
+
+  void increase_hot_size(size_t bytes);
+  void decrease_hot_size(size_t bytes);
+  void set_hot_size(size_t bytes);
+
+  void increase_neutral_to_hot_count(uint32_t increment);
+  void set_neutral_to_hot_count(uint32_t value);
+
+  void increase_neutral_to_cold_count(uint32_t increment);
+  void set_neutral_to_cold_count(uint32_t value);
+
+  void increase_cold_to_hot_count(uint32_t increment);
+  void set_cold_to_hot_count(uint32_t value);
+
+  void increase_hot_to_cold_count(uint32_t increment);
+  void set_hot_to_cold_count(uint32_t value);
+
+
+  size_t neutral_size() const;
+  size_t cold_size()    const;
+  size_t hot_size()     const;
+
+  uint32_t neutral_to_hot_count()   const;
+  uint32_t neutral_to_cold_count()  const;
+  uint32_t cold_to_hot_count()      const;
+  uint32_t hot_to_cold_count()      const;
 
   void set_soft_max_capacity(size_t v);
 
