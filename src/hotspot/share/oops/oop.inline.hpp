@@ -49,7 +49,7 @@ uintptr_t oopDesc::access_counter() const {
 }
 
 void oopDesc::set_access_counter(uintptr_t new_value){
-  printf("Setting access counter to %lu, access_counter=%lu\n", new_value, access_counter());
+  // printf("Setting access counter to %lu, access_counter=%lu\n", new_value, access_counter());
   HeapAccess<MO_RELAXED>::store_at(as_oop(), access_counter_offset_in_bytes(), new_value);
 }
 
