@@ -64,7 +64,7 @@ HeapWord* ShenandoahFreeSet::allocate_with_access_rate(ShenandoahRegionAccessRat
     size_t idx = c - 1;
     if (is_collector_free(idx)) {
       ShenandoahHeapRegion* r = _heap->get_region(idx);
-      if (r->affiliation() == affiliation && r->access_rate() == access_rate) {
+      if (r->access_rate() == access_rate) {
         HeapWord* result = try_allocate_in(r, req, in_new_region);
         if (result != NULL) {
           return result;
