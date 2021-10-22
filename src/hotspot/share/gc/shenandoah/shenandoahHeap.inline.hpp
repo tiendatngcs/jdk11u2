@@ -277,13 +277,13 @@ inline oop ShenandoahHeap::evacuate_object(oop p, Thread* thread) {
   HeapWord* copy = NULL;
 
   uintptr_t hotness_threshold = 1000;
-  ShenandoahRegionAccessRate access_rate;
-  if (p->access_counter() > hotness_threshold){
-    access_rate = HOT;
-  }
-  else {
-    access_rate = COLD;
-  }
+  ShenandoahRegionAccessRate access_rate = NEUTRAL;
+  // if (p->access_counter() > hotness_threshold){
+  //   access_rate = HOT;
+  // }
+  // else {
+  //   access_rate = COLD;
+  // }
 
 #ifdef ASSERT
   if (ShenandoahOOMDuringEvacALot &&
