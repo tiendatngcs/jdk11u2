@@ -73,7 +73,7 @@ private:
 
 public:
   static inline ShenandoahAllocRequest for_tlab(size_t min_size, size_t requested_size) {
-    return ShenandoahAllocRequest(min_size, requested_size, _alloc_tlab);
+    return ShenandoahAllocRequest(min_size, requested_size, _alloc_tlab, NEUTRAL);
   }
 
   static inline ShenandoahAllocRequest for_gclab(size_t min_size, size_t requested_size, ShenandoahRegionAccessRate access_rate) {
@@ -85,7 +85,7 @@ public:
   }
 
   static inline ShenandoahAllocRequest for_shared(size_t requested_size) {
-    return ShenandoahAllocRequest(0, requested_size, _alloc_shared);
+    return ShenandoahAllocRequest(0, requested_size, _alloc_shared, NEUTRAL);
   }
 
   inline size_t size() {
