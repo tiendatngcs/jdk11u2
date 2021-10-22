@@ -51,6 +51,7 @@ private:
   HeapWord* try_allocate_in(ShenandoahHeapRegion* region, ShenandoahAllocRequest& req, bool& in_new_region);
   HeapWord* allocate_single(ShenandoahAllocRequest& req, bool& in_new_region);
   HeapWord* allocate_contiguous(ShenandoahAllocRequest& req);
+  HeapWord* allocate_with_access_rate(ShenandoahRegionAccessRate access_rate, ShenandoahAllocRequest& req, bool& in_new_region);
 
   void flip_to_gc(ShenandoahHeapRegion* r);
 

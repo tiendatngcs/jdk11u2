@@ -58,6 +58,23 @@ bool ShenandoahFreeSet::is_collector_free(size_t idx) const {
   return _collector_free_bitmap.at(idx);
 }
 
+HeapWord* ShenandoahFreeSet::allocate_with_access_rate(ShenandoahRegionAccessRate access_rate, ShenandoahAllocRequest& req, bool& in_new_region) {
+  for (size_t c = _collector_rightmost + 1; c > _collector_leftmost; c--) {
+    // size_t is unsigned, need to dodge underflow when _leftmost = 0
+    size_t idx = c - 1;
+    if (is_collector_free(idx)) {
+      ShenandoahHeapRegion* r = _heap->get_region(idx);
+      if (r->affiliation() == affiliation && r->access_rate() == access_rate) {
+        HeapWord* result = try_allocate_in(r, req, in_new_region);
+        if (result != NULL) {
+          return result;
+        }
+      }
+    }
+  }
+  return NULL;
+}
+
 HeapWord* ShenandoahFreeSet::allocate_single(ShenandoahAllocRequest& req, bool& in_new_region) {
   // Scan the bitmap looking for a first fit.
   //
@@ -92,16 +109,22 @@ HeapWord* ShenandoahFreeSet::allocate_single(ShenandoahAllocRequest& req, bool& 
     case ShenandoahAllocRequest::_alloc_shared_gc: {
       // size_t is unsigned, need to dodge underflow when _leftmost = 0
 
-      // Fast-path: try to allocate in the collector view first
-      for (size_t c = _collector_rightmost + 1; c > _collector_leftmost; c--) {
-        size_t idx = c - 1;
-        if (is_collector_free(idx)) {
-          HeapWord* result = try_allocate_in(_heap->get_region(idx), req, in_new_region);
-          if (result != NULL) {
-            return result;
-          }
-        }
-      }
+      // // Fast-path: try to allocate in the collector view first
+      // for (size_t c = _collector_rightmost + 1; c > _collector_leftmost; c--) {
+      //   size_t idx = c - 1;
+      //   if (is_collector_free(idx)) {
+      //     HeapWord* result = try_allocate_in(_heap->get_region(idx), req, in_new_region);
+      //     if (result != NULL) {
+      //       return result;
+      //     }
+      //   }
+      // }
+
+      // Try to allocate with the desired access rate
+      HeapWord* result = allocate_with_access_rate(req.access_rate(), req, in_new_region);
+
+      // There is no hot or cold region, try to allocate in neutral region
+      HeapWord* result = allocate_with_access_rate(NEUTRAL, req, in_new_region);
 
       // No dice. Can we borrow space from mutator view?
       if (!ShenandoahEvacReserveOverflow) {
@@ -142,6 +165,24 @@ HeapWord* ShenandoahFreeSet::try_allocate_in(ShenandoahHeapRegion* r, Shenandoah
   try_recycle_trashed(r);
 
   in_new_region = r->is_empty();
+  if (req.is_gc_alloc()){
+    if (r->access_rate() == ShenandoahRegionAccessRate::NEUTRAL){
+      if (in_new_region){
+        r->set_access_rate(req.access_rate());
+      }
+      else if (req.access_rate() != ShenandoahRegionAccessRate::NEUTRAL){
+        // Non neutral request cannot be make in partially allocated region
+        return NULL;
+      }
+      // Neutral request on partially allocated region get a pass
+    }
+    else if (r->access_rate() != req.access_rate()) {
+      return NULL;
+    }
+  }
+  else if (r->access_rate() != req.access_rate()) {
+    return NULL;
+  }
 
   HeapWord* result = NULL;
   size_t size = req.size();
