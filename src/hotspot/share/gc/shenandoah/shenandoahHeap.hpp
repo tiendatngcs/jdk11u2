@@ -35,6 +35,12 @@
 #include "gc/shenandoah/shenandoahSharedVariables.hpp"
 #include "services/memoryManager.hpp"
 
+enum ShenandoahRegionAccessRate {
+  NEUTRAL,
+  HOT,
+  COLD
+};
+
 class ConcurrentGCTimer;
 class ReferenceProcessor;
 class ShenandoahCollectorPolicy;
@@ -599,9 +605,9 @@ public:
 //
 private:
   HeapWord* allocate_memory_under_lock(ShenandoahAllocRequest& request, bool& in_new_region);
-  inline HeapWord* allocate_from_gclab(Thread* thread, size_t size);
-  HeapWord* allocate_from_gclab_slow(Thread* thread, size_t size);
-  HeapWord* allocate_new_gclab(size_t min_size, size_t word_size, size_t* actual_size);
+  inline HeapWord* allocate_from_gclab(Thread* thread, size_t size, ShenandoahRegionAccessRate access_rate);
+  HeapWord* allocate_from_gclab_slow(Thread* thread, size_t size, ShenandoahRegionAccessRate access_rate);
+  HeapWord* allocate_new_gclab(size_t min_size, size_t word_size, size_t* actual_size, ShenandoahRegionAccessRate access_rate);
   void retire_and_reset_gclabs();
 
 public:

@@ -62,7 +62,8 @@ ShenandoahHeapRegion::ShenandoahHeapRegion(HeapWord* start, size_t index, bool c
   _gclab_allocs(0),
   _live_data(0),
   _critical_pins(0),
-  _update_watermark(start) {
+  _update_watermark(start),
+  _access_rate(NEUTRAL) {
 
   assert(Universe::on_page_boundary(_bottom) && Universe::on_page_boundary(_end),
          "invalid space boundaries");
@@ -426,6 +427,7 @@ void ShenandoahHeapRegion::recycle() {
   set_update_watermark(bottom());
 
   make_empty();
+  set_access_rate(NEUTRAL);
 
   if (ZapUnusedHeapArea) {
     SpaceMangler::mangle_region(MemRegion(bottom(), end()));
@@ -681,4 +683,8 @@ void ShenandoahHeapRegion::record_unpin() {
 
 size_t ShenandoahHeapRegion::pin_count() const {
   return Atomic::load(&_critical_pins);
+}
+
+void ShenandoahHeapRegion::set_access_rate(ShenandoahRegionAccessRate new_access_rate){
+  _access_rate = new_access_rate;
 }

@@ -242,10 +242,10 @@ inline void ShenandoahHeap::clear_cancelled_gc() {
   _oom_evac_handler.clear();
 }
 
-inline HeapWord* ShenandoahHeap::allocate_from_gclab(Thread* thread, size_t size) {
+inline HeapWord* ShenandoahHeap::allocate_from_gclab(Thread* thread, size_t size, ShenandoahRegionAccessRate access_rate) {
   assert(UseTLAB, "TLABs should be enabled");
 
-  PLAB* gclab = ShenandoahThreadLocalData::gclab(thread);
+  PLAB* gclab = ShenandoahThreadLocalData::gclab(thread, access_rate);
   if (gclab == NULL) {
     assert(!thread->is_Java_thread() && !thread->is_Worker_thread(),
            "Performance: thread should have GCLAB: %s", thread->name());
@@ -257,7 +257,7 @@ inline HeapWord* ShenandoahHeap::allocate_from_gclab(Thread* thread, size_t size
     return obj;
   }
   // Otherwise...
-  return allocate_from_gclab_slow(thread, size);
+  return allocate_from_gclab_slow(thread, size, access_rate);
 }
 
 inline oop ShenandoahHeap::evacuate_object(oop p, Thread* thread) {
@@ -276,6 +276,15 @@ inline oop ShenandoahHeap::evacuate_object(oop p, Thread* thread) {
   bool alloc_from_gclab = true;
   HeapWord* copy = NULL;
 
+  uintptr_t hotness_threshold = 1000;
+  ShenandoahRegionAccessRate access_rate;
+  if (p->access_counter() > hotness_threshold){
+    access_rate = HOT;
+  }
+  else {
+    access_rate = COLD;
+  }
+
 #ifdef ASSERT
   if (ShenandoahOOMDuringEvacALot &&
       (os::random() & 1) == 0) { // Simulate OOM every ~2nd slow-path call
@@ -283,10 +292,10 @@ inline oop ShenandoahHeap::evacuate_object(oop p, Thread* thread) {
   } else {
 #endif
     if (UseTLAB) {
-      copy = allocate_from_gclab(thread, size);
+      copy = allocate_from_gclab(thread, size, access_rate);
     }
     if (copy == NULL) {
-      ShenandoahAllocRequest req = ShenandoahAllocRequest::for_shared_gc(size);
+      ShenandoahAllocRequest req = ShenandoahAllocRequest::for_shared_gc(size, access_rate);
       copy = allocate_memory(req);
       alloc_from_gclab = false;
     }
@@ -325,7 +334,7 @@ inline oop ShenandoahHeap::evacuate_object(oop p, Thread* thread) {
     // have to explicitly overwrite the copy with the filler object. With that overwrite,
     // we have to keep the fwdptr initialized and pointing to our (stale) copy.
     if (alloc_from_gclab) {
-      ShenandoahThreadLocalData::gclab(thread)->undo_allocation(copy, size);
+      ShenandoahThreadLocalData::gclab(thread, access_rate)->undo_allocation(copy, size);
     } else {
       fill_with_object(copy, size);
       shenandoah_assert_correct(NULL, copy_val);

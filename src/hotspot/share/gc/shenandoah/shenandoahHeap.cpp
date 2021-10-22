@@ -851,19 +851,19 @@ void ShenandoahHeap::op_uncommit(double shrink_before, size_t shrink_until) {
   }
 }
 
-HeapWord* ShenandoahHeap::allocate_from_gclab_slow(Thread* thread, size_t size) {
+HeapWord* ShenandoahHeap::allocate_from_gclab_slow(Thread* thread, size_t size, ShenandoahRegionAccessRate access_rate) {
   // New object should fit the GCLAB size
   size_t min_size = MAX2(size, PLAB::min_size());
 
   // Figure out size of new GCLAB, looking back at heuristics. Expand aggressively.
-  size_t new_size = ShenandoahThreadLocalData::gclab_size(thread) * 2;
+  size_t new_size = ShenandoahThreadLocalData::gclab_size(thread, access_rate) * 2;
   new_size = MIN2(new_size, PLAB::max_size());
   new_size = MAX2(new_size, PLAB::min_size());
 
   // Record new heuristic value even if we take any shortcut. This captures
   // the case when moderately-sized objects always take a shortcut. At some point,
   // heuristics should catch up with them.
-  ShenandoahThreadLocalData::set_gclab_size(thread, new_size);
+  ShenandoahThreadLocalData::set_gclab_size(thread, access_rate, new_size);
 
   if (new_size < size) {
     // New size still does not fit the object. Fall back to shared allocation.
@@ -872,11 +872,11 @@ HeapWord* ShenandoahHeap::allocate_from_gclab_slow(Thread* thread, size_t size) 
   }
 
   // Retire current GCLAB, and allocate a new one.
-  PLAB* gclab = ShenandoahThreadLocalData::gclab(thread);
+  PLAB* gclab = ShenandoahThreadLocalData::gclab(thread, access_rate);
   gclab->retire();
 
   size_t actual_size = 0;
-  HeapWord* gclab_buf = allocate_new_gclab(min_size, new_size, &actual_size);
+  HeapWord* gclab_buf = allocate_new_gclab(min_size, new_size, &actual_size, access_rate);
   if (gclab_buf == NULL) {
     return NULL;
   }
@@ -915,8 +915,9 @@ HeapWord* ShenandoahHeap::allocate_new_tlab(size_t min_size,
 
 HeapWord* ShenandoahHeap::allocate_new_gclab(size_t min_size,
                                              size_t word_size,
-                                             size_t* actual_size) {
-  ShenandoahAllocRequest req = ShenandoahAllocRequest::for_gclab(min_size, word_size);
+                                             size_t* actual_size,
+                                             ShenandoahRegionAccessRate access_rate) {
+  ShenandoahAllocRequest req = ShenandoahAllocRequest::for_gclab(min_size, word_size, access_rate);
   HeapWord* res = allocate_memory(req);
   if (res != NULL) {
     *actual_size = req.actual_size();
@@ -1160,9 +1161,12 @@ void ShenandoahHeap::trash_humongous_region_at(ShenandoahHeapRegion* start) {
 class ShenandoahRetireGCLABClosure : public ThreadClosure {
 public:
   void do_thread(Thread* thread) {
-    PLAB* gclab = ShenandoahThreadLocalData::gclab(thread);
-    assert(gclab != NULL, "GCLAB should be initialized for %s", thread->name());
-    gclab->retire();
+    for (int ar_index = 0; ar_index <= ShenandoahRegionAccessRate::COLD; ar_index++){
+      ShenandoahRegionAccessRate access_rate = (ShenandoahRegionAccessRate)ar_index;
+      PLAB* gclab = ShenandoahThreadLocalData::gclab(thread, access_rate);
+      assert(gclab != NULL, "GCLAB should be initialized for %s", thread->name());
+      gclab->retire();
+    }
   }
 };
 
@@ -1239,10 +1243,14 @@ size_t ShenandoahHeap::max_tlab_size() const {
 class ShenandoahRetireAndResetGCLABClosure : public ThreadClosure {
 public:
   void do_thread(Thread* thread) {
-    PLAB* gclab = ShenandoahThreadLocalData::gclab(thread);
-    gclab->retire();
-    if (ShenandoahThreadLocalData::gclab_size(thread) > 0) {
-      ShenandoahThreadLocalData::set_gclab_size(thread, 0);
+    for (int ar_index = 0; ar_index <= COLD; ar_index++){
+      ShenandoahRegionAccessRate access_rate = (ShenandoahRegionAccessRate)ar_index;
+      PLAB* gclab = ShenandoahThreadLocalData::gclab(thread, access_rate);
+      assert(gclab != NULL, "GCLAB should be initialized for %s", thread->name());
+      gclab->retire();
+      if (ShenandoahThreadLocalData::gclab_size(thread, access_rate) > 0) {
+        ShenandoahThreadLocalData::set_gclab_size(thread, access_rate, 0);
+      }
     }
   }
 };

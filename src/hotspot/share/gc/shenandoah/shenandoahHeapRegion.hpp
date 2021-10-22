@@ -197,6 +197,9 @@ public:
   bool is_committed()              const { return !is_empty_uncommitted(); }
   bool is_cset()                   const { return _state == _cset   || _state == _pinned_cset; }
   bool is_pinned()                 const { return _state == _pinned || _state == _pinned_cset || _state == _pinned_humongous_start; }
+  bool is_neutral()                const { return _access_rate == NEUTRAL; }
+  bool is_hot()                    const { return _access_rate == HOT; }
+  bool is_cold()                   const { return _access_rate == COLD; }
 
   // Macro-properties:
   bool is_alloc_allowed()          const { return is_empty() || is_regular() || _state == _pinned; }
@@ -244,6 +247,8 @@ private:
   volatile size_t _critical_pins;
 
   HeapWord* volatile _update_watermark;
+
+  ShenandoahRegionAccessRate _access_rate;
 
 public:
   ShenandoahHeapRegion(HeapWord* start, size_t index, bool committed);
@@ -386,6 +391,12 @@ public:
   inline HeapWord* get_update_watermark() const;
   inline void set_update_watermark(HeapWord* w);
   inline void set_update_watermark_at_safepoint(HeapWord* w);
+
+  ShenandoahRegionAccessRate access_rate() const {
+    return _access_rate;
+  }
+  
+  void set_access_rate(ShenandoahRegionAccessRate new_access_rate);
 
 private:
   void do_commit();

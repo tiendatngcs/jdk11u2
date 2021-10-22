@@ -57,13 +57,14 @@ private:
   size_t _requested_size;
   size_t _actual_size;
   Type _alloc_type;
+  ShenandoahRegionAccessRate _access_rate;
 #ifdef ASSERT
   bool _actual_size_set;
 #endif
 
-  ShenandoahAllocRequest(size_t _min_size, size_t _requested_size, Type _alloc_type) :
+  ShenandoahAllocRequest(size_t _min_size, size_t _requested_size, Type _alloc_type, ShenandoahRegionAccessRate _access_rate) :
           _min_size(_min_size), _requested_size(_requested_size),
-          _actual_size(0), _alloc_type(_alloc_type)
+          _actual_size(0), _alloc_type(_alloc_type), _access_rate(_access_rate)
 #ifdef ASSERT
           , _actual_size_set(false)
 #endif
@@ -74,12 +75,12 @@ public:
     return ShenandoahAllocRequest(min_size, requested_size, _alloc_tlab);
   }
 
-  static inline ShenandoahAllocRequest for_gclab(size_t min_size, size_t requested_size) {
-    return ShenandoahAllocRequest(min_size, requested_size, _alloc_gclab);
+  static inline ShenandoahAllocRequest for_gclab(size_t min_size, size_t requested_size, ShenandoahRegionAccessRate access_rate) {
+    return ShenandoahAllocRequest(min_size, requested_size, _alloc_gclab, access_rate);
   }
 
-  static inline ShenandoahAllocRequest for_shared_gc(size_t requested_size) {
-    return ShenandoahAllocRequest(0, requested_size, _alloc_shared_gc);
+  static inline ShenandoahAllocRequest for_shared_gc(size_t requested_size, ShenandoahRegionAccessRate access_rate) {
+    return ShenandoahAllocRequest(0, requested_size, _alloc_shared_gc, access_rate);
   }
 
   static inline ShenandoahAllocRequest for_shared(size_t requested_size) {
@@ -156,6 +157,10 @@ public:
         ShouldNotReachHere();
         return false;
     }
+  }
+
+  ShenandoahRegionAccessRate access_rate() const {
+    return _access_rate;
   }
 };
 
