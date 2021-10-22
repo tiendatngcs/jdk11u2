@@ -166,11 +166,11 @@ HeapWord* ShenandoahFreeSet::try_allocate_in(ShenandoahHeapRegion* r, Shenandoah
 
   in_new_region = r->is_empty();
   if (req.is_gc_alloc()){
-    if (r->access_rate() == ShenandoahRegionAccessRate::NEUTRAL){
+    if (r->access_rate() == NEUTRAL){
       if (in_new_region){
         r->set_access_rate(req.access_rate());
       }
-      else if (req.access_rate() != ShenandoahRegionAccessRate::NEUTRAL){
+      else if (req.access_rate() != NEUTRAL){
         // Non neutral request cannot be make in partially allocated region
         return NULL;
       }
