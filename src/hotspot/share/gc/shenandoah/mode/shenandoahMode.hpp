@@ -26,6 +26,12 @@
 
 #include "memory/allocation.hpp"
 
+enum ShenandoahRegionAccessRate {
+  NEUTRAL,
+  HOT,
+  COLD
+};
+
 class ShenandoahHeuristics;
 
 #define SHENANDOAH_CHECK_FLAG_SET(name)                                     \

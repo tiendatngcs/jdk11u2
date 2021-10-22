@@ -35,12 +35,6 @@
 #include "gc/shenandoah/shenandoahSharedVariables.hpp"
 #include "services/memoryManager.hpp"
 
-enum ShenandoahRegionAccessRate {
-  NEUTRAL,
-  HOT,
-  COLD
-};
-
 class ConcurrentGCTimer;
 class ReferenceProcessor;
 class ShenandoahCollectorPolicy;
