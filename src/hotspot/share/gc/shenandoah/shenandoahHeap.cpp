@@ -873,6 +873,9 @@ HeapWord* ShenandoahHeap::allocate_from_gclab_slow(Thread* thread, size_t size, 
 
   // Retire current GCLAB, and allocate a new one.
   PLAB* gclab = ShenandoahThreadLocalData::gclab(thread, access_rate);
+  if (gclab == NULL){
+    printf("GCLAB is NULL ------ Cannot be retired\n");
+  }
   gclab->retire();
 
   size_t actual_size = 0;
