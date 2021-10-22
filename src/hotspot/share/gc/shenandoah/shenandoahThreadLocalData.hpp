@@ -42,10 +42,10 @@ private:
   PLAB* _gclab;
   size_t _gclab_size;
 
-  // PLAB* _hot_gclab;
-  // size_t _hot_gclab_size;
-  // PLAB* _cold_gclab;
-  // size_t _cold_gclab_size;
+  PLAB* _hot_gclab;
+  size_t _hot_gclab_size;
+  PLAB* _cold_gclab;
+  size_t _cold_gclab_size;
 
   uint  _worker_id;
   double _paced_time;
@@ -56,10 +56,10 @@ private:
     _satb_mark_queue(&ShenandoahBarrierSet::satb_mark_queue_set()),
     _gclab(NULL),
     _gclab_size(0),
-    // _hot_gclab(NULL),
-    // _hot_gclab_size(0),
-    // _cold_gclab(NULL),
-    // _cold_gclab_size(0),
+    _hot_gclab(NULL),
+    _hot_gclab_size(0),
+    _cold_gclab(NULL),
+    _cold_gclab_size(0),
     _worker_id(INVALID_WORKER_ID),
     _paced_time(0) {
   }
@@ -128,48 +128,48 @@ public:
     data(thread)->_gclab = new PLAB(PLAB::min_size());
     data(thread)->_gclab_size = 0;
 
-    // data(thread) ->_hot_gclab = new PLAB(PLAB::min_size());
-    // data(thread)->_hot_gclab = 0;
-    // data(thread) ->_cold_gclab = new PLAB(PLAB::min_size());
-    // data(thread)->_cold_gclab = 0;
+    data(thread) ->_hot_gclab = new PLAB(PLAB::min_size());
+    data(thread)->_hot_gclab = 0;
+    data(thread) ->_cold_gclab = new PLAB(PLAB::min_size());
+    data(thread)->_cold_gclab = 0;
   }
 
   static PLAB* gclab(Thread* thread, ShenandoahRegionAccessRate access_rate) {
-    return data(thread)->_gclab;
+    // return data(thread)->_gclab;
 
-    // switch(access_rate){
-    //   case HOT: return data(thread)->_hot_gclab;
-    //   case COLD: return data(thread)->_cold_gclab;
-    //   case NEUTRAL: return data(thread)->_gclab;
-    // }
-    // return NULL;
+    switch(access_rate){
+      case HOT: return data(thread)->_hot_gclab;
+      case COLD: return data(thread)->_cold_gclab;
+      case NEUTRAL: return data(thread)->_gclab;
+    }
+    return data(thread)->_gclab;
   }
 
   static size_t gclab_size(Thread* thread, ShenandoahRegionAccessRate access_rate) {
-    return data(thread)->_gclab_size;
-
-    // switch(access_rate){
-    //   case HOT: return data(thread)->_hot_gclab_size;
-    //   case COLD: return data(thread)->_cold_gclab_size;
-    //   case NEUTRAL: return data(thread)->_gclab_size;
-    // }
     // return data(thread)->_gclab_size;
+
+    switch(access_rate){
+      case HOT: return data(thread)->_hot_gclab_size;
+      case COLD: return data(thread)->_cold_gclab_size;
+      case NEUTRAL: return data(thread)->_gclab_size;
+    }
+    return data(thread)->_gclab_size;
   }
 
   static void set_gclab_size(Thread* thread, ShenandoahRegionAccessRate access_rate, size_t v) {
-    data(thread)->_gclab_size = v;
+    // data(thread)->_gclab_size = v;
 
-    // switch(access_rate){
-    //   case HOT:
-    //     data(thread)->_hot_gclab_size = v;
-    //     break;
-    //   case COLD:
-    //     data(thread)->_cold_gclab_size = v;
-    //     break;
-    //   case NEUTRAL:
-    //     data(thread)->_gclab_size = v;
-    //     break;
-    // }
+    switch(access_rate){
+      case HOT:
+        data(thread)->_hot_gclab_size = v;
+        break;
+      case COLD:
+        data(thread)->_cold_gclab_size = v;
+        break;
+      case NEUTRAL:
+        data(thread)->_gclab_size = v;
+        break;
+    }
   }
 
   static void add_paced_time(Thread* thread, double v) {
