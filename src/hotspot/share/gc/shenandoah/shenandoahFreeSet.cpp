@@ -122,9 +122,15 @@ HeapWord* ShenandoahFreeSet::allocate_single(ShenandoahAllocRequest& req, bool& 
 
       // Try to allocate with the desired access rate
       HeapWord* result = allocate_with_access_rate(req.access_rate(), req, in_new_region);
+      if (result != NULL) {
+        return result;
+      }
 
       // There is no hot or cold region, try to allocate in neutral region
-      HeapWord* result = allocate_with_access_rate(NEUTRAL, req, in_new_region);
+      result = allocate_with_access_rate(NEUTRAL, req, in_new_region);
+      if (result != NULL) {
+        return result;
+      }
 
       // No dice. Can we borrow space from mutator view?
       if (!ShenandoahEvacReserveOverflow) {
