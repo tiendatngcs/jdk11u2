@@ -171,24 +171,25 @@ HeapWord* ShenandoahFreeSet::try_allocate_in(ShenandoahHeapRegion* r, Shenandoah
   try_recycle_trashed(r);
 
   in_new_region = r->is_empty();
-  if (req.is_gc_alloc()){
-    if (r->access_rate() == NEUTRAL){
-      if (in_new_region){
-        r->set_access_rate(req.access_rate());
-      }
-      else if (req.access_rate() != NEUTRAL){
-        // Non neutral request cannot be make in partially allocated region
-        return NULL;
-      }
-      // Neutral request on partially allocated region get a pass
-    }
-    else if (r->access_rate() != req.access_rate()) {
-      return NULL;
-    }
-  }
-  else if (r->access_rate() != req.access_rate()) {
-    return NULL;
-  }
+  // temp comt
+  // if (req.is_gc_alloc()){
+  //   if (r->access_rate() == NEUTRAL){
+  //     if (in_new_region){
+  //       r->set_access_rate(req.access_rate());
+  //     }
+  //     else if (req.access_rate() != NEUTRAL){
+  //       // Non neutral request cannot be make in partially allocated region
+  //       return NULL;
+  //     }
+  //     // Neutral request on partially allocated region get a pass
+  //   }
+  //   else if (r->access_rate() != req.access_rate()) {
+  //     return NULL;
+  //   }
+  // }
+  // else if (r->access_rate() != req.access_rate()) {
+  //   return NULL;
+  // }
 
   HeapWord* result = NULL;
   size_t size = req.size();
