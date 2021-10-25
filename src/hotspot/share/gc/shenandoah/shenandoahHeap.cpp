@@ -1169,8 +1169,11 @@ public:
     for (int ar_index = 0; ar_index <= COLD; ar_index++){
       ShenandoahRegionAccessRate access_rate = (ShenandoahRegionAccessRate)ar_index;
       PLAB* gclab = ShenandoahThreadLocalData::gclab(thread, access_rate);
-      if (gclab != NULL){
+      if (gclab != NULL) {
         gclab->retire();
+      }
+      else {
+        printf("gclab %d is null", access_rate);
       }
       // assert(gclab != NULL, "GCLAB should be initialized for %s", thread->name());
       // gclab->retire();
@@ -1254,8 +1257,14 @@ public:
     for (int ar_index = 0; ar_index <= COLD; ar_index++){
       ShenandoahRegionAccessRate access_rate = (ShenandoahRegionAccessRate)ar_index;
       PLAB* gclab = ShenandoahThreadLocalData::gclab(thread, access_rate);
-      assert(gclab != NULL, "GCLAB should be initialized for %s", thread->name());
-      gclab->retire();
+      if (gclab != NULL) {
+        gclab->retire();
+      }
+      else {
+        printf("gclab %d is null", access_rate);
+      }
+      // assert(gclab != NULL, "GCLAB should be initialized for %s", thread->name());
+      // gclab->retire();
       if (ShenandoahThreadLocalData::gclab_size(thread, access_rate) > 0) {
         ShenandoahThreadLocalData::set_gclab_size(thread, access_rate, 0);
       }
