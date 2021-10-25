@@ -39,10 +39,10 @@ private:
   char _gc_state;
   char _oom_during_evac;
   ShenandoahSATBMarkQueue _satb_mark_queue;
-  // PLAB* _gclab;
-  // size_t _gclab_size;
-
   PLAB* _gclab;
+  size_t _gclab_size;
+
+  PLAB* _hot_gclab;
   size_t _hot_gclab_size;
   PLAB* _cold_gclab;
   size_t _cold_gclab_size;
@@ -54,9 +54,9 @@ private:
     _gc_state(0),
     _oom_during_evac(0),
     _satb_mark_queue(&ShenandoahBarrierSet::satb_mark_queue_set()),
-    // _gclab(NULL),
-    // _gclab_size(0),
     _gclab(NULL),
+    _gclab_size(0),
+    _hot_gclab(NULL),
     _hot_gclab_size(0),
     _cold_gclab(NULL),
     _cold_gclab_size(0),
@@ -65,11 +65,11 @@ private:
   }
 
   ~ShenandoahThreadLocalData() {
-    // if (_gclab != NULL) {
-    //   delete _gclab;
-    // }
     if (_gclab != NULL) {
       delete _gclab;
+    }
+    if (_hot_gclab != NULL) {
+      delete _hot_gclab;
     }
     if (_cold_gclab != NULL) {
       delete _cold_gclab;
@@ -130,21 +130,21 @@ public:
 
   static void initialize_gclab(Thread* thread) {
     assert (thread->is_Java_thread() || thread->is_Worker_thread(), "Only Java and GC worker threads are allowed to get GCLABs");
-    // assert(data(thread)->_gclab == NULL, "Only initialize once");
-    // data(thread)->_gclab = new PLAB(PLAB::min_size());
-    // data(thread)->_gclab_size = 0;
-    // if (data(thread)->_gclab == NULL){
-    //   printf("_gclab allocation failed\n");
-    // }
-    // else {
-    //   printf("_gclab allocation succeeded\n");
-    // }
-    // assert(data(thread)->_gclab != NULL, "Initiation failed");
-
     assert(data(thread)->_gclab == NULL, "Only initialize once");
     data(thread)->_gclab = new PLAB(PLAB::min_size());
-    data(thread)->_gclab = 0;
+    data(thread)->_gclab_size = 0;
     if (data(thread)->_gclab == NULL){
+      printf("_gclab allocation failed\n");
+    }
+    else {
+      printf("_gclab allocation succeeded\n");
+    }
+    // assert(data(thread)->_hot_gclab != NULL, "Initiation failed");
+
+    assert(data(thread)->_hot_gclab == NULL, "Only initialize once");
+    data(thread)->_hot_gclab = new PLAB(PLAB::min_size());
+    data(thread)->_hot_gclab = 0;
+    if (data(thread)->_hot_gclab == NULL){
       printf("_hot_gclab allocation failed\n");
     }
     else {
@@ -168,39 +168,37 @@ public:
     // return data(thread)->_gclab;
 
     switch(access_rate){
-      case NEUTRAL: return data(thread)->_gclab;
+      case HOT: return data(thread)->_hot_gclab;
       case COLD: return data(thread)->_cold_gclab;
-      // case NEUTRAL: return data(thread)->_gclab;
+      case NEUTRAL: return data(thread)->_gclab;
     }
-    // return data(thread)->_gclab;
-    return NULL;
+    return data(thread)->_gclab;
   }
 
   static size_t gclab_size(Thread* thread, ShenandoahRegionAccessRate access_rate) {
     // return data(thread)->_gclab_size;
 
     switch(access_rate){
-      case NEUTRAL: return data(thread)->_hot_gclab_size;
+      case HOT: return data(thread)->_hot_gclab_size;
       case COLD: return data(thread)->_cold_gclab_size;
-      // case NEUTRAL: return data(thread)->_gclab_size;
+      case NEUTRAL: return data(thread)->_gclab_size;
     }
-    // return data(thread)->_gclab_size;
-    return 0;
+    return data(thread)->_gclab_size;
   }
 
   static void set_gclab_size(Thread* thread, ShenandoahRegionAccessRate access_rate, size_t v) {
     // data(thread)->_gclab_size = v;
 
     switch(access_rate){
-      case NEUTRAL:
+      case HOT:
         data(thread)->_hot_gclab_size = v;
         break;
       case COLD:
         data(thread)->_cold_gclab_size = v;
         break;
-      // case NEUTRAL:
-      //   data(thread)->_gclab_size = v;
-      //   break;
+      case NEUTRAL:
+        data(thread)->_gclab_size = v;
+        break;
     }
   }
 
