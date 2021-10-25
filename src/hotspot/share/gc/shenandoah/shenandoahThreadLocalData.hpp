@@ -42,7 +42,7 @@ private:
   // PLAB* _gclab;
   // size_t _gclab_size;
 
-  PLAB* _hot_gclab;
+  PLAB* _gclab;
   size_t _hot_gclab_size;
   PLAB* _cold_gclab;
   size_t _cold_gclab_size;
@@ -56,7 +56,7 @@ private:
     _satb_mark_queue(&ShenandoahBarrierSet::satb_mark_queue_set()),
     // _gclab(NULL),
     // _gclab_size(0),
-    _hot_gclab(NULL),
+    _gclab(NULL),
     _hot_gclab_size(0),
     _cold_gclab(NULL),
     _cold_gclab_size(0),
@@ -68,8 +68,8 @@ private:
     // if (_gclab != NULL) {
     //   delete _gclab;
     // }
-    if (_hot_gclab != NULL) {
-      delete _hot_gclab;
+    if (_gclab != NULL) {
+      delete _gclab;
     }
     if (_cold_gclab != NULL) {
       delete _cold_gclab;
@@ -139,12 +139,12 @@ public:
     // else {
     //   printf("_gclab allocation succeeded\n");
     // }
-    // assert(data(thread)->_hot_gclab != NULL, "Initiation failed");
+    // assert(data(thread)->_gclab != NULL, "Initiation failed");
 
-    assert(data(thread)->_hot_gclab == NULL, "Only initialize once");
-    data(thread)->_hot_gclab = new PLAB(PLAB::min_size());
-    data(thread)->_hot_gclab = 0;
-    if (data(thread)->_hot_gclab == NULL){
+    assert(data(thread)->_gclab == NULL, "Only initialize once");
+    data(thread)->_gclab = new PLAB(PLAB::min_size());
+    data(thread)->_gclab = 0;
+    if (data(thread)->_gclab == NULL){
       printf("_hot_gclab allocation failed\n");
     }
     else {
@@ -168,7 +168,7 @@ public:
     // return data(thread)->_gclab;
 
     switch(access_rate){
-      case NEUTRAL: return data(thread)->_hot_gclab;
+      case NEUTRAL: return data(thread)->_gclab;
       case COLD: return data(thread)->_cold_gclab;
       // case NEUTRAL: return data(thread)->_gclab;
     }
