@@ -131,17 +131,17 @@ public:
   static void initialize_gclab(Thread* thread) {
     assert (thread->is_Java_thread() || thread->is_Worker_thread(), "Only Java and GC worker threads are allowed to get GCLABs");
     assert(data(thread)->_gclab == NULL, "Only initialize once");
-    data(thread)->_gclab = new PLAB(PLAB::min_size());
+    data(thread)->_gclab = &PLAB(PLAB::min_size());
     data(thread)->_gclab_size = 0;
     assert(data(thread)->_hot_gclab != NULL, "Initiation failed");
 
     assert(data(thread)->_hot_gclab == NULL, "Only initialize once");
-    data(thread)->_hot_gclab = new PLAB(PLAB::min_size());
+    data(thread)->_hot_gclab = &PLAB(PLAB::min_size());
     data(thread)->_hot_gclab = 0;
     assert(data(thread)->_hot_gclab != NULL, "Initiation failed");
 
     assert(data(thread)->_cold_gclab == NULL, "Only initialize once");
-    data(thread)->_cold_gclab = new PLAB(PLAB::min_size());
+    data(thread)->_cold_gclab = &PLAB(PLAB::min_size());
     data(thread)->_cold_gclab = 0;
     assert(data(thread)->_hot_gclab != NULL, "Initiation failed");
   }
