@@ -168,7 +168,7 @@ public:
     // return data(thread)->_gclab;
 
     switch(access_rate){
-      case HOT: return data(thread)->_hot_gclab;
+      case NEUTRAL: return data(thread)->_hot_gclab;
       case COLD: return data(thread)->_cold_gclab;
       // case NEUTRAL: return data(thread)->_gclab;
     }
@@ -180,7 +180,7 @@ public:
     // return data(thread)->_gclab_size;
 
     switch(access_rate){
-      case HOT: return data(thread)->_hot_gclab_size;
+      case NEUTRAL: return data(thread)->_hot_gclab_size;
       case COLD: return data(thread)->_cold_gclab_size;
       // case NEUTRAL: return data(thread)->_gclab_size;
     }
@@ -192,7 +192,7 @@ public:
     // data(thread)->_gclab_size = v;
 
     switch(access_rate){
-      case HOT:
+      case NEUTRAL:
         data(thread)->_hot_gclab_size = v;
         break;
       case COLD:
