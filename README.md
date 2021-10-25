@@ -13,7 +13,7 @@ CFLAGS_WARNINGS_ARE_ERRORS=""
 
 ## Build
 ```shell
-sudo bash ./configure --with-jvm-features=shenandoahgc
+sudo bash ./configure --with-jvm-features=shenandoahgc --enable-debug
 sudo make images
 ```
 
