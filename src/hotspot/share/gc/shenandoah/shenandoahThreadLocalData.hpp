@@ -143,7 +143,7 @@ public:
 
     assert(data(thread)->_hot_gclab == NULL, "Only initialize once");
     data(thread)->_hot_gclab = new PLAB(PLAB::min_size());
-    data(thread)->_hot_gclab = 0;
+    data(thread)->_hot_gclab_size = 0;
     if (data(thread)->_hot_gclab == NULL){
       printf("_hot_gclab allocation failed\n");
     }
@@ -154,7 +154,7 @@ public:
 
     assert(data(thread)->_cold_gclab == NULL, "Only initialize once");
     data(thread)->_cold_gclab = new PLAB(PLAB::min_size());
-    data(thread)->_cold_gclab = 0;
+    data(thread)->_cold_gclab_size = 0;
     if (data(thread)->_cold_gclab == NULL){
       printf("_cold_gclab allocation failed\n");
     }
