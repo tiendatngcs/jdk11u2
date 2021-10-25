@@ -133,35 +133,35 @@ public:
     assert(data(thread)->_gclab == NULL, "Only initialize once");
     data(thread)->_gclab = new PLAB(PLAB::min_size());
     data(thread)->_gclab_size = 0;
-    if (data(thread)->_gclab == NULL){
-      printf("_gclab allocation failed\n");
-    }
-    else {
-      printf("_gclab allocation succeeded\n");
-    }
-    // assert(data(thread)->_hot_gclab != NULL, "Initiation failed");
+    // if (data(thread)->_gclab == NULL){
+    //   printf("_gclab allocation failed\n");
+    // }
+    // else {
+    //   printf("_gclab allocation succeeded\n");
+    // }
+    assert(data(thread)->_gclab != NULL, "Initiation failed");
 
     assert(data(thread)->_hot_gclab == NULL, "Only initialize once");
     data(thread)->_hot_gclab = new PLAB(PLAB::min_size());
     data(thread)->_hot_gclab_size = 0;
-    if (data(thread)->_hot_gclab == NULL){
-      printf("_hot_gclab allocation failed\n");
-    }
-    else {
-      printf("_hot_gclab allocation succeeded\n");
-    }
-    // assert(data(thread)->_hot_gclab != NULL, "Initiation failed");
+    // if (data(thread)->_hot_gclab == NULL){
+    //   printf("_hot_gclab allocation failed\n");
+    // }
+    // else {
+    //   printf("_hot_gclab allocation succeeded\n");
+    // }
+    assert(data(thread)->_hot_gclab != NULL, "Initiation failed");
 
     assert(data(thread)->_cold_gclab == NULL, "Only initialize once");
     data(thread)->_cold_gclab = new PLAB(PLAB::min_size());
     data(thread)->_cold_gclab_size = 0;
-    if (data(thread)->_cold_gclab == NULL){
-      printf("_cold_gclab allocation failed\n");
-    }
-    else {
-      printf("_cold_gclab allocation succeeded\n");
-    }
-    // assert(data(thread)->_hot_gclab != NULL, "Initiation failed");
+    // if (data(thread)->_cold_gclab == NULL){
+    //   printf("_cold_gclab allocation failed\n");
+    // }
+    // else {
+    //   printf("_cold_gclab allocation succeeded\n");
+    // }
+    assert(data(thread)->_cold_gclab != NULL, "Initiation failed");
   }
 
   static PLAB* gclab(Thread* thread, ShenandoahRegionAccessRate access_rate) {
