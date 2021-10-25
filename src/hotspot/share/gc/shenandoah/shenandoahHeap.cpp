@@ -1170,10 +1170,10 @@ public:
       ShenandoahRegionAccessRate access_rate = (ShenandoahRegionAccessRate)ar_index;
       PLAB* gclab = ShenandoahThreadLocalData::gclab(thread, access_rate);
       assert(gclab != NULL, "GCLAB should be initialized for %s", thread->name());
-      // if (gclab != NULL){
-      //   gclab->retire();
-      // }
-      gclab->retire();
+      if (gclab != NULL){
+        gclab->retire();
+      }
+      // gclab->retire();
     }
   }
 };
