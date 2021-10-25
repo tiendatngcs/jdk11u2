@@ -127,11 +127,17 @@ public:
     assert(data(thread)->_gclab == NULL, "Only initialize once");
     data(thread)->_gclab = new PLAB(PLAB::min_size());
     data(thread)->_gclab_size = 0;
+    printf("gclab initialized\t");
 
-    data(thread) ->_hot_gclab = new PLAB(PLAB::min_size());
+    assert(data(thread)->_hot_gclab == NULL, "Only initialize once");
+    data(thread)->_hot_gclab = new PLAB(PLAB::min_size());
     data(thread)->_hot_gclab = 0;
-    data(thread) ->_cold_gclab = new PLAB(PLAB::min_size());
+    printf("hot_gclab initialized\t");
+
+    assert(data(thread)->_cold_gclab == NULL, "Only initialize once");
+    data(thread)->_cold_gclab = new PLAB(PLAB::min_size());
     data(thread)->_cold_gclab = 0;
+    printf("cold_gclab initialized\t");
   }
 
   static PLAB* gclab(Thread* thread, ShenandoahRegionAccessRate access_rate) {
