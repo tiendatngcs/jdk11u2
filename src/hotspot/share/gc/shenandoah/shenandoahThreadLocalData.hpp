@@ -136,6 +136,9 @@ public:
     if (data(thread)->_gclab == NULL){
       printf("_gclab allocation failed\n");
     }
+    else {
+      printf("_gclab allocation succeeded\n");
+    }
     // assert(data(thread)->_hot_gclab != NULL, "Initiation failed");
 
     assert(data(thread)->_hot_gclab == NULL, "Only initialize once");
@@ -144,6 +147,9 @@ public:
     if (data(thread)->_hot_gclab == NULL){
       printf("_hot_gclab allocation failed\n");
     }
+    else {
+      printf("_hot_gclab allocation succeeded\n");
+    }
     // assert(data(thread)->_hot_gclab != NULL, "Initiation failed");
 
     assert(data(thread)->_cold_gclab == NULL, "Only initialize once");
@@ -151,6 +157,9 @@ public:
     data(thread)->_cold_gclab = 0;
     if (data(thread)->_cold_gclab == NULL){
       printf("_cold_gclab allocation failed\n");
+    }
+    else {
+      printf("_cold_gclab allocation succeeded\n");
     }
     // assert(data(thread)->_hot_gclab != NULL, "Initiation failed");
   }
