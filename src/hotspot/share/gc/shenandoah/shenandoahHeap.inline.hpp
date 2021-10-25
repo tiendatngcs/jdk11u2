@@ -278,12 +278,12 @@ inline oop ShenandoahHeap::evacuate_object(oop p, Thread* thread) {
 
   uintptr_t hotness_threshold = 1000;
   ShenandoahRegionAccessRate access_rate = NEUTRAL;
-  // if (p->access_counter() > hotness_threshold){
-  //   access_rate = HOT;
-  // }
-  // else {
-  //   access_rate = COLD;
-  // }
+  if (p->access_counter() > hotness_threshold){
+    access_rate = HOT;
+  }
+  else {
+    access_rate = COLD;
+  }
 
 #ifdef ASSERT
   if (ShenandoahOOMDuringEvacALot &&

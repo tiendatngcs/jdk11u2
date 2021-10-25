@@ -1172,9 +1172,9 @@ public:
       if (gclab != NULL) {
         gclab->retire();
       }
-      else {
-        printf("gclab %d is null\t", access_rate);
-      }
+      // else {
+      //   printf("gclab %d is null\t", access_rate);
+      // }
       // assert(gclab != NULL, "GCLAB should be initialized for %s", thread->name());
       // gclab->retire();
     }
@@ -1260,9 +1260,9 @@ public:
       if (gclab != NULL) {
         gclab->retire();
       }
-      else {
-        printf("gclab %d is null\t", access_rate);
-      }
+      // else {
+      //   printf("gclab %d is null\t", access_rate);
+      // }
       // assert(gclab != NULL, "GCLAB should be initialized for %s", thread->name());
       // gclab->retire();
       if (ShenandoahThreadLocalData::gclab_size(thread, access_rate) > 0) {
