@@ -617,6 +617,10 @@ void ShenandoahHeap::post_initialize() {
   // gclab can not be initialized early during VM startup, as it can not determinate its max_size.
   // Now, we will let WorkGang to initialize gclab when new worker is created.
   _workers->set_initialize_gclab();
+  if (_safepoint_workers != NULL) {
+    _safepoint_workers->threads_do(&init_gclabs);
+    _safepoint_workers->set_initialize_gclab();
+  }
 
   _scm->initialize(_max_workers);
   _full_gc->initialize(_gc_timer);
@@ -1166,6 +1170,9 @@ public:
       ShenandoahRegionAccessRate access_rate = (ShenandoahRegionAccessRate)ar_index;
       PLAB* gclab = ShenandoahThreadLocalData::gclab(thread, access_rate);
       assert(gclab != NULL, "GCLAB should be initialized for %s", thread->name());
+      // if (gclab != NULL){
+      //   gclab->retire();
+      // }
       gclab->retire();
     }
   }
