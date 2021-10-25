@@ -1173,7 +1173,7 @@ public:
         gclab->retire();
       }
       else {
-        printf("gclab %d is null", access_rate);
+        printf("gclab %d is null\t", access_rate);
       }
       // assert(gclab != NULL, "GCLAB should be initialized for %s", thread->name());
       // gclab->retire();
@@ -1261,7 +1261,7 @@ public:
         gclab->retire();
       }
       else {
-        printf("gclab %d is null", access_rate);
+        printf("gclab %d is null\t", access_rate);
       }
       // assert(gclab != NULL, "GCLAB should be initialized for %s", thread->name());
       // gclab->retire();

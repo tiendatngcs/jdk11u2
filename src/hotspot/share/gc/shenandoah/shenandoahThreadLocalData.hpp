@@ -68,6 +68,12 @@ private:
     if (_gclab != NULL) {
       delete _gclab;
     }
+    if (_hot_gclab != NULL) {
+      delete _hot_gclab;
+    }
+    if (_cold_gclab != NULL) {
+      delete _cold_gclab;
+    }
   }
 
   static ShenandoahThreadLocalData* data(Thread* thread) {
