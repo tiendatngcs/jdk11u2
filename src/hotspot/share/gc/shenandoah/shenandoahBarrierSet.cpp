@@ -144,7 +144,7 @@ void ShenandoahBarrierSet::on_thread_attach(JavaThread* thread) {
 
 void ShenandoahBarrierSet::on_thread_detach(JavaThread* thread) {
   ShenandoahThreadLocalData::satb_mark_queue(thread).flush();
-  for (int ar_index = 0; ar_index <= COLD; ar_index++){
+  for (int ar_index = 1; ar_index <= COLD; ar_index++){
       PLAB* gclab = ShenandoahThreadLocalData::gclab(thread, (ShenandoahRegionAccessRate)ar_index);
       if (gclab != NULL) {
         gclab->retire();

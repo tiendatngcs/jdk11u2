@@ -1166,7 +1166,7 @@ void ShenandoahHeap::trash_humongous_region_at(ShenandoahHeapRegion* start) {
 class ShenandoahRetireGCLABClosure : public ThreadClosure {
 public:
   void do_thread(Thread* thread) {
-    for (int ar_index = 0; ar_index <= COLD; ar_index++){
+    for (int ar_index = 1; ar_index <= COLD; ar_index++){
       ShenandoahRegionAccessRate access_rate = (ShenandoahRegionAccessRate)ar_index;
       PLAB* gclab = ShenandoahThreadLocalData::gclab(thread, access_rate);
       if (gclab != NULL) {
@@ -1254,7 +1254,7 @@ size_t ShenandoahHeap::max_tlab_size() const {
 class ShenandoahRetireAndResetGCLABClosure : public ThreadClosure {
 public:
   void do_thread(Thread* thread) {
-    for (int ar_index = 0; ar_index <= COLD; ar_index++){
+    for (int ar_index = 1; ar_index <= COLD; ar_index++){
       ShenandoahRegionAccessRate access_rate = (ShenandoahRegionAccessRate)ar_index;
       PLAB* gclab = ShenandoahThreadLocalData::gclab(thread, access_rate);
       if (gclab != NULL) {
