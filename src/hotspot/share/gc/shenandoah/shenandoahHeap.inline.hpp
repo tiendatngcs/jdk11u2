@@ -553,4 +553,15 @@ inline ShenandoahMarkingContext* ShenandoahHeap::marking_context() const {
   return _marking_context;
 }
 
+inline void ShenandoahHeap::oop_add_access_counter(oop obj, uintptr_t increment){
+  assert(obj != NULL, "Object cannot be null");
+  if (obj->gc_epoch() < gc_epoch()){
+    obj->set_access_counter(increment);
+    obj->set_gc_epoch(gc_epoch());
+  }
+  else {
+    obj->add_access_counter(increment);
+  }
+}
+
 #endif // SHARE_VM_GC_SHENANDOAH_SHENANDOAHHEAP_INLINE_HPP

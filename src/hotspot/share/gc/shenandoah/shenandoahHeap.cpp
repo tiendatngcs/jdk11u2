@@ -2983,15 +2983,3 @@ void ShenandoahHeap::flush_liveness_cache(uint worker_id) {
     }
   }
 }
-
-
-void ShenandoahHeap::oop_add_access_counter(oop obj, uintptr_t increment){
-  assert(obj != NULL, "Object cannot be null");
-  if (obj->gc_epoch() < gc_epoch()){
-    obj->set_access_counter(increment);
-    obj->set_gc_epoch(gc_epoch());
-  }
-  else {
-    obj->add_access_counter(increment);
-  }
-}
