@@ -36,7 +36,7 @@ private:
 
   static ShenandoahSATBMarkQueueSet _satb_mark_queue_set;
 
-  ShenandoahHeap* _heap;
+  static ShenandoahHeap* _heap;
 
 public:
   ShenandoahBarrierSet(ShenandoahHeap* heap);
