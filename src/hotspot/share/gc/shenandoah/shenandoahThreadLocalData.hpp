@@ -39,8 +39,8 @@ private:
   char _gc_state;
   char _oom_during_evac;
   ShenandoahSATBMarkQueue _satb_mark_queue;
-  PLAB* _gclab;
-  size_t _gclab_size;
+  // PLAB* _gclab;
+  // size_t _gclab_size;
 
   PLAB* _hot_gclab;
   size_t _hot_gclab_size;
@@ -54,8 +54,8 @@ private:
     _gc_state(0),
     _oom_during_evac(0),
     _satb_mark_queue(&ShenandoahBarrierSet::satb_mark_queue_set()),
-    _gclab(NULL),
-    _gclab_size(0),
+    // _gclab(NULL),
+    // _gclab_size(0),
     _hot_gclab(NULL),
     _hot_gclab_size(0),
     _cold_gclab(NULL),
@@ -65,9 +65,9 @@ private:
   }
 
   ~ShenandoahThreadLocalData() {
-    if (_gclab != NULL) {
-      delete _gclab;
-    }
+    // if (_gclab != NULL) {
+    //   delete _gclab;
+    // }
     if (_hot_gclab != NULL) {
       delete _hot_gclab;
     }
@@ -130,16 +130,16 @@ public:
 
   static void initialize_gclab(Thread* thread) {
     assert (thread->is_Java_thread() || thread->is_Worker_thread(), "Only Java and GC worker threads are allowed to get GCLABs");
-    assert(data(thread)->_gclab == NULL, "Only initialize once");
-    data(thread)->_gclab = new PLAB(PLAB::min_size());
-    data(thread)->_gclab_size = 0;
+    // assert(data(thread)->_gclab == NULL, "Only initialize once");
+    // data(thread)->_gclab = new PLAB(PLAB::min_size());
+    // data(thread)->_gclab_size = 0;
     // if (data(thread)->_gclab == NULL){
     //   printf("_gclab allocation failed\n");
     // }
     // else {
     //   printf("_gclab allocation succeeded\n");
     // }
-    assert(data(thread)->_gclab != NULL, "Initiation failed");
+    // assert(data(thread)->_gclab != NULL, "Initiation failed");
 
     assert(data(thread)->_hot_gclab == NULL, "Only initialize once");
     data(thread)->_hot_gclab = new PLAB(PLAB::min_size());
@@ -166,29 +166,30 @@ public:
 
   static PLAB* gclab(Thread* thread, ShenandoahRegionAccessRate access_rate) {
     // return data(thread)->_gclab;
-
+    assert(access_rate != NEUTRAL, "There is no Neutral gclab");
     switch(access_rate){
       case HOT: return data(thread)->_hot_gclab;
       case COLD: return data(thread)->_cold_gclab;
-      case NEUTRAL: return data(thread)->_gclab;
+      // case NEUTRAL: return data(thread)->_gclab;
     }
-    return data(thread)->_gclab;
+    // return data(thread)->_gclab;
+    return NULL;
   }
 
   static size_t gclab_size(Thread* thread, ShenandoahRegionAccessRate access_rate) {
     // return data(thread)->_gclab_size;
-
+    assert(access_rate != NEUTRAL, "There is no Neutral gclab");
     switch(access_rate){
       case HOT: return data(thread)->_hot_gclab_size;
       case COLD: return data(thread)->_cold_gclab_size;
-      case NEUTRAL: return data(thread)->_gclab_size;
+      // case NEUTRAL: return data(thread)->_gclab_size;
     }
-    return data(thread)->_gclab_size;
+    return 0;
   }
 
   static void set_gclab_size(Thread* thread, ShenandoahRegionAccessRate access_rate, size_t v) {
     // data(thread)->_gclab_size = v;
-
+    assert(access_rate != NEUTRAL, "There is no Neutral gclab");
     switch(access_rate){
       case HOT:
         data(thread)->_hot_gclab_size = v;
@@ -196,9 +197,9 @@ public:
       case COLD:
         data(thread)->_cold_gclab_size = v;
         break;
-      case NEUTRAL:
-        data(thread)->_gclab_size = v;
-        break;
+      // case NEUTRAL:
+      //   data(thread)->_gclab_size = v;
+      //   break;
     }
   }
 
