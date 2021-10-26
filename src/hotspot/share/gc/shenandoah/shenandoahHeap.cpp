@@ -453,11 +453,12 @@ ShenandoahHeap::ShenandoahHeap(ShenandoahCollectorPolicy* policy) :
   _used(0),
   _committed(0),
   _bytes_allocated_since_gc_start(0),
-  _neutral_size(0),
+  // _neutral_size(0),
   _cold_size(0),
   _hot_size(0),
-  _neutral_to_hot_count(0),
-  _neutral_to_cold_count(0),
+  // _neutral_to_hot_count(0),
+  // _neutral_to_cold_count(0),
+  _gc_epoch(0),
   _cold_to_hot_count(0),
   _hot_to_cold_count(0),
   _max_workers(MAX2(ConcGCThreads, ParallelGCThreads)),
@@ -641,10 +642,10 @@ size_t ShenandoahHeap::committed() const {
   return _committed;
 }
 
-size_t ShenandoahHeap::neutral_size() const {
-  OrderAccess::acquire();
-  return _neutral_size;
-}
+// size_t ShenandoahHeap::neutral_size() const {
+//   OrderAccess::acquire();
+//   return _neutral_size;
+// }
 
 size_t ShenandoahHeap::cold_size() const {
   OrderAccess::acquire();
@@ -656,15 +657,20 @@ size_t ShenandoahHeap::hot_size() const {
   return _hot_size;
 }
 
-uint32_t ShenandoahHeap::neutral_to_hot_count() const {
+uintptr_t ShenandoahHeap::gc_epoch() const{
   OrderAccess::acquire();
-  return _neutral_to_hot_count;
+  return _gc_epoch;
 }
 
-uint32_t ShenandoahHeap::neutral_to_cold_count() const {
-  OrderAccess::acquire();
-  return _neutral_to_cold_count;
-}
+// uint32_t ShenandoahHeap::neutral_to_hot_count() const {
+//   OrderAccess::acquire();
+//   return _neutral_to_hot_count;
+// }
+
+// uint32_t ShenandoahHeap::neutral_to_cold_count() const {
+//   OrderAccess::acquire();
+//   return _neutral_to_cold_count;
+// }
 
 uint32_t ShenandoahHeap::cold_to_hot_count() const {
   OrderAccess::acquire();
@@ -699,18 +705,18 @@ void ShenandoahHeap::decrease_used(size_t bytes) {
   Atomic::sub(bytes, &_used);
 }
 
-void ShenandoahHeap::increase_neutral_size(size_t bytes) {
-  Atomic::add(bytes, &_neutral_size);
-}
+// void ShenandoahHeap::increase_neutral_size(size_t bytes) {
+//   Atomic::add(bytes, &_neutral_size);
+// }
 
-void ShenandoahHeap::set_neutral_size(size_t bytes) {
-  OrderAccess::release_store_fence(&_neutral_size, bytes);
-}
+// void ShenandoahHeap::set_neutral_size(size_t bytes) {
+//   OrderAccess::release_store_fence(&_neutral_size, bytes);
+// }
 
-void ShenandoahHeap::decrease_neutral_size(size_t bytes) {
-  assert(neutral_size() >= bytes, "never decrease size by more than we've left");
-  Atomic::sub(bytes, &_neutral_size);
-}
+// void ShenandoahHeap::decrease_neutral_size(size_t bytes) {
+//   assert(neutral_size() >= bytes, "never decrease size by more than we've left");
+//   Atomic::sub(bytes, &_neutral_size);
+// }
 
 void ShenandoahHeap::increase_cold_size(size_t bytes) {
   Atomic::add(bytes, &_cold_size);
@@ -733,26 +739,30 @@ void ShenandoahHeap::set_hot_size(size_t bytes) {
   OrderAccess::release_store_fence(&_hot_size, bytes);
 }
 
+void ShenandoahHeap::increase_gc_epoch(uintptr_t increment) {
+  Atomic::add(increment, &_gc_epoch);
+}
+
 void ShenandoahHeap::decrease_hot_size(size_t bytes) {
   assert(hot_size() >= bytes, "never decrease size by more than we've left");
   Atomic::sub(bytes, &_hot_size);
 }
 
-void ShenandoahHeap::increase_neutral_to_hot_count(uint32_t increment) {
-  Atomic::add(increment, &_neutral_to_hot_count);
-}
+// void ShenandoahHeap::increase_neutral_to_hot_count(uint32_t increment) {
+//   Atomic::add(increment, &_neutral_to_hot_count);
+// }
 
-void ShenandoahHeap::set_neutral_to_hot_count(uint32_t value) {
-  OrderAccess::release_store_fence(&_neutral_to_hot_count, value);
-}
+// void ShenandoahHeap::set_neutral_to_hot_count(uint32_t value) {
+//   OrderAccess::release_store_fence(&_neutral_to_hot_count, value);
+// }
 
-void ShenandoahHeap::increase_neutral_to_cold_count(uint32_t increment) {
-  Atomic::add(increment, &_neutral_to_cold_count);
-}
+// void ShenandoahHeap::increase_neutral_to_cold_count(uint32_t increment) {
+//   Atomic::add(increment, &_neutral_to_cold_count);
+// }
 
-void ShenandoahHeap::set_neutral_to_cold_count(uint32_t value) {
-  OrderAccess::release_store_fence(&_neutral_to_cold_count, value);
-}
+// void ShenandoahHeap::set_neutral_to_cold_count(uint32_t value) {
+//   OrderAccess::release_store_fence(&_neutral_to_cold_count, value);
+// }
 
 void ShenandoahHeap::increase_cold_to_hot_count(uint32_t increment) {
   Atomic::add(increment, &_cold_to_hot_count);
@@ -2971,5 +2981,17 @@ void ShenandoahHeap::flush_liveness_cache(uint worker_id) {
       r->increase_live_data_gc_words(live);
       ld[i] = 0;
     }
+  }
+}
+
+
+void ShenandoahHeap::oop_add_access_counter(oop obj, uintptr_t increment){
+  assert(obj != NULL, "Object cannot be null");
+  if (obj->gc_epoch() < gc_epoch()){
+    obj->set_access_counter(increment);
+    obj->set_gc_epoch(gc_epoch());
+  }
+  else {
+    obj->add_access_counter(increment);
   }
 }

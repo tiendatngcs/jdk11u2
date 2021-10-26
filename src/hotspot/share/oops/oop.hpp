@@ -57,7 +57,7 @@ class oopDesc {
   friend class JVMCIVMStructs;
  private:
   volatile uintptr_t _access_counter;
-  // volatile uintptr_t _gc_epoch;
+  volatile uintptr_t _gc_epoch;
   volatile markOop _mark;
   union _metadata {
     Klass*      _klass;
@@ -67,7 +67,7 @@ class oopDesc {
  public:
   oopDesc();
   inline uintptr_t access_counter() const;
-  // inline uintptr_t gc_epoch() const;
+  inline uintptr_t gc_epoch() const;
   inline markOop  mark()          const;
   inline markOop  mark_raw()      const;
   inline markOop* mark_addr_raw() const;
@@ -75,8 +75,8 @@ class oopDesc {
   inline void set_access_counter(uintptr_t new_value);
   inline void add_access_counter(uintptr_t increment);
 
-  // inline void set_gc_epoch(uintptr_t new_value);
-  // inline void add_gc_epoch(uintptr_t increment);
+  inline void set_gc_epoch(uintptr_t new_value);
+  inline void add_gc_epoch(uintptr_t increment);
 
   inline void set_mark(volatile markOop m);
   inline void set_mark_raw(volatile markOop m);

@@ -431,13 +431,17 @@ void ShenandoahControlThread::service_concurrent_normal_cycle(GCCause::Cause cau
 
   // Cycle is complete
   log_info(gc)("Dat log --- cycle is complete\n"
-                "heap:\n"
-                      "\tcapacity: %lu\n"
-                      "\tused: %lu\n"
-                      "\tcommitted: %lu\n"
-                      "\tbytes_allocated_since_gc_start: %lu\n", heap->capacity(), heap->used(), heap->committed(), heap->bytes_allocated_since_gc_start());
+                "Current epoch: %lu\n"
+                "heap: ______\n"
+                "capacity: %lu\n"
+                "used: %lu\n"
+                "committed: %lu\n"
+                "bytes_allocated_since_gc_start: %lu\n"
+                "hot_size: %lu\n"
+                "cold_size: %lu\n", heap->current_epoch(), heap->capacity(), heap->used(), heap->committed(), heap->bytes_allocated_since_gc_start(), heap->hot_size(), heap->cold_size());
   heap->heuristics()->record_success_concurrent();
   heap->shenandoah_policy()->record_success_concurrent();
+  heap->increase_current_epoch(1);
 }
 
 bool ShenandoahControlThread::check_cancellation_or_degen(ShenandoahHeap::ShenandoahDegenPoint point) {

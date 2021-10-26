@@ -168,12 +168,14 @@ private:
   volatile size_t _bytes_allocated_since_gc_start;
   shenandoah_padding(1);
 
-  size_t _neutral_size;
+  // size_t _neutral_size;
   size_t _cold_size;
   size_t _hot_size;
 
-  uint32_t _neutral_to_hot_count;
-  uint32_t _neutral_to_cold_count;
+  uintptr_t _gc_epoch;
+
+  // uint32_t _neutral_to_hot_count;
+  // uint32_t _neutral_to_cold_count;
   uint32_t _cold_to_hot_count;
   uint32_t _hot_to_cold_count;
   
@@ -198,9 +200,9 @@ public:
   size_t used()              const;
   size_t committed()         const;
 
-  void increase_neutral_size(size_t bytes);
-  void decrease_neutral_size(size_t bytes);
-  void set_neutral_size(size_t bytes);
+  // void increase_neutral_size(size_t bytes);
+  // void decrease_neutral_size(size_t bytes);
+  // void set_neutral_size(size_t bytes);
 
   void increase_cold_size(size_t bytes);
   void decrease_cold_size(size_t bytes);
@@ -210,11 +212,13 @@ public:
   void decrease_hot_size(size_t bytes);
   void set_hot_size(size_t bytes);
 
-  void increase_neutral_to_hot_count(uint32_t increment);
-  void set_neutral_to_hot_count(uint32_t value);
+  void increase_gc_epoch(uintptr_t increment);
 
-  void increase_neutral_to_cold_count(uint32_t increment);
-  void set_neutral_to_cold_count(uint32_t value);
+  // void increase_neutral_to_hot_count(uint32_t increment);
+  // void set_neutral_to_hot_count(uint32_t value);
+
+  // void increase_neutral_to_cold_count(uint32_t increment);
+  // void set_neutral_to_cold_count(uint32_t value);
 
   void increase_cold_to_hot_count(uint32_t increment);
   void set_cold_to_hot_count(uint32_t value);
@@ -226,6 +230,8 @@ public:
   size_t neutral_size() const;
   size_t cold_size()    const;
   size_t hot_size()     const;
+
+  uintptr_t gc_epoch() const;
 
   uint32_t neutral_to_hot_count()   const;
   uint32_t neutral_to_cold_count()  const;
@@ -729,6 +735,8 @@ public:
   void trash_humongous_region_at(ShenandoahHeapRegion *r);
 
   void deduplicate_string(oop str);
+
+  void oop_add_access_counter(oop obj, uintptr_t increment);
 
 private:
   void trash_cset_regions();
