@@ -65,27 +65,27 @@ void oopDesc::add_access_counter(uintptr_t increment) {
   }
 }
 
-// uintptr_t oopDesc::gc_epoch() const {
-//   return HeapAccess<MO_RELAXED>::load_at(as_oop(), gc_epoch_offset_in_bytes());
-// }
+uintptr_t oopDesc::gc_epoch() const {
+  return HeapAccess<MO_RELAXED>::load_at(as_oop(), gc_epoch_offset_in_bytes());
+}
 
-// void oopDesc::set_gc_epoch(uintptr_t new_value){
-//   HeapAccess<MO_RELAXED>::store_at(as_oop(), gc_epoch_offset_in_bytes(), new_value);
-// }
+void oopDesc::set_gc_epoch(uintptr_t new_value){
+  HeapAccess<MO_RELAXED>::store_at(as_oop(), gc_epoch_offset_in_bytes(), new_value);
+}
 
-// void oopDesc::add_gc_epoch(uintptr_t increment) {
-//   uintptr_t epoch = gc_epoch();
-//   // code below prevents overflow
-//   if (UINTPTR_MAX - increment > epoch){
-//     set_gc_epoch(epoch + increment);
-//   }
-//   else {
-//     printf("GC epoch reaches UINTPTR_MAX\n");
-//     if (epoch < UINTPTR_MAX){
-//       set_gc_epoch(UINTPTR_MAX);
-//     }
-//   }
-// }
+void oopDesc::add_gc_epoch(uintptr_t increment) {
+  uintptr_t epoch = gc_epoch();
+  // code below prevents overflow
+  if (UINTPTR_MAX - increment > epoch){
+    set_gc_epoch(epoch + increment);
+  }
+  else {
+    printf("GC epoch reaches UINTPTR_MAX\n");
+    if (epoch < UINTPTR_MAX){
+      set_gc_epoch(UINTPTR_MAX);
+    }
+  }
+}
 
 markOop  oopDesc::mark()      const {
   return HeapAccess<MO_VOLATILE>::load_at(as_oop(), mark_offset_in_bytes());
