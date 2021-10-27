@@ -85,6 +85,18 @@ oop ShenandoahBarrierSet::load_reference_barrier(oop obj) {
   }
 }
 
+void ShenandoahBarrierSet::oop_add_access_counter(oop obj, uintptr_t increment) {
+  if (obj != NULL) {
+    if (obj->gc_epoch() < _heap->gc_epoch()){
+      obj->set_access_counter(increment);
+      obj->set_gc_epoch(_heap->gc_epoch());
+    }
+    else {
+      obj->add_access_counter(increment);
+    }
+  }
+}
+
 bool ShenandoahBarrierSet::need_load_reference_barrier(DecoratorSet decorators, BasicType type) {
   if (!ShenandoahLoadRefBarrier) return false;
   // Only needed for references

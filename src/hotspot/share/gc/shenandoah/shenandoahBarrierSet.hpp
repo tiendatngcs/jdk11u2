@@ -88,6 +88,8 @@ public:
   oop load_reference_barrier(oop obj);
   oop load_reference_barrier_not_null(oop obj);
 
+  void oop_add_access_counter(oop obj, uintptr_t increment);
+
   template <class T>
   inline oop load_reference_barrier_mutator(oop obj, T* load_addr);
 
