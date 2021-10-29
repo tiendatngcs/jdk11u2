@@ -425,6 +425,8 @@ void ShenandoahHeapRegion::recycle() {
 
   ShenandoahHeap::heap()->marking_context()->reset_top_at_mark_start(this);
   set_update_watermark(bottom());
+  ShenandoahHeap* heap = ShenandoahHeap::heap();
+  heap->decrease_access_rate(used(), access_rate());
 
   make_empty();
   set_access_rate(NEUTRAL);

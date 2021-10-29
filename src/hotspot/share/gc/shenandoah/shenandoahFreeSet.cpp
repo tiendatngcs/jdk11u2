@@ -344,7 +344,7 @@ HeapWord* ShenandoahFreeSet::allocate_contiguous(ShenandoahAllocRequest& req) {
     } else {
       used_words = ShenandoahHeapRegion::region_size_words();
     }
-
+    r->set_access_rate(req.access_rate());
     r->set_top(r->bottom() + used_words);
 
     _mutator_free_bitmap.clear_bit(r->index());

@@ -204,13 +204,18 @@ public:
   // void decrease_neutral_size(size_t bytes);
   // void set_neutral_size(size_t bytes);
 
-  void increase_cold_size(size_t bytes);
-  void decrease_cold_size(size_t bytes);
-  void set_cold_size(size_t bytes);
+  // void increase_cold_size(size_t bytes);
+  // void decrease_cold_size(size_t bytes);
+  // void set_cold_size(size_t bytes);
 
-  void increase_hot_size(size_t bytes);
-  void decrease_hot_size(size_t bytes);
-  void set_hot_size(size_t bytes);
+  // void increase_hot_size(size_t bytes);
+  // void decrease_hot_size(size_t bytes);
+  // void set_hot_size(size_t bytes);
+
+  void increase_access_rate(size_t bytes, ShenandoahRegionAccessRate access_rate);
+  void decrease_access_rate(size_t bytes, ShenandoahRegionAccessRate access_rate);
+  void set_access_rate(size_t bytes, ShenandoahRegionAccessRate access_rate);
+
 
   void increase_gc_epoch(uintptr_t increment);
 

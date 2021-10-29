@@ -317,6 +317,7 @@ inline oop ShenandoahHeap::evacuate_object(oop p, Thread* thread) {
   // Try to install the new forwarding pointer.
   oop copy_val = oop(copy);
   oop result = ShenandoahForwarding::try_update_forwardee(p, copy_val);
+  increase_access_rate(copy_val->size(), access_rate);
   if (result == copy_val) {
     // Successfully evacuated. Our copy is now the public one!
     shenandoah_assert_correct(NULL, copy_val);

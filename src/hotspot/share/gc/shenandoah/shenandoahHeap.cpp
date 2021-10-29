@@ -718,35 +718,75 @@ void ShenandoahHeap::decrease_used(size_t bytes) {
 //   Atomic::sub(bytes, &_neutral_size);
 // }
 
-void ShenandoahHeap::increase_cold_size(size_t bytes) {
-  Atomic::add(bytes, &_cold_size);
+// void ShenandoahHeap::increase_cold_size(size_t bytes) {
+//   Atomic::add(bytes, &_cold_size);
+// }
+
+// void ShenandoahHeap::set_cold_size(size_t bytes) {
+//   OrderAccess::release_store_fence(&_cold_size, bytes);
+// }
+
+// void ShenandoahHeap::decrease_cold_size(size_t bytes) {
+//   assert(cold_size() >= bytes, "never decrease size by more than we've left");
+//   Atomic::sub(bytes, &_cold_size);
+// }
+
+// void ShenandoahHeap::increase_hot_size(size_t bytes) {
+//   Atomic::add(bytes, &_hot_size);
+// }
+
+// void ShenandoahHeap::set_hot_size(size_t bytes) {
+//   OrderAccess::release_store_fence(&_hot_size, bytes);
+// }
+
+// void ShenandoahHeap::decrease_hot_size(size_t bytes) {
+//   assert(hot_size() >= bytes, "never decrease size by more than we've left");
+//   Atomic::sub(bytes, &_hot_size);
+// }
+
+void ShenandoahHeap::increase_access_rate(size_t bytes, ShenandoahRegionAccessRate access_rate) {
+  switch(access_rate):{
+    case HOT:
+      Atomic::add(bytes, &_hot_size);
+      break;
+    case COLD:
+      Atomic::add(bytes, &_cold_size);
+      break;
+    default:
+      break;
+  }
 }
 
-void ShenandoahHeap::set_cold_size(size_t bytes) {
-  OrderAccess::release_store_fence(&_cold_size, bytes);
+void ShenandoahHeap::decrease_access_rate(size_t bytes, ShenandoahRegionAccessRate access_rate) {
+  switch(access_rate):{
+    case HOT:
+      Atomic::sub(bytes, &_hot_size);
+      break;
+    case COLD:
+      Atomic::sub(bytes, &_cold_size);
+      break;
+    default:
+      break;
+  }
 }
 
-void ShenandoahHeap::decrease_cold_size(size_t bytes) {
-  assert(cold_size() >= bytes, "never decrease size by more than we've left");
-  Atomic::sub(bytes, &_cold_size);
-}
-
-void ShenandoahHeap::increase_hot_size(size_t bytes) {
-  Atomic::add(bytes, &_hot_size);
-}
-
-void ShenandoahHeap::set_hot_size(size_t bytes) {
-  OrderAccess::release_store_fence(&_hot_size, bytes);
+void ShenandoahHeap::set_access_rate(size_t bytes, ShenandoahRegionAccessRate access_rate) {
+  switch(access_rate):{
+    case HOT:
+      OrderAccess::release_store_fence(&_hot_size, bytes);
+      break;
+    case COLD:
+      OrderAccess::release_store_fence(&_cold_size, bytes);
+      break;
+    default:
+      break;
+  }
 }
 
 void ShenandoahHeap::increase_gc_epoch(uintptr_t increment) {
   Atomic::add(increment, &_gc_epoch);
 }
 
-void ShenandoahHeap::decrease_hot_size(size_t bytes) {
-  assert(hot_size() >= bytes, "never decrease size by more than we've left");
-  Atomic::sub(bytes, &_hot_size);
-}
 
 // void ShenandoahHeap::increase_neutral_to_hot_count(uint32_t increment) {
 //   Atomic::add(increment, &_neutral_to_hot_count);
