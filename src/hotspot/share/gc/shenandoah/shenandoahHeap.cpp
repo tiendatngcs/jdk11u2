@@ -747,10 +747,12 @@ void ShenandoahHeap::decrease_used(size_t bytes) {
 void ShenandoahHeap::increase_access_rate(size_t bytes, ShenandoahRegionAccessRate access_rate) {
   switch(access_rate){
     case HOT:
-      Atomic::add(bytes, &_hot_size);
+      // Atomic::add(bytes, &_hot_size);
+      _hot_size += bytes;
       break;
     case COLD:
-      Atomic::add(bytes, &_cold_size);
+      // Atomic::add(bytes, &_cold_size);
+      _cold_size += bytes;
       break;
     default:
       break;
@@ -760,10 +762,12 @@ void ShenandoahHeap::increase_access_rate(size_t bytes, ShenandoahRegionAccessRa
 void ShenandoahHeap::decrease_access_rate(size_t bytes, ShenandoahRegionAccessRate access_rate) {
   switch(access_rate){
     case HOT:
-      Atomic::sub(bytes, &_hot_size);
+      // Atomic::sub(bytes, &_hot_size);
+      _hot_size -= bytes;
       break;
     case COLD:
-      Atomic::sub(bytes, &_cold_size);
+      // Atomic::sub(bytes, &_cold_size);
+      _cold_size -= bytes;
       break;
     default:
       break;
@@ -773,10 +777,12 @@ void ShenandoahHeap::decrease_access_rate(size_t bytes, ShenandoahRegionAccessRa
 void ShenandoahHeap::set_access_rate(size_t bytes, ShenandoahRegionAccessRate access_rate) {
   switch(access_rate){
     case HOT:
-      OrderAccess::release_store_fence(&_hot_size, bytes);
+      // OrderAccess::release_store_fence(&_hot_size, bytes);
+      _hot_size = bytes;
       break;
     case COLD:
-      OrderAccess::release_store_fence(&_cold_size, bytes);
+      // OrderAccess::release_store_fence(&_cold_size, bytes);
+      _cold_size = bytes;
       break;
     default:
       break;
@@ -784,7 +790,8 @@ void ShenandoahHeap::set_access_rate(size_t bytes, ShenandoahRegionAccessRate ac
 }
 
 void ShenandoahHeap::increase_gc_epoch(uintptr_t increment) {
-  Atomic::add(increment, &_gc_epoch);
+  // Atomic::add(increment, &_gc_epoch);
+  _gc_epoch += increment;
 }
 
 
