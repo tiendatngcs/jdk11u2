@@ -316,6 +316,8 @@ inline oop ShenandoahHeap::evacuate_object(oop p, Thread* thread) {
 
   // Try to install the new forwarding pointer.
   oop copy_val = oop(copy);
+  prinf("old access rate: %lu\n", p->access_counter());
+  prinf("new access rate: %lu\n", copy_val->access_counter());
   oop result = ShenandoahForwarding::try_update_forwardee(p, copy_val);
   increase_access_rate(copy_val->size(), access_rate);
   if (result == copy_val) {
