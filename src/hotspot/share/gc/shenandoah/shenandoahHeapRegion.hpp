@@ -398,6 +398,8 @@ public:
   
   void set_access_rate(ShenandoahRegionAccessRate new_access_rate);
 
+  void increase_heap_hard_hot_cold_stats();
+
 private:
   void do_commit();
   void do_uncommit();

@@ -170,7 +170,9 @@ private:
 
   // size_t _neutral_size;
   size_t _cold_size;
+  size_t _hard_cold_size;
   size_t _hot_size;
+  size_t _hard_hot_size;
 
   uintptr_t _gc_epoch;
 
@@ -212,9 +214,13 @@ public:
   // void decrease_hot_size(size_t bytes);
   // void set_hot_size(size_t bytes);
 
-  void increase_access_rate(size_t bytes, ShenandoahRegionAccessRate access_rate);
-  void decrease_access_rate(size_t bytes, ShenandoahRegionAccessRate access_rate);
-  void set_access_rate(size_t bytes, ShenandoahRegionAccessRate access_rate);
+  void increase_hotness_size(size_t bytes, ShenandoahRegionAccessRate access_rate);
+  void decrease_hotness_size(size_t bytes, ShenandoahRegionAccessRate access_rate);
+  void set_hotness_size(size_t bytes, ShenandoahRegionAccessRate access_rate);
+
+  void increase_hard_hotness_size(size_t bytes, ShenandoahRegionAccessRate access_rate);
+  void decrease_hard_hotness_size(size_t bytes, ShenandoahRegionAccessRate access_rate);
+  void set_hard_hotness_size(size_t bytes, ShenandoahRegionAccessRate access_rate);
 
 
   void increase_gc_epoch(uintptr_t increment);
@@ -232,9 +238,11 @@ public:
   void set_hot_to_cold_count(uint32_t value);
 
 
-  size_t neutral_size() const;
+  // size_t neutral_size() const;
   size_t cold_size()    const;
   size_t hot_size()     const;
+  size_t hard_cold_size()    const;
+  size_t hard_hot_size()     const;
 
   uintptr_t gc_epoch() const;
 
@@ -690,6 +698,7 @@ public:
   // Liveness caching support
   ShenandoahLiveData* get_liveness_cache(uint worker_id);
   void flush_liveness_cache(uint worker_id);
+  void refresh_hard_hot_cold_stats();
 
   size_t pretouch_heap_page_size() { return _pretouch_heap_page_size; }
 

@@ -23,6 +23,7 @@
 
 #include "precompiled.hpp"
 #include "memory/allocation.hpp"
+// #include "gc/shared/gcArguments.inline.hpp"
 #include "gc/shenandoah/shenandoahHeapRegionSet.inline.hpp"
 #include "gc/shenandoah/shenandoahHeap.inline.hpp"
 #include "gc/shenandoah/shenandoahHeapRegion.hpp"
@@ -426,7 +427,7 @@ void ShenandoahHeapRegion::recycle() {
   ShenandoahHeap::heap()->marking_context()->reset_top_at_mark_start(this);
   set_update_watermark(bottom());
   ShenandoahHeap* heap = ShenandoahHeap::heap();
-  heap->decrease_access_rate(used(), access_rate());
+  heap->decrease_hotness_size(used(), access_rate());
 
   make_empty();
   set_access_rate(NEUTRAL);
@@ -687,6 +688,32 @@ size_t ShenandoahHeapRegion::pin_count() const {
   return Atomic::load(&_critical_pins);
 }
 
-void ShenandoahHeapRegion::set_access_rate(ShenandoahRegionAccessRate new_access_rate){
+void ShenandoahHeapRegion::set_access_rate(ShenandoahRegionAccessRate new_access_rate) {
   _access_rate = new_access_rate;
+}
+
+void ShenandoahHeapRegion::increase_heap_hard_hot_cold_stats() {
+  ShenandoahHeap* heap = ShenandoahHeap::heap();
+  switch (_access_rate) {
+    case HOT:
+    case COLD:
+      heap->increase_hard_hotness_size(used(), _access_rate);
+      break;
+    default: {
+      // assert(! is_humongous(), "no humongous region here");
+      HeapWord* obj_addr = bottom();
+      HeapWord* t = top();
+      // Could call objects iterate, but this is easier.
+      while (obj_addr < t) {
+        oop obj = oop(obj_addr);
+        if (obj->access_rate() < ShenandoahHotnessThreshold) {
+          heap->increase_hard_hotness_size(obj->size(), COLD);
+        }
+        else {
+          heap->increase_hard_hotness_size(obj->size(), HOT);
+        }
+        obj_addr += obj->size();
+      }
+    }
+  }
 }

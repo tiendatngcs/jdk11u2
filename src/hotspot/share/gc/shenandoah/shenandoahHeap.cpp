@@ -455,7 +455,9 @@ ShenandoahHeap::ShenandoahHeap(ShenandoahCollectorPolicy* policy) :
   _bytes_allocated_since_gc_start(0),
   // _neutral_size(0),
   _cold_size(0),
+  _hard_cold_size(0),
   _hot_size(0),
+  _hard_hot_size(0),
   // _neutral_to_hot_count(0),
   // _neutral_to_cold_count(0),
   _gc_epoch(0),
@@ -657,6 +659,16 @@ size_t ShenandoahHeap::hot_size() const {
   return _hot_size;
 }
 
+size_t ShenandoahHeap::hard_cold_size() const {
+  OrderAccess::acquire();
+  return _hard_cold_size;
+}
+
+size_t ShenandoahHeap::hard_hot_size() const {
+  OrderAccess::acquire();
+  return _hard_hot_size;
+}
+
 uintptr_t ShenandoahHeap::gc_epoch() const{
   OrderAccess::acquire();
   return _gc_epoch;
@@ -744,7 +756,7 @@ void ShenandoahHeap::decrease_used(size_t bytes) {
 //   Atomic::sub(bytes, &_hot_size);
 // }
 
-void ShenandoahHeap::increase_access_rate(size_t bytes, ShenandoahRegionAccessRate access_rate) {
+void ShenandoahHeap::increase_hotness_size(size_t bytes, ShenandoahRegionAccessRate access_rate) {
   switch(access_rate){
     case HOT:
       // Atomic::add(bytes, &_hot_size);
@@ -759,7 +771,7 @@ void ShenandoahHeap::increase_access_rate(size_t bytes, ShenandoahRegionAccessRa
   }
 }
 
-void ShenandoahHeap::decrease_access_rate(size_t bytes, ShenandoahRegionAccessRate access_rate) {
+void ShenandoahHeap::decrease_hotness_size(size_t bytes, ShenandoahRegionAccessRate access_rate) {
   switch(access_rate){
     case HOT:
       // Atomic::sub(bytes, &_hot_size);
@@ -774,7 +786,7 @@ void ShenandoahHeap::decrease_access_rate(size_t bytes, ShenandoahRegionAccessRa
   }
 }
 
-void ShenandoahHeap::set_access_rate(size_t bytes, ShenandoahRegionAccessRate access_rate) {
+void ShenandoahHeap::set_hotness_size(size_t bytes, ShenandoahRegionAccessRate access_rate) {
   switch(access_rate){
     case HOT:
       // OrderAccess::release_store_fence(&_hot_size, bytes);
@@ -783,6 +795,51 @@ void ShenandoahHeap::set_access_rate(size_t bytes, ShenandoahRegionAccessRate ac
     case COLD:
       // OrderAccess::release_store_fence(&_cold_size, bytes);
       _cold_size = bytes;
+      break;
+    default:
+      break;
+  }
+}
+//-------------------------
+void ShenandoahHeap::increase_hard_hotness_size(size_t bytes, ShenandoahRegionAccessRate access_rate) {
+  switch(access_rate){
+    case HOT:
+      // Atomic::add(bytes, &_hot_size);
+      _hard_hot_size += bytes;
+      break;
+    case COLD:
+      // Atomic::add(bytes, &_cold_size);
+      _hard_cold_size += bytes;
+      break;
+    default:
+      break;
+  }
+}
+
+void ShenandoahHeap::decrease_hard_hotness_size(size_t bytes, ShenandoahRegionAccessRate access_rate) {
+  switch(access_rate){
+    case HOT:
+      // Atomic::sub(bytes, &_hot_size);
+      _hard_hot_size -= bytes;
+      break;
+    case COLD:
+      // Atomic::sub(bytes, &_cold_size);
+      _hard_cold_size -= bytes;
+      break;
+    default:
+      break;
+  }
+}
+
+void ShenandoahHeap::set_hard_hotness_size(size_t bytes, ShenandoahRegionAccessRate access_rate) {
+  switch(access_rate){
+    case HOT:
+      // OrderAccess::release_store_fence(&_hot_size, bytes);
+      _hard_hot_size = bytes;
+      break;
+    case COLD:
+      // OrderAccess::release_store_fence(&_cold_size, bytes);
+      _hard_cold_size = bytes;
       break;
     default:
       break;
@@ -3029,4 +3086,29 @@ void ShenandoahHeap::flush_liveness_cache(uint worker_id) {
       ld[i] = 0;
     }
   }
+}
+
+class ShenandoahHardHotnessStatsRegionClosure : public ShenandoahHeapRegionClosure {
+private:
+  ShenandoahHeapLock* const _lock;
+
+public:
+  ShenandoahHardHotnessStatsRegionClosure() {
+    ShenandoahHeap::heap()->set_hard_hotness_size(0, HOT);
+    ShenandoahHeap::heap()->set_hard_hotness_size(0, COLD);
+  }
+
+  void heap_region_do(ShenandoahHeapRegion* r) {
+    if (r->is_active()) {
+      r->increase_heap_hard_hot_cold_stats();
+    }
+  }
+
+  bool is_thread_safe() { return true; }
+};
+
+void ShenandoahHeap::refresh_hard_hot_cold_stats() {
+  ShenandoahHeapLocker locker(lock()); // !!!!!
+  ShenandoahHardHotnessStatsRegionClosure cl;
+  parallel_heap_region_iterate(&cl); 
 }
