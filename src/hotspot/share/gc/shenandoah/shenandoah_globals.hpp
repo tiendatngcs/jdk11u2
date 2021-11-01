@@ -284,6 +284,9 @@
           "Many heuristics automatically enable this. This option is "      \
           "similar to global ExplicitGCInvokesConcurrent.")                 \
                                                                             \
+  experimental(uintx, ShenandoahHotnessThreshold, 1000,                     \
+          "How many times an object should be accessed to be classified as  \
+          hot.")                                                            \
   diagnostic(bool, ShenandoahHumongousMoves, true,                          \
           "Allow moving humongous regions. This makes GC more resistant "   \
           "to external fragmentation that may otherwise fail other "        \
