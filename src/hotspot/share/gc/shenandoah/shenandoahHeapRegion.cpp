@@ -706,13 +706,18 @@ private:
       //   oop forw = obj->forwardee();
       //   RawAccess<IS_NOT_NULL>::oop_store(p, forw);
       // }
-      if (obj->access_counter() < ShenandoahHotnessThreshold) {
-        // heap->increase_hard_hotness_size(obj->size(), COLD);
-        _heap->increase_hard_hotness_size(obj->size(), COLD);
+      if (obj == NULL) {
+        printf("obj is null\n");
       }
       else {
-        // heap->increase_hard_hotness_size(obj->size(), HOT);
-        _heap->increase_hard_hotness_size(obj->size(), HOT);
+        if (obj->access_counter() < ShenandoahHotnessThreshold) {
+          // heap->increase_hard_hotness_size(obj->size(), COLD);
+          _heap->increase_hard_hotness_size(obj->size(), COLD);
+        }
+        else {
+          // heap->increase_hard_hotness_size(obj->size(), HOT);
+          _heap->increase_hard_hotness_size(obj->size(), HOT);
+        }
       }
     }
   }
