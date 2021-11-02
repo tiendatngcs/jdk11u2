@@ -700,7 +700,7 @@ void ShenandoahHeapRegion::increase_heap_hard_hot_cold_stats() {
       heap->increase_hard_hotness_size(used(), _access_rate);
       break;
     default: 
-      // {
+      {
       // // assert(! is_humongous(), "no humongous region here");
       // HeapWord* obj_addr = bottom();
       // HeapWord* t = top();
@@ -717,7 +717,7 @@ void ShenandoahHeapRegion::increase_heap_hard_hot_cold_stats() {
       //   }
       //   obj_addr += obj->size();
       // }
-      break;
+      // break;
     }
   }
 }
