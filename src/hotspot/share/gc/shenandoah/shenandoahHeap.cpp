@@ -3110,5 +3110,5 @@ public:
 void ShenandoahHeap::refresh_hard_hot_cold_stats() {
   ShenandoahHeapLocker locker(lock()); // !!!!!
   ShenandoahHardHotnessStatsRegionClosure cl;
-  parallel_heap_region_iterate(&cl); 
+  heap_region_iterate(&cl); 
 }
