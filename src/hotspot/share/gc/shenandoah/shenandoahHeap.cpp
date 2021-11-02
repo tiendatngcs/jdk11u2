@@ -3099,7 +3099,7 @@ public:
   }
 
   void heap_region_do(ShenandoahHeapRegion* r) {
-    if (r->is_active()) {
+    if (r->is_active() && r->has_live()) {
       r->increase_heap_hard_hot_cold_stats();
     }
   }

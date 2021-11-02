@@ -731,6 +731,8 @@ public:
 };
 
 void ShenandoahHeapRegion::increase_heap_hard_hot_cold_stats() {
+  assert(is_active(), "region must be active");
+  assert(has_live(), "region must contain live objects");
   ShenandoahHeap* heap = ShenandoahHeap::heap();
   switch (_access_rate) {
     case HOT:
