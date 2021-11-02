@@ -65,7 +65,7 @@ class oopDesc {
   } _metadata;
 
  public:
-  oopDesc();
+  // oopDesc();
   inline uintptr_t access_counter() const;
   inline uintptr_t gc_epoch() const;
   inline markOop  mark()          const;
