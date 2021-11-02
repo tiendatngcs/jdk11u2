@@ -747,21 +747,22 @@ void ShenandoahHeapRegion::increase_heap_hard_hot_cold_stats() {
       HeapWord* obj_addr = bottom();
       HeapWord* t = top();
       // Could call objects iterate, but this is easier.
-      oop obj = oop(obj_addr);
-      printf("ac = %lu\n", obj->access_counter());
-      printf("size = %d\n", obj->size());
-      // while (obj_addr < t) {
-      //   oop obj = oop(obj_addr);
-      //   if (obj->access_counter() < ShenandoahHotnessThreshold) {
-      //     // heap->increase_hard_hotness_size(obj->size(), COLD);
-      //     heap->increase_hard_hotness_size(1, COLD);
-      //   }
-      //   else {
-      //     // heap->increase_hard_hotness_size(obj->size(), HOT);
-      //     heap->increase_hard_hotness_size(1, HOT);
-      //   }
-      //   obj_addr += obj->size();
-      // }
+      // oop obj = oop(obj_addr);
+      // printf("ac = %lu\n", obj->access_counter());
+      // printf("size = %d\n", obj->size());
+      while (obj_addr < t) {
+        oop obj = oop(obj_addr);
+        if (obj == NULL) break;
+        if (obj->access_counter() < ShenandoahHotnessThreshold) {
+          // heap->increase_hard_hotness_size(obj->size(), COLD);
+          heap->increase_hard_hotness_size(1, COLD);
+        }
+        else {
+          // heap->increase_hard_hotness_size(obj->size(), HOT);
+          heap->increase_hard_hotness_size(1, HOT);
+        }
+        obj_addr += obj->size();
+      }
       break;
     }
   }
