@@ -734,8 +734,8 @@ void ShenandoahHeapRegion::increase_heap_hard_hot_cold_stats() {
       break;
     default: 
       {
-      ShenandoahCollectHardHotnessStatsClosure* cl;
-      oop_iterate(cl);
+      ShenandoahCollectHardHotnessStatsClosure cl;
+      oop_iterate(&cl);
       // // assert(! is_humongous(), "no humongous region here");
       // HeapWord* obj_addr = bottom();
       // HeapWord* t = top();
