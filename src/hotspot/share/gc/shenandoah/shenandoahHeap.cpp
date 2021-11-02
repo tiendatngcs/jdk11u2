@@ -3088,31 +3088,8 @@ void ShenandoahHeap::flush_liveness_cache(uint worker_id) {
   }
 }
 
-class ShenandoahHardHotnessStatsRegionClosure : public ShenandoahHeapRegionClosure {
-// private:
-//   ShenandoahHeapLock* const _lock;
-
-public:
-  ShenandoahHardHotnessStatsRegionClosure() {
-    ShenandoahHeap::heap()->set_hard_hotness_size(0, HOT);
-    ShenandoahHeap::heap()->set_hard_hotness_size(0, COLD);
-  }
-
-  void heap_region_do(ShenandoahHeapRegion* r) {
-    if (r->is_active() && r->has_live()) {
-      r->increase_heap_hard_hot_cold_stats();
-    }
-  }
-
-  bool is_thread_safe() { return true; }
-};
-
 void ShenandoahHeap::refresh_hard_hot_cold_stats() {
   ShenandoahHeapLocker locker(lock()); // !!!!!
-  // ShenandoahHardHotnessStatsRegionClosure cl;
-  // heap_region_iterate(&cl); 
-
-
   heap()->set_hard_hotness_size(0, HOT);
   heap()->set_hard_hotness_size(0, COLD);
   for (size_t i = 0; i < num_regions(); i++) {
