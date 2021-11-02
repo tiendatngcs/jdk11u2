@@ -699,23 +699,25 @@ void ShenandoahHeapRegion::increase_heap_hard_hot_cold_stats() {
     case COLD:
       heap->increase_hard_hotness_size(used(), _access_rate);
       break;
-    default: {
-      // assert(! is_humongous(), "no humongous region here");
-      HeapWord* obj_addr = bottom();
-      HeapWord* t = top();
-      // Could call objects iterate, but this is easier.
-      while (obj_addr < t) {
-        oop obj = oop(obj_addr);
-        if (obj->access_counter() < ShenandoahHotnessThreshold) {
-          // heap->increase_hard_hotness_size(obj->size(), COLD);
-          heap->increase_hard_hotness_size(1, COLD);
-        }
-        else {
-          // heap->increase_hard_hotness_size(obj->size(), HOT);
-          heap->increase_hard_hotness_size(1, HOT);
-        }
-        obj_addr += obj->size();
-      }
+    default: 
+      // {
+      // // assert(! is_humongous(), "no humongous region here");
+      // HeapWord* obj_addr = bottom();
+      // HeapWord* t = top();
+      // // Could call objects iterate, but this is easier.
+      // while (obj_addr < t) {
+      //   oop obj = oop(obj_addr);
+      //   if (obj->access_counter() < ShenandoahHotnessThreshold) {
+      //     // heap->increase_hard_hotness_size(obj->size(), COLD);
+      //     heap->increase_hard_hotness_size(1, COLD);
+      //   }
+      //   else {
+      //     // heap->increase_hard_hotness_size(obj->size(), HOT);
+      //     heap->increase_hard_hotness_size(1, HOT);
+      //   }
+      //   obj_addr += obj->size();
+      // }
+      break;
     }
   }
 }
