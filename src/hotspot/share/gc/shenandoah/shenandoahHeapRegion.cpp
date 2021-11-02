@@ -701,7 +701,7 @@ private:
     T o = RawAccess<>::oop_load(p);
     if (!CompressedOops::is_null(o)) {
       oop obj = CompressedOops::decode_not_null(o);
-      assert(_ctx->is_marked(obj), "must be marked");
+      // assert(_ctx->is_marked(obj), "must be marked");
       // if (obj->is_forwarded()) {
       //   oop forw = obj->forwardee();
       //   RawAccess<IS_NOT_NULL>::oop_store(p, forw);
