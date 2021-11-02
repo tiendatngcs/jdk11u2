@@ -692,6 +692,39 @@ void ShenandoahHeapRegion::set_access_rate(ShenandoahRegionAccessRate new_access
   _access_rate = new_access_rate;
 }
 
+class ShenandoahCollectHardHotnessStatsClosure : public MetadataVisitingOopIterateClosure {
+private:
+  ShenandoahHeap* const _heap;
+
+  template <class T>
+  inline void do_oop_work(T* p) {
+    T o = RawAccess<>::oop_load(p);
+    if (!CompressedOops::is_null(o)) {
+      oop obj = CompressedOops::decode_not_null(o);
+      assert(_ctx->is_marked(obj), "must be marked");
+      // if (obj->is_forwarded()) {
+      //   oop forw = obj->forwardee();
+      //   RawAccess<IS_NOT_NULL>::oop_store(p, forw);
+      // }
+      if (obj->access_counter() < ShenandoahHotnessThreshold) {
+        // heap->increase_hard_hotness_size(obj->size(), COLD);
+        _heap->increase_hard_hotness_size(obj->size(), COLD);
+      }
+      else {
+        // heap->increase_hard_hotness_size(obj->size(), HOT);
+        _heap->increase_hard_hotness_size(obj->size(), HOT);
+      }
+    }
+  }
+
+public:
+  ShenandoahCollectHardHotnessStatsClosure() :
+    _heap(ShenandoahHeap::heap()) {}
+
+  void do_oop(oop* p)       { do_oop_work(p); }
+  void do_oop(narrowOop* p) { do_oop_work(p); }
+};
+
 void ShenandoahHeapRegion::increase_heap_hard_hot_cold_stats() {
   ShenandoahHeap* heap = ShenandoahHeap::heap();
   switch (_access_rate) {
@@ -701,6 +734,8 @@ void ShenandoahHeapRegion::increase_heap_hard_hot_cold_stats() {
       break;
     default: 
       {
+      ShenandoahCollectHardHotnessStatsClosure* cl;
+      oop_iterate(cl);
       // // assert(! is_humongous(), "no humongous region here");
       // HeapWord* obj_addr = bottom();
       // HeapWord* t = top();
@@ -717,7 +752,7 @@ void ShenandoahHeapRegion::increase_heap_hard_hot_cold_stats() {
       //   }
       //   obj_addr += obj->size();
       // }
-      // break;
+      break;
     }
   }
 }
