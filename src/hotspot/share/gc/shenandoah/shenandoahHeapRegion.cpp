@@ -752,10 +752,15 @@ void ShenandoahHeapRegion::increase_heap_hard_hot_cold_stats() {
       // printf("size = %d\n", obj->size());
       printf("starting while loop\n");
       while (obj_addr < t) {
-        oop obj = oop(obj_addr);
+        try {
+          oop obj = oop(obj_addr);
+        }
+        catch (...) {
+          break;
+        }
         if (obj == NULL) break;
-        printf("ac = %lu\n", obj->access_counter());
-        printf("size = %d\n", obj->size());
+        // printf("ac = %lu\n", obj->access_counter());
+        // printf("size = %d\n", obj->size());
         if (obj->access_counter() < ShenandoahHotnessThreshold) {
           // heap->increase_hard_hotness_size(obj->size(), COLD);
           heap->increase_hard_hotness_size(1, COLD);
