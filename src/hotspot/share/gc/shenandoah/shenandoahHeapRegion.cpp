@@ -741,12 +741,13 @@ void ShenandoahHeapRegion::increase_heap_hard_hot_cold_stats() {
       break;
     default: 
       {
-      ShenandoahCollectHardHotnessStatsClosure cl;
-      oop_iterate(&cl);
-      // // assert(! is_humongous(), "no humongous region here");
-      // HeapWord* obj_addr = bottom();
-      // HeapWord* t = top();
-      // // Could call objects iterate, but this is easier.
+      // ShenandoahCollectHardHotnessStatsClosure cl;
+      // oop_iterate(&cl);
+      // assert(! is_humongous(), "no humongous region here");
+      HeapWord* obj_addr = bottom();
+      HeapWord* t = top();
+      // Could call objects iterate, but this is easier.
+      oop obj = oop(obj_addr);
       // while (obj_addr < t) {
       //   oop obj = oop(obj_addr);
       //   if (obj->access_counter() < ShenandoahHotnessThreshold) {
