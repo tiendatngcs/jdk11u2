@@ -731,7 +731,7 @@ public:
 };
 
 void ShenandoahHeapRegion::increase_heap_hard_hot_cold_stats() {
-  assert(is_active(), "region must be active");
+  // assert(is_active(), "region must be active");
   assert(has_live(), "region must contain live objects");
   ShenandoahHeap* heap = ShenandoahHeap::heap();
   switch (_access_rate) {
@@ -745,24 +745,28 @@ void ShenandoahHeapRegion::increase_heap_hard_hot_cold_stats() {
       // oop_iterate(&cl);
       // assert(! is_humongous(), "no humongous region here");
       HeapWord* obj_addr = bottom();
-      HeapWord* t = top();
+      size_t size = 0;
+      uintptr_t ac = 0;
+      // HeapWord* t = top();
       // Could call objects iterate, but this is easier.
       // oop obj = oop(obj_addr);
       // printf("ac = %lu\n", obj->access_counter());
       // printf("size = %d\n", obj->size());
       // printf("starting while loop\n");
-      while (obj_addr < t) {
+      while (obj_addr < top()) {
         oop obj = oop(obj_addr);
         if (obj == NULL) break;
+        size = obj->size();
+        ac = obj->access_counter();
         // printf("ac = %lu\n", obj->access_counter());
         // printf("size = %d\n", obj->size());
-        if (obj->access_counter() < ShenandoahHotnessThreshold) {
-          heap->increase_hard_hotness_size(obj->size(), COLD);
+        if (ac < ShenandoahHotnessThreshold) {
+          heap->increase_hard_hotness_size(size, COLD);
         }
         else {
-          heap->increase_hard_hotness_size(obj->size(), HOT);
+          heap->increase_hard_hotness_size(size, HOT);
         }
-        obj_addr += obj->size();
+        obj_addr += size;
       }
       break;
     }
