@@ -707,10 +707,12 @@ void ShenandoahHeapRegion::increase_heap_hard_hot_cold_stats() {
       while (obj_addr < t) {
         oop obj = oop(obj_addr);
         if (obj->access_counter() < ShenandoahHotnessThreshold) {
-          heap->increase_hard_hotness_size(obj->size(), COLD);
+          // heap->increase_hard_hotness_size(obj->size(), COLD);
+          heap->increase_hard_hotness_size(1, COLD);
         }
         else {
-          heap->increase_hard_hotness_size(obj->size(), HOT);
+          // heap->increase_hard_hotness_size(obj->size(), HOT);
+          heap->increase_hard_hotness_size(1, HOT);
         }
         obj_addr += obj->size();
       }
