@@ -3094,7 +3094,7 @@ void ShenandoahHeap::refresh_hard_hot_cold_stats() {
   heap()->set_hard_hotness_size(0, COLD);
   for (size_t i = 0; i < num_regions(); i++) {
     ShenandoahHeapRegion* r = get_region(i);
-    if (r->is_active() && r->has_live()){
+    if (r->is_regular() && r->has_live()){
       r->increase_heap_hard_hot_cold_stats();
     }
   }
