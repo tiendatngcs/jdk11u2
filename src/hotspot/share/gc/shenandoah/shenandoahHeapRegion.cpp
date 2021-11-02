@@ -748,6 +748,8 @@ void ShenandoahHeapRegion::increase_heap_hard_hot_cold_stats() {
       HeapWord* t = top();
       // Could call objects iterate, but this is easier.
       oop obj = oop(obj_addr);
+      printf("ac = %lu\n", obj->access_counter());
+      printf("size = %d\n", obj->size());
       // while (obj_addr < t) {
       //   oop obj = oop(obj_addr);
       //   if (obj->access_counter() < ShenandoahHotnessThreshold) {
