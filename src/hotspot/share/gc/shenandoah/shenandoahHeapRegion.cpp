@@ -706,7 +706,7 @@ void ShenandoahHeapRegion::increase_heap_hard_hot_cold_stats() {
       // Could call objects iterate, but this is easier.
       while (obj_addr < t) {
         oop obj = oop(obj_addr);
-        if (obj->access_rate() < ShenandoahHotnessThreshold) {
+        if (obj->access_counter() < ShenandoahHotnessThreshold) {
           heap->increase_hard_hotness_size(obj->size(), COLD);
         }
         else {

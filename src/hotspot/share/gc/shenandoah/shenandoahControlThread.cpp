@@ -430,7 +430,7 @@ void ShenandoahControlThread::service_concurrent_normal_cycle(GCCause::Cause cau
   }
 
   // Cycle is complete
-  heap->refresh_hard_hot_cold_stats()
+  heap->refresh_hard_hot_cold_stats();
   log_info(gc)("Dat log --- cycle is complete\n"
                 "Current gc epoch: %lu\n"
                 "heap: ______\n"

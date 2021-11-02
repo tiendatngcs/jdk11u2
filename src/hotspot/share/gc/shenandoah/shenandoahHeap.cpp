@@ -3089,8 +3089,8 @@ void ShenandoahHeap::flush_liveness_cache(uint worker_id) {
 }
 
 class ShenandoahHardHotnessStatsRegionClosure : public ShenandoahHeapRegionClosure {
-private:
-  ShenandoahHeapLock* const _lock;
+// private:
+//   ShenandoahHeapLock* const _lock;
 
 public:
   ShenandoahHardHotnessStatsRegionClosure() {
