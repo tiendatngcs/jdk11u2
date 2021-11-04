@@ -174,6 +174,9 @@ private:
   size_t _hot_size;
   size_t _hard_hot_size;
 
+  size_t _hot_region_count;
+  size_t _cold_region_count;
+
   uintptr_t _gc_epoch;
 
   // uint32_t _neutral_to_hot_count;
@@ -222,6 +225,10 @@ public:
   void decrease_hard_hotness_size(size_t bytes, ShenandoahRegionAccessRate access_rate);
   void set_hard_hotness_size(size_t bytes, ShenandoahRegionAccessRate access_rate);
 
+  void increase_region_count(size_t num, ShenandoahRegionAccessRate access_rate);
+  void decrease_region_count(size_t num, ShenandoahRegionAccessRate access_rate);
+  void set_region_count(size_t num, ShenandoahRegionAccessRate access_rate);
+
 
   void increase_gc_epoch(uintptr_t increment);
 
@@ -243,6 +250,10 @@ public:
   size_t hot_size()     const;
   size_t hard_cold_size()    const;
   size_t hard_hot_size()     const;
+
+  size_t hot_region_count()   const;
+  size_t cold_region_count()  const;
+
 
   uintptr_t gc_epoch() const;
 

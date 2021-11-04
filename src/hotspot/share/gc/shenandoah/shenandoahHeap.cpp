@@ -669,6 +669,16 @@ size_t ShenandoahHeap::hard_hot_size() const {
   return _hard_hot_size;
 }
 
+size_t hot_region_count()   const {
+  OrderAccess::acquire();
+  return _hot_region_count;
+}
+
+size_t cold_region_count()  const {
+  OrderAccess::acquire();
+  return _cold_region_count;
+}
+
 uintptr_t ShenandoahHeap::gc_epoch() const{
   OrderAccess::acquire();
   return _gc_epoch;
@@ -840,6 +850,52 @@ void ShenandoahHeap::set_hard_hotness_size(size_t bytes, ShenandoahRegionAccessR
     case COLD:
       // OrderAccess::release_store_fence(&_cold_size, bytes);
       _hard_cold_size = bytes;
+      break;
+    default:
+      break;
+  }
+}
+
+//-------
+void ShenandoahHeap::increase_region_count(size_t num, ShenandoahRegionAccessRate access_rate) {
+  switch(access_rate){
+    case HOT:
+      // Atomic::add(bytes, &_hot_size);
+      _hot_region_count += num;
+      break;
+    case COLD:
+      // Atomic::add(bytes, &_cold_size);
+      _cold_region_count += num;
+      break;
+    default:
+      break;
+  }
+}
+
+void ShenandoahHeap::decrease_region_count(size_t num, ShenandoahRegionAccessRate access_rate) {
+  switch(access_rate){
+    case HOT:
+      // Atomic::add(bytes, &_hot_size);
+      _hot_region_count -= num;
+      break;
+    case COLD:
+      // Atomic::add(bytes, &_cold_size);
+      _cold_region_count -= num;
+      break;
+    default:
+      break;
+  }
+}
+
+void ShenandoahHeap::set_region_count(size_t num, ShenandoahRegionAccessRate access_rate) {
+  switch(access_rate){
+    case HOT:
+      // Atomic::add(bytes, &_hot_size);
+      _hot_region_count = num;
+      break;
+    case COLD:
+      // Atomic::add(bytes, &_cold_size);
+      _cold_region_count = num;
       break;
     default:
       break;
