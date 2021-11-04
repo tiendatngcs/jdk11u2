@@ -671,12 +671,12 @@ size_t ShenandoahHeap::hard_hot_size() const {
   return _hard_hot_size;
 }
 
-size_t hot_region_count()   const {
+size_t ShenandoahHeap::hot_region_count()   const {
   OrderAccess::acquire();
   return _hot_region_count;
 }
 
-size_t cold_region_count()  const {
+size_t ShenandoahHeap::cold_region_count()  const {
   OrderAccess::acquire();
   return _cold_region_count;
 }
