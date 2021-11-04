@@ -430,9 +430,9 @@ void ShenandoahHeapRegion::recycle() {
   heap->decrease_hotness_size(used(), access_rate());
 
   make_empty();
-  ShenandoahRegionAccessRate access_rate = access_rate();
+  ShenandoahRegionAccessRate ar = access_rate();
   set_access_rate(NEUTRAL);
-  heap->decrease_region_count(1, access_rate);
+  heap->decrease_region_count(1, ar);
 
   if (ZapUnusedHeapArea) {
     SpaceMangler::mangle_region(MemRegion(bottom(), end()));
