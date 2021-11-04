@@ -176,6 +176,7 @@ HeapWord* ShenandoahFreeSet::try_allocate_in(ShenandoahHeapRegion* r, Shenandoah
     if (r->access_rate() == NEUTRAL){
       if (in_new_region){
         r->set_access_rate(req.access_rate());
+        _heap->increase_region_count(1, req.access_rate());
       }
       else if (req.access_rate() != NEUTRAL){
         // Non neutral request cannot be make in partially allocated region
@@ -345,6 +346,7 @@ HeapWord* ShenandoahFreeSet::allocate_contiguous(ShenandoahAllocRequest& req) {
       used_words = ShenandoahHeapRegion::region_size_words();
     }
     r->set_access_rate(req.access_rate());
+    _heap->increase_region_count(1, req.access_rate());
     r->set_top(r->bottom() + used_words);
 
     _mutator_free_bitmap.clear_bit(r->index());
