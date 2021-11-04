@@ -458,6 +458,8 @@ ShenandoahHeap::ShenandoahHeap(ShenandoahCollectorPolicy* policy) :
   _hard_cold_size(0),
   _hot_size(0),
   _hard_hot_size(0),
+  _hot_region_count(0),
+  _cold_region_count(0),
   // _neutral_to_hot_count(0),
   // _neutral_to_cold_count(0),
   _gc_epoch(0),
