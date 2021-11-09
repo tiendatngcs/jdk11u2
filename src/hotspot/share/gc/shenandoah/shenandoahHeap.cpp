@@ -461,7 +461,7 @@ ShenandoahHeap::ShenandoahHeap(ShenandoahCollectorPolicy* policy) :
   _hard_hot_size(0),
   _hot_region_count(0),
   _cold_region_count(0),
-  _histogram{},
+  // _histogram(),
   // _neutral_to_hot_count(0),
   // _neutral_to_cold_count(0),
   _gc_epoch(0),
@@ -520,6 +520,7 @@ ShenandoahHeap::ShenandoahHeap(ShenandoahCollectorPolicy* policy) :
                  /* are_ConcurrentGC_threads */ false);
     _safepoint_workers->initialize_workers();
   }
+  reset_histogram();
 }
 
 #ifdef _MSC_VER
@@ -683,15 +684,18 @@ size_t ShenandoahHeap::cold_region_count()  const {
   return _cold_region_count;
 }
 
-size_t* ShenandoahHeap::histogram()   const {
+const size_t* ShenandoahHeap::histogram()   const {
   OrderAccess::acquire();
   return _histogram;
 }
 
 std::string ShenandoahHeap::histogram_in_string() const {
   std::string str;
-  for (int i = 0; i < _histogram.size(); i++) {
-    str += std::to_string(_histogram[i])+", ";
+  int arr_size = sizeof(_histogram)/sizeof(_histogram[0]);
+  for (int i = 0; i < arr_size; i++) {
+    std::stringstream stream;
+    stream << _histogram[i];
+    str += std::to_string(stream.str())+", ";
   }
   return str;
 }
