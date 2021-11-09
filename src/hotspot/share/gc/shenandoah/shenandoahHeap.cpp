@@ -695,7 +695,7 @@ std::string ShenandoahHeap::histogram_in_string() const {
   for (int i = 0; i < arr_size; i++) {
     std::stringstream stream;
     stream << _histogram[i];
-    str += std::to_string(stream.str())+", ";
+    str += stream.str() + ", ";
   }
   return str;
 }
@@ -946,8 +946,9 @@ void ShenandoahHeap::set_region_count(size_t num, ShenandoahRegionAccessRate acc
 void ShenandoahHeap::update_histogram(oop obj) {
   // uintptr_t ac
   int idx = static_cast<int>(log10(obj->access_counter()));
-  if (idx >= _histogram.size()) {
-    _histogram[_histogram.size()-1] += 1;
+  int arr_size = sizeof(_histogram)/sizeof(_histogram[0]);
+  if (idx >= arr_size) {
+    _histogram[arr_size-1] += 1;
   }
   else {
     _histogram[idx] += 1;
