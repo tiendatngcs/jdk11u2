@@ -177,6 +177,8 @@ private:
   size_t _hot_region_count;
   size_t _cold_region_count;
 
+  size_t _histogram[20];
+
   uintptr_t _gc_epoch;
 
   // uint32_t _neutral_to_hot_count;
@@ -233,6 +235,9 @@ public:
   void decrease_region_count(size_t num, ShenandoahRegionAccessRate access_rate);
   void set_region_count(size_t num, ShenandoahRegionAccessRate access_rate);
 
+  void update_histogram(oop obj);
+  void reset_histogram();
+
 
   void increase_gc_epoch(uintptr_t increment);
 
@@ -258,6 +263,8 @@ public:
   size_t hot_region_count()   const;
   size_t cold_region_count()  const;
 
+  size_t* histogram()   const;
+  std::string histogram_in_string() const;
 
   uintptr_t gc_epoch() const;
 

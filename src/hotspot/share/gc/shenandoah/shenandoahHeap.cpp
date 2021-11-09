@@ -70,6 +70,9 @@
 #include "runtime/vmThread.hpp"
 #include "services/mallocTracker.hpp"
 
+#include <math.h>
+#include <string>
+
 ShenandoahHeap* ShenandoahHeap::_heap = NULL;
 
 class ShenandoahPretouchHeapTask : public AbstractGangTask {
@@ -460,6 +463,7 @@ ShenandoahHeap::ShenandoahHeap(ShenandoahCollectorPolicy* policy) :
   _hard_hot_size(0),
   _hot_region_count(0),
   _cold_region_count(0),
+  _histogram{},
   // _neutral_to_hot_count(0),
   // _neutral_to_cold_count(0),
   _gc_epoch(0),
@@ -679,6 +683,19 @@ size_t ShenandoahHeap::hot_region_count()   const {
 size_t ShenandoahHeap::cold_region_count()  const {
   OrderAccess::acquire();
   return _cold_region_count;
+}
+
+size_t* ShenandoahHeap::histogram()   const {
+  OrderAccess::acquire();
+  return _histogram;
+}
+
+std::string ShenandoahHeap::histogram_in_string() const {
+  std::string str;
+  for (int i = 0; i < _histogram.size(); i++) {
+    str += std::to_string(_histogram[i])+", ";
+  }
+  return str;
 }
 
 uintptr_t ShenandoahHeap::gc_epoch() const{
@@ -922,6 +939,21 @@ void ShenandoahHeap::set_region_count(size_t num, ShenandoahRegionAccessRate acc
     default:
       break;
   }
+}
+
+void ShenandoahHeap::update_histogram(oop obj) {
+  // uintptr_t ac
+  int idx = static_cast<int>(log10(obj->access_counter()));
+  if (idx >= _histogram.size()) {
+    _histogram[_histogram.size()-1] += 1;
+  }
+  else {
+    _histogram[idx] += 1;
+  }
+}
+
+void ShenandoahHeap::reset_histogram() {
+  memset(_histogram, 0, sizeof(_histogram));
 }
 
 void ShenandoahHeap::increase_gc_epoch(uintptr_t increment) {
