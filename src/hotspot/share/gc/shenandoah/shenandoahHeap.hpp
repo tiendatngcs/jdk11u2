@@ -218,11 +218,15 @@ public:
   // void set_hot_size(size_t bytes);
 
   void increase_hotness_size(size_t bytes, ShenandoahRegionAccessRate access_rate);
+  void increase_hotness_size(oop obj);
   void decrease_hotness_size(size_t bytes, ShenandoahRegionAccessRate access_rate);
+  void decrease_hotness_size(oop obj);
   void set_hotness_size(size_t bytes, ShenandoahRegionAccessRate access_rate);
 
   void increase_hard_hotness_size(size_t bytes, ShenandoahRegionAccessRate access_rate);
+  void increase_hard_hotness_size(oop obj);
   void decrease_hard_hotness_size(size_t bytes, ShenandoahRegionAccessRate access_rate);
+  void decrease_hard_hotness_size(oop obj);
   void set_hard_hotness_size(size_t bytes, ShenandoahRegionAccessRate access_rate);
 
   void increase_region_count(size_t num, ShenandoahRegionAccessRate access_rate);
@@ -346,6 +350,8 @@ private:
 public:
   char gc_state() const;
   static address gc_state_addr();
+
+  static ShenandoahRegionAccessRate get_access_rate_from_access_counter(uintptr_t ac);
 
   void set_concurrent_mark_in_progress(bool in_progress);
   void set_evacuation_in_progress(bool in_progress);

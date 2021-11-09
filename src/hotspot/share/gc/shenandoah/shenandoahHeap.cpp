@@ -783,6 +783,11 @@ void ShenandoahHeap::increase_hotness_size(size_t bytes, ShenandoahRegionAccessR
   }
 }
 
+void ShenandoahHeap::increase_hotness_size(oop obj) {
+  if (obj == NULL) return;
+  increase_hotness_size(obj->size(), get_access_rate_from_access_counter(obj->access_counter()));
+}
+
 void ShenandoahHeap::decrease_hotness_size(size_t bytes, ShenandoahRegionAccessRate access_rate) {
   switch(access_rate){
     case HOT:
@@ -796,6 +801,11 @@ void ShenandoahHeap::decrease_hotness_size(size_t bytes, ShenandoahRegionAccessR
     default:
       break;
   }
+}
+
+void ShenandoahHeap::decrease_hotness_size(oop obj) {
+  if (obj == NULL) return;
+  decrease_hotness_size(obj->size(), get_access_rate_from_access_counter(obj->access_counter()));
 }
 
 void ShenandoahHeap::set_hotness_size(size_t bytes, ShenandoahRegionAccessRate access_rate) {
@@ -828,6 +838,11 @@ void ShenandoahHeap::increase_hard_hotness_size(size_t bytes, ShenandoahRegionAc
   }
 }
 
+void ShenandoahHeap::increase_hard_hotness_size(oop obj){
+  if (obj == NULL) return;
+  increase_hard_hotness_size(obj->size(), get_access_rate_from_access_counter(obj->access_counter()));
+}
+
 void ShenandoahHeap::decrease_hard_hotness_size(size_t bytes, ShenandoahRegionAccessRate access_rate) {
   switch(access_rate){
     case HOT:
@@ -841,6 +856,11 @@ void ShenandoahHeap::decrease_hard_hotness_size(size_t bytes, ShenandoahRegionAc
     default:
       break;
   }
+}
+
+void ShenandoahHeap::decrease_hard_hotness_size(oop obj){
+  if (obj == NULL) return;
+  decrease_hard_hotness_size(obj->size(), get_access_rate_from_access_counter(obj->access_counter()));
 }
 
 void ShenandoahHeap::set_hard_hotness_size(size_t bytes, ShenandoahRegionAccessRate access_rate) {
@@ -2356,6 +2376,13 @@ address ShenandoahHeap::gc_state_addr() {
   return (address) ShenandoahHeap::heap()->_gc_state.addr_of();
 }
 
+ShenandoahRegionAccessRate ShenandoahHeap::get_access_rate_from_access_counter(uintptr_t ac) {
+  if (ac < ShenandoahHotnessThreshold) {
+    return COLD;
+  }
+  return HOT;
+}
+
 size_t ShenandoahHeap::bytes_allocated_since_gc_start() {
   return OrderAccess::load_acquire(&_bytes_allocated_since_gc_start);
 }
@@ -3147,13 +3174,15 @@ void ShenandoahHeap::flush_liveness_cache(uint worker_id) {
 }
 
 void ShenandoahHeap::refresh_hard_hot_cold_stats() {
-  ShenandoahHeapLocker locker(lock()); // !!!!!
+  // ShenandoahHeapLocker locker(lock()); // !!!!!
+  // heap()->set_hard_hotness_size(0, HOT);
+  // heap()->set_hard_hotness_size(0, COLD);
+  // for (size_t i = 0; i < num_regions(); i++) {
+  //   ShenandoahHeapRegion* r = get_region(i);
+  //   if (r->is_regular() && r->has_live()){
+  //     r->increase_heap_hard_hot_cold_stats();
+  //   }
+  // }
   heap()->set_hard_hotness_size(0, HOT);
   heap()->set_hard_hotness_size(0, COLD);
-  for (size_t i = 0; i < num_regions(); i++) {
-    ShenandoahHeapRegion* r = get_region(i);
-    if (r->is_regular() && r->has_live()){
-      r->increase_heap_hard_hot_cold_stats();
-    }
-  }
 }

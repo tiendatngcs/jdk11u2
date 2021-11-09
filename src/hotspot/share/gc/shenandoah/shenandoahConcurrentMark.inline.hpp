@@ -264,7 +264,7 @@ inline void ShenandoahConcurrentMark::mark_through_ref(T *p, ShenandoahHeap* hea
           ShenandoahStringDedup::enqueue_candidate(obj);
         }
       }
-
+      heap->increase_hard_hotness_size(obj);
       shenandoah_assert_marked(p, obj);
     }
   }
