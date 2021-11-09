@@ -70,8 +70,6 @@
 #include "runtime/vmThread.hpp"
 #include "services/mallocTracker.hpp"
 
-#include <math.h>
-#include <string>
 
 ShenandoahHeap* ShenandoahHeap::_heap = NULL;
 

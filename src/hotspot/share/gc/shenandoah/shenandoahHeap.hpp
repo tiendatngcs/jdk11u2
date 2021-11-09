@@ -35,6 +35,9 @@
 #include "gc/shenandoah/shenandoahSharedVariables.hpp"
 #include "services/memoryManager.hpp"
 
+#include <math.h>
+#include <string>
+
 class ConcurrentGCTimer;
 class ReferenceProcessor;
 class ShenandoahCollectorPolicy;
