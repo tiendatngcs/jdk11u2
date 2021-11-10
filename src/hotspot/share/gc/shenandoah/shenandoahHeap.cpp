@@ -958,6 +958,7 @@ void ShenandoahHeap::update_histogram(oop obj) {
 }
 
 void ShenandoahHeap::reset_histogram() {
+  OrderAccess::acquire();
   memset(_histogram, 0, sizeof(_histogram));
 }
 
