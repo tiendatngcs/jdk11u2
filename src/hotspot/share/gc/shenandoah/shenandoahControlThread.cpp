@@ -453,6 +453,7 @@ void ShenandoahControlThread::service_concurrent_normal_cycle(GCCause::Cause cau
   heap->heuristics()->record_success_concurrent();
   heap->shenandoah_policy()->record_success_concurrent();
   heap->increase_gc_epoch(1);
+  printf("GC epoch = %lu\n", heap->gc_epoch());
 }
 
 bool ShenandoahControlThread::check_cancellation_or_degen(ShenandoahHeap::ShenandoahDegenPoint point) {

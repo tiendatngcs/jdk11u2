@@ -961,7 +961,7 @@ void ShenandoahHeap::update_histogram(oop obj) {
   }
   int idx = static_cast<int>(log10(ac));
   int arr_size = sizeof(_histogram)/sizeof(_histogram[0]);
-  printf("arr_size %d | ac %lu | idx %d\n", arr_size, ac, idx);
+  // printf("arr_size %d | ac %lu | idx %d\n", arr_size, ac, idx);
   if (idx >= arr_size) {
     // Atomic::add(1, &_histogram[arr_size-1]);
     _histogram[arr_size-1] += 1;
@@ -1016,9 +1016,12 @@ void ShenandoahHeap::set_hot_to_cold_count(uint32_t value) {
 }
 
 void ShenandoahHeap::oop_check_to_reset_access_counter(oop obj) {
-  if (obj != NULL && obj->gc_epoch() < _heap->gc_epoch()) {
-    obj->set_access_counter(0);
-    obj->set_gc_epoch(_heap->gc_epoch());
+  if (obj != NULL) {
+    printf("obj gc_epoch: %lu | heap gc_epoch: %lu\n", obj->gc_epoch(), _heap->gc_epoch());
+    if (obj->gc_epoch() < _heap->gc_epoch()) {
+      obj->set_access_counter(0);
+      obj->set_gc_epoch(_heap->gc_epoch());
+    }
   }
 }
 

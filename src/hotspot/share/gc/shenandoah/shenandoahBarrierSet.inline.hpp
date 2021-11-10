@@ -302,10 +302,10 @@ inline oop ShenandoahBarrierSet::AccessBarrier<decorators, BarrierSetT>::oop_ato
   // if (base != NULL){
   //   bs->oop_add_access_counter(base, 1);
   // }
-  if (new_value != NULL){
-    // new_value->add_access_counter(1);
-    bs->oop_add_access_counter(new_value, 1);
-  }
+  // if (new_value != NULL){
+  //   // new_value->add_access_counter(1);
+  //   bs->oop_add_access_counter(new_value, 1);
+  // }
   return oop_atomic_xchg_in_heap_impl(new_value, AccessInternal::oop_field_addr<decorators>(base, offset));
 }
 
@@ -314,14 +314,14 @@ template <DecoratorSet decorators, typename BarrierSetT>
 void ShenandoahBarrierSet::AccessBarrier<decorators, BarrierSetT>::clone_in_heap(oop src, oop dst, size_t size) {
   ShenandoahBarrierSet *const bs = ShenandoahBarrierSet::barrier_set();
   // access_counter
-  if (src != NULL){
-    // src->add_access_counter(1);
-    bs->oop_add_access_counter(src, 1);
-  }
-  if (dst != NULL){
-    // dst->add_access_counter(1);
-    bs->oop_add_access_counter(dst, 1);
-  }
+  // if (src != NULL){
+  //   // src->add_access_counter(1);
+  //   bs->oop_add_access_counter(src, 1);
+  // }
+  // if (dst != NULL){
+  //   // dst->add_access_counter(1);
+  //   bs->oop_add_access_counter(dst, 1);
+  // }
   if (ShenandoahCloneBarrier) {
     bs->clone_barrier_runtime(src);
   }
