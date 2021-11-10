@@ -703,8 +703,6 @@ public:
   inline void mark_complete_marking_context();
   inline void mark_incomplete_marking_context();
 
-  // inline void oop_add_access_counter(oop obj, uintptr_t increment);
-
   template<class T>
   inline void marked_object_iterate(ShenandoahHeapRegion* region, T* cl);
 

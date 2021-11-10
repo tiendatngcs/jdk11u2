@@ -959,7 +959,7 @@ void ShenandoahHeap::update_histogram(oop obj) {
     _histogram[0] += 1;
     return;
   }
-  int idx = static_cast<int>(log10(ac));
+  int idx = static_cast<int>(log2(ac));
   int arr_size = sizeof(_histogram)/sizeof(_histogram[0]);
   // printf("arr_size %d | ac %lu | idx %d\n", arr_size, ac, idx);
   if (idx >= arr_size) {

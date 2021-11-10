@@ -84,9 +84,10 @@ void oopDesc::add_gc_epoch(uintptr_t increment) {
   }
   else {
     printf("GC epoch reaches UINTPTR_MAX\n");
-    if (epoch < UINTPTR_MAX){
-      set_gc_epoch(UINTPTR_MAX);
-    }
+    // if (epoch < UINTPTR_MAX){
+    //   set_gc_epoch(UINTPTR_MAX);
+    // }
+    set_gc_epoch(0);
   }
 }
 
