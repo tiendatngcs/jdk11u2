@@ -167,10 +167,10 @@ template <DecoratorSet decorators, typename BarrierSetT>
 inline oop ShenandoahBarrierSet::AccessBarrier<decorators, BarrierSetT>::oop_load_in_heap_at(oop base, ptrdiff_t offset) {
   ShenandoahBarrierSet *const bs = ShenandoahBarrierSet::barrier_set();
   // access_counter
-  if (base != NULL){
-    // base->add_access_counter(1);
-    bs->oop_add_access_counter(base, 1);
-  }
+  // if (base != NULL){
+  //   // base->add_access_counter(1);
+  //   bs->oop_add_access_counter(base, 1);
+  // }
 
   oop value = Raw::oop_load_in_heap_at(base, offset);
 
@@ -213,10 +213,10 @@ template <DecoratorSet decorators, typename BarrierSetT>
 inline void ShenandoahBarrierSet::AccessBarrier<decorators, BarrierSetT>::oop_store_in_heap_at(oop base, ptrdiff_t offset, oop value) {
   ShenandoahBarrierSet *const bs = ShenandoahBarrierSet::barrier_set();
   // Access counter
-  if (base != NULL){
-    // base->add_access_counter(1);
-    bs->oop_add_access_counter(base, 1);
-  }
+  // if (base != NULL){
+  //   // base->add_access_counter(1);
+  //   bs->oop_add_access_counter(base, 1);
+  // }
   if (value != NULL){
     // value->add_access_counter(1);
     bs->oop_add_access_counter(value, 1);
@@ -258,10 +258,10 @@ template <DecoratorSet decorators, typename BarrierSetT>
 inline oop ShenandoahBarrierSet::AccessBarrier<decorators, BarrierSetT>::oop_atomic_cmpxchg_in_heap_at(oop new_value, oop base, ptrdiff_t offset, oop compare_value) {
   ShenandoahBarrierSet *const bs = ShenandoahBarrierSet::barrier_set();
   // access_counter
-  if (base != NULL){
-    // base->add_access_counter(1);
-    bs->oop_add_access_counter(base, 1);
-  }
+  // if (base != NULL){
+  //   // base->add_access_counter(1);
+  //   bs->oop_add_access_counter(base, 1);
+  // }
   if (compare_value != NULL){
     // compare_value->add_access_counter(1);
     bs->oop_add_access_counter(compare_value, 1);
@@ -299,10 +299,9 @@ inline oop ShenandoahBarrierSet::AccessBarrier<decorators, BarrierSetT>::oop_ato
 template <DecoratorSet decorators, typename BarrierSetT>
 inline oop ShenandoahBarrierSet::AccessBarrier<decorators, BarrierSetT>::oop_atomic_xchg_in_heap_at(oop new_value, oop base, ptrdiff_t offset) {
   ShenandoahBarrierSet *const bs = ShenandoahBarrierSet::barrier_set();
-  if (base != NULL){
-    // base->add_access_counter(1);
-    bs->oop_add_access_counter(base, 1);
-  }
+  // if (base != NULL){
+  //   bs->oop_add_access_counter(base, 1);
+  // }
   if (new_value != NULL){
     // new_value->add_access_counter(1);
     bs->oop_add_access_counter(new_value, 1);
