@@ -444,6 +444,7 @@ void ShenandoahControlThread::service_concurrent_normal_cycle(GCCause::Cause cau
                 "cold_region_count: %lu\n"
                 "histogram: %s\n", heap->gc_epoch(), heap->capacity(), heap->used(), heap->committed(), heap->bytes_allocated_since_gc_start(), heap->hot_size(), heap->cold_size(), heap->num_regions(), heap->hot_region_count(), heap->cold_region_count(), "Placeholder");
   int arr_size = sizeof(heap->histogram()) / sizeof(heap->histogram()[0]);
+  log_info(gc)("Array size: %d", arr_size);
   for (int i = 0; i < arr_size; i++){
     log_info(gc)("\t%d: %lu", i, heap->histogram()[i]);
   }
