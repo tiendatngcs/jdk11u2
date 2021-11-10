@@ -461,7 +461,7 @@ ShenandoahHeap::ShenandoahHeap(ShenandoahCollectorPolicy* policy) :
   _hard_hot_size(0),
   _hot_region_count(0),
   _cold_region_count(0),
-  // _histogram(),
+  _histogram(),
   // _neutral_to_hot_count(0),
   // _neutral_to_cold_count(0),
   _gc_epoch(0),
@@ -946,6 +946,7 @@ void ShenandoahHeap::set_region_count(size_t num, ShenandoahRegionAccessRate acc
 void ShenandoahHeap::update_histogram(oop obj) {
   // uintptr_t ac
   if (obj == NULL) return;
+  OrderAccess::acquire();
   int idx = static_cast<int>(log10(obj->access_counter()));
   int arr_size = sizeof(_histogram)/sizeof(_histogram[0]);
   if (idx >= arr_size) {
