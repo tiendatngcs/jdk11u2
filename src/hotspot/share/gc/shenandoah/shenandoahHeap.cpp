@@ -945,6 +945,7 @@ void ShenandoahHeap::set_region_count(size_t num, ShenandoahRegionAccessRate acc
 
 void ShenandoahHeap::update_histogram(oop obj) {
   // uintptr_t ac
+  if (obj == NULL) return;
   int idx = static_cast<int>(log10(obj->access_counter()));
   int arr_size = sizeof(_histogram)/sizeof(_histogram[0]);
   if (idx >= arr_size) {
