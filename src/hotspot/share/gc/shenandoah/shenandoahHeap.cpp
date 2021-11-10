@@ -790,12 +790,12 @@ void ShenandoahHeap::decrease_used(size_t bytes) {
 void ShenandoahHeap::increase_hotness_size(size_t bytes, ShenandoahRegionAccessRate access_rate) {
   switch(access_rate){
     case HOT:
-      // Atomic::add(bytes, &_hot_size);
-      _hot_size += bytes;
+      Atomic::add(bytes, &_hot_size);
+      // _hot_size += bytes;
       break;
     case COLD:
-      // Atomic::add(bytes, &_cold_size);
-      _cold_size += bytes;
+      Atomic::add(bytes, &_cold_size);
+      // _cold_size += bytes;
       break;
     default:
       break;
@@ -810,12 +810,12 @@ void ShenandoahHeap::increase_hotness_size(oop obj) {
 void ShenandoahHeap::decrease_hotness_size(size_t bytes, ShenandoahRegionAccessRate access_rate) {
   switch(access_rate){
     case HOT:
-      // Atomic::sub(bytes, &_hot_size);
-      _hot_size -= bytes;
+      Atomic::sub(bytes, &_hot_size);
+      // _hot_size -= bytes;
       break;
     case COLD:
-      // Atomic::sub(bytes, &_cold_size);
-      _cold_size -= bytes;
+      Atomic::sub(bytes, &_cold_size);
+      // _cold_size -= bytes;
       break;
     default:
       break;
@@ -830,12 +830,12 @@ void ShenandoahHeap::decrease_hotness_size(oop obj) {
 void ShenandoahHeap::set_hotness_size(size_t bytes, ShenandoahRegionAccessRate access_rate) {
   switch(access_rate){
     case HOT:
-      // OrderAccess::release_store_fence(&_hot_size, bytes);
-      _hot_size = bytes;
+      OrderAccess::release_store_fence(&_hot_size, bytes);
+      // _hot_size = bytes;
       break;
     case COLD:
-      // OrderAccess::release_store_fence(&_cold_size, bytes);
-      _cold_size = bytes;
+      OrderAccess::release_store_fence(&_cold_size, bytes);
+      // _cold_size = bytes;
       break;
     default:
       break;
@@ -901,12 +901,12 @@ void ShenandoahHeap::set_hard_hotness_size(size_t bytes, ShenandoahRegionAccessR
 void ShenandoahHeap::increase_region_count(size_t num, ShenandoahRegionAccessRate access_rate) {
   switch(access_rate){
     case HOT:
-      // Atomic::add(bytes, &_hot_size);
-      _hot_region_count += num;
+      Atomic::add(num, &_hot_region_count);
+      // _hot_region_count += num;
       break;
     case COLD:
-      // Atomic::add(bytes, &_cold_size);
-      _cold_region_count += num;
+      Atomic::add(num, &_cold_region_count);
+      // _cold_region_count += num;
       break;
     default:
       break;
@@ -916,12 +916,12 @@ void ShenandoahHeap::increase_region_count(size_t num, ShenandoahRegionAccessRat
 void ShenandoahHeap::decrease_region_count(size_t num, ShenandoahRegionAccessRate access_rate) {
   switch(access_rate){
     case HOT:
-      // Atomic::add(bytes, &_hot_size);
-      _hot_region_count -= num;
+      Atomic::sub(num, &_hot_region_count);
+      // _hot_region_count -= num;
       break;
     case COLD:
-      // Atomic::add(bytes, &_cold_size);
-      _cold_region_count -= num;
+      Atomic::sub(num, &_hot_region_count);
+      // _cold_region_count -= num;
       break;
     default:
       break;
@@ -932,11 +932,13 @@ void ShenandoahHeap::set_region_count(size_t num, ShenandoahRegionAccessRate acc
   switch(access_rate){
     case HOT:
       // Atomic::add(bytes, &_hot_size);
-      _hot_region_count = num;
+      OrderAccess::release_store_fence(&_hot_region_count, num);
+      // _hot_region_count = num;
       break;
     case COLD:
       // Atomic::add(bytes, &_cold_size);
-      _cold_region_count = num;
+      OrderAccess::release_store_fence(&_cold_region_count, num);
+      // _cold_region_count = num;
       break;
     default:
       break;
@@ -946,14 +948,16 @@ void ShenandoahHeap::set_region_count(size_t num, ShenandoahRegionAccessRate acc
 void ShenandoahHeap::update_histogram(oop obj) {
   // uintptr_t ac
   if (obj == NULL) return;
-  OrderAccess::acquire();
+  if (_histogram == NULL) return;
   int idx = static_cast<int>(log10(obj->access_counter()));
   int arr_size = sizeof(_histogram)/sizeof(_histogram[0]);
   if (idx >= arr_size) {
-    _histogram[arr_size-1] += 1;
+    Atomic::add(1, &_histogram[arr_size-1]);
+    // _histogram[arr_size-1] += 1;
   }
   else {
-    _histogram[idx] += 1;
+    Atomic::add(1, &_histogram[idx]);
+    // _histogram[idx] += 1;
   }
 }
 
