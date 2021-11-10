@@ -448,7 +448,7 @@ void ShenandoahControlThread::service_concurrent_normal_cycle(GCCause::Cause cau
   //   log_info(gc)("\t%d: %lu", i, heap->histogram()[i]);
   // }
   heap->refresh_hard_hot_cold_stats();
-  heap->reset_histogram();
+  // heap->reset_histogram();
   heap->heuristics()->record_success_concurrent();
   heap->shenandoah_policy()->record_success_concurrent();
   heap->increase_gc_epoch(1);
