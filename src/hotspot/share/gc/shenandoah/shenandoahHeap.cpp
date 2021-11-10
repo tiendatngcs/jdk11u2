@@ -949,7 +949,12 @@ void ShenandoahHeap::update_histogram(oop obj) {
   // uintptr_t ac
   if (obj == NULL) return;
   if (_histogram == NULL) return;
-  int idx = static_cast<int>(log10(obj->access_counter()));
+  ac = obj->access_counter();
+  if (ac == 0){
+    _histogram[0] += 1;
+    return;
+  }
+  int idx = static_cast<int>(log10(ac));
   int arr_size = sizeof(_histogram)/sizeof(_histogram[0]);
   if (idx >= arr_size) {
     // Atomic::add(1, &_histogram[arr_size-1]);

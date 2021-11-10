@@ -267,7 +267,7 @@ inline void ShenandoahConcurrentMark::mark_through_ref(T *p, ShenandoahHeap* hea
       shenandoah_assert_marked(p, obj);
     }
     heap->increase_hotness_size(obj);
-    // heap->update_histogram(obj);
+    heap->update_histogram(obj);
   }
 }
 
