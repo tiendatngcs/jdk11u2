@@ -689,16 +689,16 @@ const size_t* ShenandoahHeap::histogram()   const {
   return _histogram;
 }
 
-std::string ShenandoahHeap::histogram_in_string() const {
-  std::string str;
-  int arr_size = sizeof(_histogram)/sizeof(_histogram[0]);
-  for (int i = 0; i < arr_size; i++) {
-    std::stringstream stream;
-    stream << _histogram[i];
-    str += stream.str() + ", ";
-  }
-  return str;
-}
+// std::string ShenandoahHeap::histogram_in_string() const {
+//   std::string str;
+//   int arr_size = sizeof(_histogram)/sizeof(_histogram[0]);
+//   for (int i = 0; i < arr_size; i++) {
+//     std::stringstream stream;
+//     stream << _histogram[i];
+//     str += stream.str() + ", ";
+//   }
+//   return str;
+// }
 
 uintptr_t ShenandoahHeap::gc_epoch() const{
   OrderAccess::acquire();

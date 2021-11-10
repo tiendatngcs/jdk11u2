@@ -36,8 +36,8 @@
 #include "services/memoryManager.hpp"
 
 #include <math.h>
-#include <string>
-#include <sstream>
+// #include <string>
+// #include <sstream>
 
 class ConcurrentGCTimer;
 class ReferenceProcessor;
@@ -268,7 +268,7 @@ public:
   size_t cold_region_count()  const;
 
   const size_t* histogram()   const;
-  std::string histogram_in_string() const;
+  // std::string histogram_in_string() const;
 
   uintptr_t gc_epoch() const;
 
