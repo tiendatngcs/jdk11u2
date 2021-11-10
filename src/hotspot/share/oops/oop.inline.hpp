@@ -49,6 +49,9 @@ uintptr_t oopDesc::access_counter() const {
 
 void oopDesc::set_access_counter(uintptr_t new_value){
   HeapAccess<MO_RELAXED>::store_at(as_oop(), access_counter_offset_in_bytes(), new_value);
+  if (new_value == 0){
+    printf("ac is set to: %lu\n", access_counter());
+  }
 }
 
 void oopDesc::add_access_counter(uintptr_t increment) {
