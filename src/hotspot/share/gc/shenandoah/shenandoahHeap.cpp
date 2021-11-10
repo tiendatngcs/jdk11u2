@@ -804,6 +804,7 @@ void ShenandoahHeap::increase_hotness_size(size_t bytes, ShenandoahRegionAccessR
 
 void ShenandoahHeap::increase_hotness_size(oop obj) {
   if (obj == NULL) return;
+  oop_check_to_reset_access_counter(obj);
   increase_hotness_size(obj->size(), get_access_rate_from_access_counter(obj->access_counter()));
 }
 
@@ -824,6 +825,7 @@ void ShenandoahHeap::decrease_hotness_size(size_t bytes, ShenandoahRegionAccessR
 
 void ShenandoahHeap::decrease_hotness_size(oop obj) {
   if (obj == NULL) return;
+  oop_check_to_reset_access_counter(obj);
   decrease_hotness_size(obj->size(), get_access_rate_from_access_counter(obj->access_counter()));
 }
 
@@ -859,6 +861,7 @@ void ShenandoahHeap::increase_hard_hotness_size(size_t bytes, ShenandoahRegionAc
 
 void ShenandoahHeap::increase_hard_hotness_size(oop obj){
   if (obj == NULL) return;
+  oop_check_to_reset_access_counter(obj);
   increase_hard_hotness_size(obj->size(), get_access_rate_from_access_counter(obj->access_counter()));
 }
 
@@ -879,6 +882,7 @@ void ShenandoahHeap::decrease_hard_hotness_size(size_t bytes, ShenandoahRegionAc
 
 void ShenandoahHeap::decrease_hard_hotness_size(oop obj){
   if (obj == NULL) return;
+  oop_check_to_reset_access_counter(obj);
   decrease_hard_hotness_size(obj->size(), get_access_rate_from_access_counter(obj->access_counter()));
 }
 
@@ -949,6 +953,7 @@ void ShenandoahHeap::update_histogram(oop obj) {
   // uintptr_t ac
   if (obj == NULL) return;
   if (_histogram == NULL) return;
+  oop_check_to_reset_access_counter(obj);
   uintptr_t ac = obj->access_counter();
   if (ac == 0){
     _histogram[0] += 1;
@@ -1007,6 +1012,13 @@ void ShenandoahHeap::increase_hot_to_cold_count(uint32_t increment) {
 
 void ShenandoahHeap::set_hot_to_cold_count(uint32_t value) {
   OrderAccess::release_store_fence(&_hot_to_cold_count, value);
+}
+
+void ShenandoahHeap::oop_check_to_reset_access_counter(oop obj) {
+  if (obj != NULL && obj->gc_epoch() < _heap->gc_epoch()) {
+    obj->set_access_counter(0);
+    obj->set_gc_epoch(_heap->gc_epoch());
+  }
 }
 
 void ShenandoahHeap::increase_allocated(size_t bytes) {

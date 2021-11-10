@@ -703,6 +703,7 @@ private:
     T o = RawAccess<>::oop_load(p);
     if (!CompressedOops::is_null(o)) {
       oop obj = CompressedOops::decode_not_null(o);
+      _heap->oop_check_to_reset_access_counter(obj);
       // assert(_ctx->is_marked(obj), "must be marked");
       // if (obj->is_forwarded()) {
       //   oop forw = obj->forwardee();
@@ -732,45 +733,45 @@ public:
   void do_oop(narrowOop* p) { do_oop_work(p); }
 };
 
-void ShenandoahHeapRegion::increase_heap_hard_hot_cold_stats() {
-  // assert(is_active(), "region must be active");
-  assert(has_live(), "region must contain live objects");
-  ShenandoahHeap* heap = ShenandoahHeap::heap();
-  switch (_access_rate) {
-    case HOT:
-    case COLD:
-      heap->increase_hard_hotness_size(used(), _access_rate);
-      break;
-    default: 
-      {
-      // ShenandoahCollectHardHotnessStatsClosure cl;
-      // oop_iterate(&cl);
-      // assert(! is_humongous(), "no humongous region here");
-      HeapWord* obj_addr = bottom();
-      size_t size = 0;
-      uintptr_t ac = 0;
-      // HeapWord* t = top();
-      // Could call objects iterate, but this is easier.
-      // oop obj = oop(obj_addr);
-      // printf("ac = %lu\n", obj->access_counter());
-      // printf("size = %d\n", obj->size());
-      // printf("starting while loop\n");
-      while (obj_addr < top()) {
-        oop obj = oop(obj_addr);
-        if (obj == NULL) break;
-        size = obj->size();
-        ac = obj->access_counter();
-        // printf("ac = %lu\n", obj->access_counter());
-        // printf("size = %d\n", obj->size());
-        if (ac < ShenandoahHotnessThreshold) {
-          heap->increase_hard_hotness_size(size, COLD);
-        }
-        else {
-          heap->increase_hard_hotness_size(size, HOT);
-        }
-        obj_addr += size;
-      }
-      break;
-    }
-  }
-}
+// void ShenandoahHeapRegion::increase_heap_hard_hot_cold_stats() {
+//   // assert(is_active(), "region must be active");
+//   assert(has_live(), "region must contain live objects");
+//   ShenandoahHeap* heap = ShenandoahHeap::heap();
+//   switch (_access_rate) {
+//     case HOT:
+//     case COLD:
+//       heap->increase_hard_hotness_size(used(), _access_rate);
+//       break;
+//     default: 
+//       {
+//       // ShenandoahCollectHardHotnessStatsClosure cl;
+//       // oop_iterate(&cl);
+//       // assert(! is_humongous(), "no humongous region here");
+//       HeapWord* obj_addr = bottom();
+//       size_t size = 0;
+//       uintptr_t ac = 0;
+//       // HeapWord* t = top();
+//       // Could call objects iterate, but this is easier.
+//       // oop obj = oop(obj_addr);
+//       // printf("ac = %lu\n", obj->access_counter());
+//       // printf("size = %d\n", obj->size());
+//       // printf("starting while loop\n");
+//       while (obj_addr < top()) {
+//         oop obj = oop(obj_addr);
+//         if (obj == NULL) break;
+//         size = obj->size();
+//         ac = obj->access_counter();
+//         // printf("ac = %lu\n", obj->access_counter());
+//         // printf("size = %d\n", obj->size());
+//         if (ac < ShenandoahHotnessThreshold) {
+//           heap->increase_hard_hotness_size(size, COLD);
+//         }
+//         else {
+//           heap->increase_hard_hotness_size(size, HOT);
+//         }
+//         obj_addr += size;
+//       }
+//       break;
+//     }
+//   }
+// }
