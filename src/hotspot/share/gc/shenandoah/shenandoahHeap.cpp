@@ -949,7 +949,7 @@ void ShenandoahHeap::update_histogram(oop obj) {
   // uintptr_t ac
   if (obj == NULL) return;
   if (_histogram == NULL) return;
-  ac = obj->access_counter();
+  uintptr_t ac = obj->access_counter();
   if (ac == 0){
     _histogram[0] += 1;
     return;
