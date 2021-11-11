@@ -182,6 +182,7 @@ private:
   size_t _cold_region_count;
 
   size_t _histogram[20];
+  size_t _size_histogram[20];
 
   uintptr_t _gc_epoch;
 
@@ -269,6 +270,7 @@ public:
   size_t cold_region_count()  const;
 
   const size_t* histogram()   const;
+  const size_t* size_histogram() const;
   // std::string histogram_in_string() const;
 
   uintptr_t gc_epoch() const;
@@ -725,7 +727,7 @@ public:
   // Liveness caching support
   ShenandoahLiveData* get_liveness_cache(uint worker_id);
   void flush_liveness_cache(uint worker_id);
-  void refresh_hard_hot_cold_stats();
+  void refresh_hot_cold_stats();
 
   size_t pretouch_heap_page_size() { return _pretouch_heap_page_size; }
 

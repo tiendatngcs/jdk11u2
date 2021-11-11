@@ -462,6 +462,7 @@ ShenandoahHeap::ShenandoahHeap(ShenandoahCollectorPolicy* policy) :
   _hot_region_count(0),
   _cold_region_count(0),
   _histogram(),
+  _size_histogram(),
   // _neutral_to_hot_count(0),
   // _neutral_to_cold_count(0),
   _gc_epoch(0),
@@ -689,16 +690,10 @@ const size_t* ShenandoahHeap::histogram()   const {
   return _histogram;
 }
 
-// std::string ShenandoahHeap::histogram_in_string() const {
-//   std::string str;
-//   int arr_size = sizeof(_histogram)/sizeof(_histogram[0]);
-//   for (int i = 0; i < arr_size; i++) {
-//     std::stringstream stream;
-//     stream << _histogram[i];
-//     str += stream.str() + ", ";
-//   }
-//   return str;
-// }
+const size_t* ShenandoahHeap::size_histogram()   const {
+  OrderAccess::acquire();
+  return _size_histogram;
+}
 
 uintptr_t ShenandoahHeap::gc_epoch() const{
   OrderAccess::acquire();
@@ -952,11 +947,11 @@ void ShenandoahHeap::set_region_count(size_t num, ShenandoahRegionAccessRate acc
 void ShenandoahHeap::update_histogram(oop obj) {
   // uintptr_t ac
   if (obj == NULL) return;
-  if (_histogram == NULL) return;
   oop_check_to_reset_access_counter(obj);
   uintptr_t ac = obj->access_counter();
   if (ac == 0){
     _histogram[0] += 1;
+    _size_histogram[0] += obj->size();
     return;
   }
   int idx = static_cast<int>(log2(ac));
@@ -965,16 +960,19 @@ void ShenandoahHeap::update_histogram(oop obj) {
   if (idx >= arr_size) {
     // Atomic::add(1, &_histogram[arr_size-1]);
     _histogram[arr_size-1] += 1;
+    _size_histogram[arr_size-1] += obj->size();
   }
   else {
     // Atomic::add(1, &_histogram[idx]);
     _histogram[idx] += 1;
+    _size_histogram[idx] += obj->size();
   }
 }
 
 void ShenandoahHeap::reset_histogram() {
   OrderAccess::acquire();
   memset(_histogram, 0, sizeof(_histogram));
+  memset(_size_histogram, 0, sizeof(_size_histogram));
 }
 
 void ShenandoahHeap::increase_gc_epoch(uintptr_t increment) {
@@ -3236,16 +3234,7 @@ void ShenandoahHeap::flush_liveness_cache(uint worker_id) {
   }
 }
 
-void ShenandoahHeap::refresh_hard_hot_cold_stats() {
-  // ShenandoahHeapLocker locker(lock()); // !!!!!
-  // heap()->set_hard_hotness_size(0, HOT);
-  // heap()->set_hard_hotness_size(0, COLD);
-  // for (size_t i = 0; i < num_regions(); i++) {
-  //   ShenandoahHeapRegion* r = get_region(i);
-  //   if (r->is_regular() && r->has_live()){
-  //     r->increase_heap_hard_hot_cold_stats();
-  //   }
-  // }
-  heap()->set_hard_hotness_size(0, HOT);
-  heap()->set_hard_hotness_size(0, COLD);
+void ShenandoahHeap::refresh_hot_cold_stats() {
+  heap()->set_hotness_size(0, HOT);
+  heap()->set_hotness_size(0, COLD);
 }

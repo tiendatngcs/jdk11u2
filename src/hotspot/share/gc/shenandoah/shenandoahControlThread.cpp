@@ -445,10 +445,16 @@ void ShenandoahControlThread::service_concurrent_normal_cycle(GCCause::Cause cau
                 "histogram: %s\n", heap->gc_epoch(), heap->capacity(), heap->used(), heap->committed(), heap->bytes_allocated_since_gc_start(), heap->hot_size(), heap->cold_size(), heap->num_regions(), heap->hot_region_count(), heap->cold_region_count(), "Placeholder");
   // int arr_size = sizeof(heap->histogram()) / sizeof(heap->histogram()[0]);
   // log_info(gc)("Array size: %d", arr_size);
+  log_info(gc)("Obj count ac histogram");
   for (int i = 0; i < 20; i++){
     log_info(gc)("\t%d: %lu", i, heap->histogram()[i]);
   }
-  heap->refresh_hard_hot_cold_stats();
+
+  log_info(gc)("Obj size ac histogram");
+  for (int i = 0; i < 20; i++){
+    log_info(gc)("\t%d: %lu", i, heap->size_histogram()[i]);
+  }
+  heap->refresh_hot_cold_stats();
   heap->reset_histogram();
   heap->heuristics()->record_success_concurrent();
   heap->shenandoah_policy()->record_success_concurrent();
