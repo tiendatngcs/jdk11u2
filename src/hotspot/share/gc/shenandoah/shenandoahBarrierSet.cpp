@@ -85,10 +85,10 @@ oop ShenandoahBarrierSet::load_reference_barrier(oop obj) {
   }
 }
 
-void ShenandoahBarrierSet::oop_add_access_counter(oop obj, uintptr_t increment) {
-  _heap->oop_check_to_reset_access_counter(obj);
-  obj->add_access_counter(increment);
-}
+// void ShenandoahBarrierSet::oop_add_access_counter(oop obj, uintptr_t increment) {
+//   _heap->oop_check_to_reset_access_counter(obj);
+//   obj->add_access_counter(increment);
+// }
 
 bool ShenandoahBarrierSet::need_load_reference_barrier(DecoratorSet decorators, BasicType type) {
   if (!ShenandoahLoadRefBarrier) return false;
