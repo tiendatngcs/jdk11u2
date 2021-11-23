@@ -1016,11 +1016,26 @@ void ShenandoahHeap::set_hot_to_cold_count(uint32_t value) {
 void ShenandoahHeap::oop_check_to_reset_access_counter(oop obj) {
   if (obj != NULL) {
     // printf("obj gc_epoch: %lu | heap gc_epoch: %lu\n", obj->gc_epoch(), _heap->gc_epoch());
-    if (obj->gc_epoch() != _heap->gc_epoch()) {
+    if (obj->gc_epoch() < _heap->gc_epoch()) {
+      if (obj->access_counter() != 0){
+        // only reset gc_epoch if that obj was accessed in the last cycle. This would make objs the never see a barrier to stay at 0;
+        obj->set_access_counter(2 << 12);
+        obj->set_gc_epoch(_heap->gc_epoch());
+      }
+    }
+    else if (obj->gc_epoch() > _heap->gc_epoch()) {
+      printf("Newly created obj\n");
       obj->set_access_counter(0);
       obj->set_gc_epoch(_heap->gc_epoch());
     }
   }
+  // if (obj != NULL) {
+  //   // printf("obj gc_epoch: %lu | heap gc_epoch: %lu\n", obj->gc_epoch(), _heap->gc_epoch());
+  //   if (obj->gc_epoch() != _heap->gc_epoch()) {
+  //     obj->set_access_counter(0);
+  //     obj->set_gc_epoch(_heap->gc_epoch());
+  //   }
+  // }
 }
 
 void ShenandoahHeap::increase_allocated(size_t bytes) {
