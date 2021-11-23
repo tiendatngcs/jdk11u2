@@ -79,12 +79,21 @@ void ShenandoahAdaptiveHeuristics::choose_collection_set_from_regiondata(Shenand
 
   for (size_t idx = 0; idx < size; idx++) {
     ShenandoahHeapRegion* r = data[idx]._region;
+    
 
     size_t new_cset    = cur_cset + r->get_live_data_bytes();
     size_t new_garbage = cur_garbage + r->garbage();
 
+
     if (new_cset > max_cset) {
       break;
+    }
+    
+    if (ShenandoahCSCollectAll){
+      cset->add_region(r);
+      cur_cset = new_cset;
+      cur_garbage = new_garbage;
+      continue;
     }
 
     if ((new_garbage < min_garbage) || (r->garbage() > garbage_threshold)) {

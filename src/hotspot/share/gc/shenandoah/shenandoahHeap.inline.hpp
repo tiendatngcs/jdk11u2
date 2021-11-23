@@ -315,6 +315,8 @@ inline oop ShenandoahHeap::evacuate_object(oop p, Thread* thread) {
   if (result == copy_val) {
     // Successfully evacuated. Our copy is now the public one!
     shenandoah_assert_correct(NULL, copy_val);
+    increase_hotness_size(copy_val);
+    update_histogram(copy_val);
     return copy_val;
   }  else {
     // Failed to evacuate. We need to deal with the object that is left behind. Since this
@@ -335,6 +337,8 @@ inline oop ShenandoahHeap::evacuate_object(oop p, Thread* thread) {
       shenandoah_assert_correct(NULL, copy_val);
     }
     shenandoah_assert_correct(NULL, result);
+    increase_hotness_size(result);
+    update_histogram(result);
     return result;
   }
 }
