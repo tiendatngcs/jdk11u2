@@ -1019,7 +1019,7 @@ void ShenandoahHeap::oop_check_to_reset_access_counter(oop obj) {
     if (obj->gc_epoch() < _heap->gc_epoch()) {
       if (obj->access_counter() != 0){
         // only reset gc_epoch if that obj was accessed in the last cycle. This would make objs the never see a barrier to stay at 0;
-        obj->set_access_counter(2 << 12);
+        obj->set_access_counter(1 << 12);
         obj->set_gc_epoch(_heap->gc_epoch());
       }
     }
@@ -1027,6 +1027,12 @@ void ShenandoahHeap::oop_check_to_reset_access_counter(oop obj) {
       printf("Newly created obj\n");
       obj->set_access_counter(0);
       obj->set_gc_epoch(_heap->gc_epoch());
+    }
+    else {
+      if (obj->access_counter() != 0 && obj->access_counter() < 1 << 12){
+        // promote obj if it was accessed at least 1
+        obj->set_access_counter(obj->access_counter() + 1 << 12);
+      }
     }
   }
   // if (obj != NULL) {
