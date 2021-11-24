@@ -210,12 +210,12 @@ inline void ShenandoahBarrierSet::AccessBarrier<decorators, BarrierSetT>::oop_st
 template <DecoratorSet decorators, typename BarrierSetT>
 template <typename T>
 inline void ShenandoahBarrierSet::AccessBarrier<decorators, BarrierSetT>::oop_store_in_heap(T* addr, oop value) {
-  oop obj = Raw::oop_load_in_heap(addr);
+  // oop obj = Raw::oop_load_in_heap(addr);
   ShenandoahHeap *const heap = ShenandoahHeap::heap();
-  if (obj != NULL){
-    heap->oop_check_to_reset_access_counter(obj);
-    obj->add_access_counter(1);
-  }
+  // if (obj != NULL){
+  //   heap->oop_check_to_reset_access_counter(obj);
+  //   obj->add_access_counter(1);
+  // }
   if (value != NULL) {
     heap->oop_check_to_reset_access_counter(value);
     value->add_access_counter(1);
