@@ -1024,7 +1024,7 @@ void ShenandoahHeap::oop_check_to_reset_access_counter(oop obj) {
       }
     }
     else if (obj->gc_epoch() > _heap->gc_epoch()) {
-      printf("Newly created obj\n");
+      // printf("Newly created obj\n");
       obj->set_access_counter(0);
       obj->set_gc_epoch(_heap->gc_epoch());
     }
