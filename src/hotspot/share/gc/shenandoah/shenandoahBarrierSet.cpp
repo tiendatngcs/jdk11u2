@@ -79,6 +79,9 @@ oop ShenandoahBarrierSet::load_reference_barrier_not_null(oop obj) {
 
 oop ShenandoahBarrierSet::load_reference_barrier(oop obj) {
   if (obj != NULL) {
+    // ShenandoahHeap *const heap = ShenandoahHeap::heap();
+    // heap->oop_check_to_reset_access_counter(obj);
+    // obj->add_access_counter(1);
     return load_reference_barrier_not_null(obj);
   } else {
     return obj;
