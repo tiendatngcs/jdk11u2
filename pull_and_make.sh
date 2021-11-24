@@ -1,2 +1,2 @@
 git pull
-sudo make images
+make images

@@ -1,3 +1,3 @@
 git pull
-sudo bash ./configure
-sudo make images
+bash ./configure
+make images
