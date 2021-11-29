@@ -70,6 +70,24 @@ namespace AccessInternal {
     }
   };
 
+// Dat mod
+  // template <class GCBarrierType, DecoratorSet decorators>
+  // struct PostRuntimeDispatch<GCBarrierType, BARRIER_STORE, decorators>: public AllStatic {
+  //   template <>
+  //   static void access_barrier<oop>(void* addr, oop value) {
+  //     GCBarrierType::store_in_heap(reinterpret_cast<oop*>(addr), value);
+  //   }
+
+  //   static void oop_access_barrier(void* addr, oop value) {
+  //     typedef typename HeapOopType<decorators>::type OopType;
+  //     if (HasDecorator<decorators, IN_HEAP>::value) {
+  //       GCBarrierType::oop_store_in_heap(reinterpret_cast<OopType*>(addr), value);
+  //     } else {
+  //       GCBarrierType::oop_store_not_in_heap(reinterpret_cast<OopType*>(addr), value);
+  //     }
+  //   }
+  // };
+
   template <class GCBarrierType, DecoratorSet decorators>
   struct PostRuntimeDispatch<GCBarrierType, BARRIER_LOAD, decorators>: public AllStatic {
     template <typename T>

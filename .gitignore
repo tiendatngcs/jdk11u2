@@ -15,3 +15,5 @@ NashornProfile.txt
 **/JTwork/**
 /.vscode/
 *~
+
+gce_test/*.log*

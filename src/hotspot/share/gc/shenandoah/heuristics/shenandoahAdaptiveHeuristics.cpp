@@ -94,7 +94,7 @@ void ShenandoahAdaptiveHeuristics::choose_collection_set_from_regiondata(Shenand
     }
     
     if (ShenandoahCSCollectAll){
-      printf("Collecting one of all regions\n");
+      // printf("Collecting one of all regions\n");
       cset->add_region(r);
       cur_cset = new_cset;
       cur_garbage = new_garbage;
