@@ -14,7 +14,7 @@ CFLAGS_WARNINGS_ARE_ERRORS=""
 ## Build
 ```shell
 sudo ./configure --with-jvm-features=shenandoahgc --enable-debug
-sudo make images
+make images
 ```
 
 ## Verify Shenandoah is working
