@@ -1,0 +1,1409 @@
+#
+# A fatal error has been detected by the Java Runtime Environment:
+#
+#  SIGSEGV (0xb) at pc=0x00007f73b7ef9039, pid=1356382, tid=1356401
+#
+# JRE version: OpenJDK Runtime Environment (11.0.13) (fastdebug build 11.0.13-internal+0-adhoc.root.jdk11u)
+# Java VM: OpenJDK 64-Bit Server VM (fastdebug 11.0.13-internal+0-adhoc.root.jdk11u, mixed mode, tiered, compressed oops, shenandoah gc, linux-amd64)
+# Problematic frame:
+# V  [libjvm.so+0x19c2039]  ShenandoahHeap::update_histogram(oop)+0x79
+#
+# Core dump will be written. Default location: Core dumps may be processed with "/usr/share/apport/apport %p %s %c %d %P %E" (or dumping to /home/grads/t/tiendat.ng.cs/github_repos/java_progs/core.1356382)
+#
+# If you would like to submit a bug report, please visit:
+#   https://bugreport.java.com/bugreport/crash.jsp
+#
+
+---------------  S U M M A R Y ------------
+
+Command Line: -XX:+UnlockExperimentalVMOptions -XX:+UseShenandoahGC -XX:ShenandoahHotnessThreshold=1000 -Xlog:gc*,gc+ref*,gc+ergo*,gc+heap*,gc+stats*,gc+compaction*,gc+age*:file=gc.log -Xms2m -Xmx16m --add-modules=ALL-DEFAULT jdk.compiler/com.sun.tools.javac.launcher.Main gc_test.java
+
+Host: csce-nguyen-s1.engr.tamu.edu, Intel(R) Xeon(R) Silver 4214R CPU @ 2.40GHz, 48 cores, 187G, Ubuntu 20.04.3 LTS
+Time: Tue Nov  9 18:47:05 2021 CST elapsed time: 0.261158 seconds (0d 0h 0m 0s)
+
+---------------  T H R E A D  ---------------
+
+Current thread (0x00007f7398004000):  GCTaskThread "Shenandoah GC Threads#2" [stack: 0x00007f738ac1c000,0x00007f738ad1c000] [id=1356401]
+
+Stack: [0x00007f738ac1c000,0x00007f738ad1c000],  sp=0x00007f738ad1aaa0,  free space=1018k
+Native frames: (J=compiled Java code, A=aot compiled Java code, j=interpreted, Vv=VM code, C=native code)
+V  [libjvm.so+0x19c2039]  ShenandoahHeap::update_histogram(oop)+0x79
+V  [libjvm.so+0x19897c6]  void OopOopIterateDispatch<ShenandoahMarkRefsClosure>::Table::oop_oop_iterate<InstanceKlass, unsigned int>(ShenandoahMarkRefsClosure*, oop, Klass*)+0x2b6
+V  [libjvm.so+0x19989e1]  void ShenandoahConcurrentMark::do_task<ShenandoahMarkRefsClosure>(Padded<BufferedOverflowTaskQueue<ShenandoahMarkTask, (MemoryType)5, 131072u>, 128ul>*, ShenandoahMarkRefsClosure*, unsigned short*, ShenandoahMarkTask*)+0x4f1
+V  [libjvm.so+0x19994a2]  void ShenandoahConcurrentMark::mark_loop_work<ShenandoahMarkRefsClosure, true>(ShenandoahMarkRefsClosure*, unsigned short*, unsigned int, ShenandoahTaskTerminator*)+0x462
+V  [libjvm.so+0x19a8a65]  void ShenandoahConcurrentMark::mark_loop_prework<true>(unsigned int, ShenandoahTaskTerminator*, ReferenceProcessor*, bool)+0x2b5
+V  [libjvm.so+0x19a9d19]  ShenandoahConcurrentMarkingTask::work(unsigned int)+0xf9
+V  [libjvm.so+0x1d03978]  GangWorker::run_task(WorkData)+0x88
+V  [libjvm.so+0x1d03abc]  GangWorker::loop()+0x2c
+V  [libjvm.so+0x1b9c9eb]  Thread::call_run()+0x7b
+V  [libjvm.so+0x1759346]  thread_native_entry(Thread*)+0x116
+
+
+siginfo: si_signo: 11 (SIGSEGV), si_code: 1 (SEGV_MAPERR), si_addr: 0x00007f6fb0075578
+
+Register to memory mapping:
+
+RAX=0xffffffff80000000 is an unknown value
+RBX=0x00007f73b0075370 points into unknown readable memory: 0x00007f73b87e1ba0 | a0 1b 7e b8 73 7f 00 00
+RCX=0x0000000000000004 is an unknown value
+RDX=0x00007f73b649e69c: <offset 0x00000000000b669c> in /lib/x86_64-linux-gnu/libm.so.6 at 0x00007f73b63e8000
+RSP=0x00007f738ad1aaa0 points into unknown readable memory: 0x00007f73b0075370 | 70 53 07 b0 73 7f 00 00
+RBP=0x00007f738ad1aab0 points into unknown readable memory: 0x00007f738ad1ab60 | 60 ab d1 8a 73 7f 00 00
+RSI=0x00007f738ad1ab28 points into unknown readable memory: 0x00000000ff440000 | 00 00 44 ff 00 00 00 00
+RDI=0x0000000000000012 is an unknown value
+R8 =0x0000000000000001 is an unknown value
+R9 =0x0000000000000008 is an unknown value
+R10=0x0000000000000001 is an unknown value
+R11=0x0 is NULL
+R12=0x00007f738ad1ab28 points into unknown readable memory: 0x00000000ff440000 | 00 00 44 ff 00 00 00 00
+R13=0x00007f73b0075370 points into unknown readable memory: 0x00007f73b87e1ba0 | a0 1b 7e b8 73 7f 00 00
+R14=0x00007f738ad1ad20 points into unknown readable memory: 0x00007f73b87e13d0 | d0 13 7e b8 73 7f 00 00
+R15=0x00007f73b887f654: <offset 0x0000000002348654> in /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/server/libjvm.so at 0x00007f73b6537000
+
+
+Registers:
+RAX=0xffffffff80000000, RBX=0x00007f73b0075370, RCX=0x0000000000000004, RDX=0x00007f73b649e69c
+RSP=0x00007f738ad1aaa0, RBP=0x00007f738ad1aab0, RSI=0x00007f738ad1ab28, RDI=0x0000000000000012
+R8 =0x0000000000000001, R9 =0x0000000000000008, R10=0x0000000000000001, R11=0x0000000000000000
+R12=0x00007f738ad1ab28, R13=0x00007f73b0075370, R14=0x00007f738ad1ad20, R15=0x00007f73b887f654
+RIP=0x00007f73b7ef9039, EFLAGS=0x0000000000010a16, CSGSFS=0x002b000000000033, ERR=0x0000000000000006
+  TRAPNO=0x000000000000000e
+
+Top of Stack: (sp=0x00007f738ad1aaa0)
+0x00007f738ad1aaa0:   00007f73b0075370 00000000ff3e9b4c
+0x00007f738ad1aab0:   00007f738ad1ab60 00007f73b7ec07c6
+0x00007f738ad1aac0:   0000000100018f30 0000000100019328
+0x00007f738ad1aad0:   00007f73b007b6c0 00007f73b0075370 
+
+Instructions: (pc=0x00007f73b7ef9039)
+0x00007f73b7ef8f39:   83 fa 02 75 12 48 01 b7 00 02 00 00 c3 66 2e 0f
+0x00007f73b7ef8f49:   1f 84 00 00 00 00 00 c3 0f 1f 80 00 00 00 00 48
+0x00007f73b7ef8f59:   01 b7 f8 01 00 00 c3 f3 0f 1e fa 83 fa 01 74 1f
+0x00007f73b7ef8f69:   83 fa 02 75 12 48 29 b7 00 02 00 00 c3 66 2e 0f
+0x00007f73b7ef8f79:   1f 84 00 00 00 00 00 c3 0f 1f 80 00 00 00 00 48
+0x00007f73b7ef8f89:   29 b7 f8 01 00 00 c3 f3 0f 1e fa 83 fa 01 74 1f
+0x00007f73b7ef8f99:   83 fa 02 75 12 48 89 b7 00 02 00 00 c3 66 2e 0f
+0x00007f73b7ef8fa9:   1f 84 00 00 00 00 00 c3 0f 1f 80 00 00 00 00 48
+0x00007f73b7ef8fb9:   89 b7 f8 01 00 00 c3 f3 0f 1e fa 48 8b 06 48 85
+0x00007f73b7ef8fc9:   c0 0f 84 80 00 00 00 55 48 89 e5 53 48 89 fb 48
+0x00007f73b7ef8fd9:   83 ec 08 48 8b 3e e8 6c 15 f8 ff 48 85 c0 78 27
+0x00007f73b7ef8fe9:   66 0f ef c0 f2 48 0f 2a c0 e8 d9 f5 93 fe f2 0f
+0x00007f73b7ef8ff9:   2c c0 83 f8 13 7e 37 48 83 83 a0 02 00 00 01 48
+0x00007f73b7ef9009:   8b 5d f8 c9 c3 66 90 48 89 c2 83 e0 01 66 0f ef
+0x00007f73b7ef9019:   c0 48 d1 ea 48 09 c2 f2 48 0f 2a c2 f2 0f 58 c0
+0x00007f73b7ef9029:   e8 a2 f5 93 fe f2 0f 2c c0 83 f8 13 7f c9 48 98
+0x00007f73b7ef9039:   48 83 84 c3 08 02 00 00 01 48 8b 5d f8 c9 c3 0f
+0x00007f73b7ef9049:   1f 84 00 00 00 00 00 c3 90 66 66 2e 0f 1f 84 00
+0x00007f73b7ef9059:   00 00 00 00 0f 1f 00 f3 0f 1e fa 48 89 f8 48 c7
+0x00007f73b7ef9069:   87 08 02 00 00 00 00 00 00 48 8d bf 10 02 00 00
+0x00007f73b7ef9079:   48 c7 87 90 00 00 00 00 00 00 00 48 83 e7 f8 29
+0x00007f73b7ef9089:   f8 8d 88 a8 02 00 00 31 c0 c1 e9 03 f3 48 ab c3
+0x00007f73b7ef9099:   90 66 0f 1f 44 00 00 f3 0f 1e fa 48 01 b7 a8 02
+0x00007f73b7ef90a9:   00 00 c3 0f 1f 40 00 f3 0f 1e fa 48 81 c7 b0 02
+0x00007f73b7ef90b9:   00 00 f0 0f c1 37 c3 f3 0f 1e fa 48 81 c7 b0 02
+0x00007f73b7ef90c9:   00 00 87 37 c3 66 90 f3 0f 1e fa 48 81 c7 b4 02
+0x00007f73b7ef90d9:   00 00 f0 0f c1 37 c3 f3 0f 1e fa 48 81 c7 b4 02
+0x00007f73b7ef90e9:   00 00 87 37 c3 66 90 f3 0f 1e fa 48 81 c7 90 01
+0x00007f73b7ef90f9:   00 00 f0 48 0f c1 37 c3 90 66 66 2e 0f 1f 84 00
+0x00007f73b7ef9109:   00 00 00 00 0f 1f 00 f3 0f 1e fa 55 48 8d 04 f5
+0x00007f73b7ef9119:   00 00 00 00 48 89 e5 41 55 41 89 d5 41 54 49 89
+0x00007f73b7ef9129:   f4 53 48 89 fb 48 83 ec 08 84 d2 75 0f 48 8d 8f 
+
+
+Stack slot to memory mapping:
+stack at sp + 0 slots: 0x00007f73b0075370 points into unknown readable memory: 0x00007f73b87e1ba0 | a0 1b 7e b8 73 7f 00 00
+stack at sp + 1 slots: 0x00000000ff3e9b4c is pointing into object: java.util.HashMap 
+{0x00000000ff3e9b18} - klass: 'java/util/HashMap'
+ - ---- fields (total size 8 words):
+ - transient strict 'keySet' 'Ljava/util/Set;' @28  a 'java/util/HashMap$KeySet'{0x00000000ff440690} (ff440690)
+ - transient strict 'values' 'Ljava/util/Collection;' @32  NULL (0)
+ - transient 'size' 'I' @36  4
+ - transient 'modCount' 'I' @40  4
+ - 'threshold' 'I' @44  12 (c)
+ - final 'loadFactor' 'F' @48  0.750000 (3f400000)
+ - transient strict 'table' '[Ljava/util/HashMap$Node;' @52  a 'java/util/HashMap$Node'[16] {0x00000000ff440000} (ff440000)
+ - transient strict 'entrySet' 'Ljava/util/Set;' @56  NULL (0)
+stack at sp + 2 slots: 0x00007f738ad1ab60 points into unknown readable memory: 0x00007f738ad1ac10 | 10 ac d1 8a 73 7f 00 00
+stack at sp + 3 slots: 0x00007f73b7ec07c6: <offset 0x00000000019897c6> in /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/server/libjvm.so at 0x00007f73b6537000
+stack at sp + 4 slots: 0x0000000100018f30 is a pointer to class: 
+java.util.HashMap {0x0000000100018f30}
+ - instance size:     8
+ - klass size:        127
+ - access:            public synchronized 
+ - state:             fully_initialized
+ - name:              'java/util/HashMap'
+ - super:             'java/util/AbstractMap'
+ - sub:               'java/util/LinkedHashMap'   
+ - arrays:            NULL
+ - methods:           Array<T>(0x00007f73b555de98)
+ - method ordering:   Array<T>(0x00007f73b5429058)
+ - default_methods:   Array<T>(0x0000000000000000)
+ - local interfaces:  Array<T>(0x00007f73b555ddd0)
+ - trans. interfaces: Array<T>(0x00007f73b5563d98)
+ - constants:         constant pool [573] {0x00007f73b555ca10} for 'java/util/HashMap' cache=0x00007f73b55644b0
+ - class loader data:  loader data: 0x00007f73b00b96d0 of 'bootstrap'
+ - host class:        NULL
+ - source file:       'HashMap.java'
+ - class annotations:       Array<T>(0x0000000000000000)
+ - class type annotations:  Array<T>(0x0000000000000000)
+ - field annotations:       Array<T>(0x0000000000000000)
+ - field type annotations:  Array<T>(0x0000000000000000)
+ - generic signature: '<K:Ljava/lang/Object;V:Ljava/lang/Object;>Ljava/util/AbstractMap<TK;TV;>;Ljava/util/Map<TK;TV;>;Ljava/lang/Cloneable;Ljava/io/Serializable;'
+ - inner classes:     Array<T>(0x00007f73b55620d0)
+ - nest members:     Array<T>(0x00007f73b5562150)
+ - java mirror:       a 'java/lang/Class'{0x00000000ff009270} = 'java/util/HashMap'
+ - vtable length      37  (start addr: 0x0000000100019108)
+ - itable length      29 (start addr: 0x0000000100019230)
+ - ---- static fields (4 words):
+ - private static final 'serialVersionUID' 'J' @128 
+ - static final 'DEFAULT_INITIAL_CAPACITY' 'I' @136 
+ - static final 'MAXIMUM_CAPACITY' 'I' @140 
+ - static final 'DEFAULT_LOAD_FACTOR' 'F' @144 
+ - static final 'TREEIFY_THRESHOLD' 'I' @148 
+ - static final 'UNTREEIFY_THRESHOLD' 'I' @152 
+ - static final 'MIN_TREEIFY_CAPACITY' 'I' @156 
+ - ---- non-static fields (8 words):
+ - transient strict 'keySet' 'Ljava/util/Set;' @28 
+ - transient strict 'values' 'Ljava/util/Collection;' @32 
+ - transient 'size' 'I' @36 
+ - transient 'modCount' 'I' @40 
+ - 'threshold' 'I' @44 
+ - final 'loadFactor' 'F' @48 
+ - transient strict 'table' '[Ljava/util/HashMap$Node;' @52 
+ - transient strict 'entrySet' 'Ljava/util/Set;' @56 
+ - non-static oop maps: 28-32 52-56 
+stack at sp + 5 slots: 0x0000000100019328 is a pointer to class: 
+java.util.concurrent.ConcurrentMap {0x0000000100019328}
+ - instance size:     4
+ - klass size:        65
+ - access:            public interface abstract 
+ - state:             fully_initialized
+ - name:              'java/util/concurrent/ConcurrentMap'
+ - super:             'java/lang/Object'
+ - sub:               
+ - nof implementors:  1
+ - implementor:    
+   'java/util/concurrent/ConcurrentHashMap'
+ - arrays:            NULL
+ - methods:           Array<T>(0x00007f73b556a1f0)
+ - method ordering:   Array<T>(0x00007f73b5429058)
+ - default_methods:   Array<T>(0x0000000000000000)
+ - local interfaces:  Array<T>(0x00007f73b55684f8)
+ - trans. interfaces: Array<T>(0x00007f73b55684f8)
+ - constants:         constant pool [208]/operands[7] {0x00007f73b5569a90} for 'java/util/concurrent/ConcurrentMap' cache=0x00007f73b55730b8
+ - class loader data:  loader data: 0x00007f73b00b96d0 of 'bootstrap'
+ - host class:        NULL
+ - source file:       'ConcurrentMap.java'
+ - class annotations:       Array<T>(0x0000000000000000)
+ - class type annotations:  Array<T>(0x0000000000000000)
+ - field annotations:       Array<T>(0x0000000000000000)
+ - field type annotations:  Array<T>(0x0000000000000000)
+ - generic signature: '<K:Ljava/lang/Object;V:Ljava/lang/Object;>Ljava/lang/Object;Ljava/util/Map<TK;TV;>;'
+ - inner classes:     Array<T>(0x00007f73b5569158)
+ - nest members:     Array<T>(0x00007f73b5429070)
+ - java mirror:       a 'java/lang/Class'{0x00000000ff0093c8} = 'java/util/concurrent/ConcurrentMap'
+ - vtable length      5  (start addr: 0x0000000100019500)
+ - itable length      0 (start addr: 0x0000000100019528)
+ - ---- static fields (0 words):
+ - ---- non-static fields (0 words):
+ - non-static oop maps: 
+stack at sp + 6 slots: 0x00007f73b007b6c0 points into unknown readable memory: 0x00007f73b87e0e58 | 58 0e 7e b8 73 7f 00 00
+stack at sp + 7 slots: 0x00007f73b0075370 points into unknown readable memory: 0x00007f73b87e1ba0 | a0 1b 7e b8 73 7f 00 00
+
+
+---------------  P R O C E S S  ---------------
+
+uid  : 331007653 euid : 331007653 gid  : 331007653 egid : 331007653
+
+umask: 0002 (-------w-)
+
+Threads class SMR info:
+_java_thread_list=0x00007f73640c6060, length=14, elements={
+0x00007f73b0062000, 0x00007f73b01ef000, 0x00007f73b01f2000, 0x00007f73b0215000,
+0x00007f73b0217800, 0x00007f73b021a000, 0x00007f73b021d000, 0x00007f73b021f800,
+0x00007f73b027e000, 0x00007f7370060800, 0x00007f736c096000, 0x00007f736c098800,
+0x00007f737014f800, 0x00007f73640c4000
+}
+_java_thread_list_alloc_cnt=15, _java_thread_list_free_cnt=14, _java_thread_list_max=14, _nested_thread_list_max=0
+_tlh_cnt=58, _tlh_times=0, avg_tlh_time=0.00, _tlh_time_max=0
+_delete_lock_wait_cnt=0, _delete_lock_wait_max=0
+_to_delete_list_cnt=0, _to_delete_list_max=1
+
+Java Threads: ( => current thread )
+  0x00007f73b0062000 JavaThread "main" [_thread_blocked, id=1356383, stack(0x00007f73b62e7000,0x00007f73b63e8000)]
+  0x00007f73b01ef000 JavaThread "Reference Handler" daemon [_thread_blocked, id=1356388, stack(0x00007f73a07f7000,0x00007f73a08f8000)]
+  0x00007f73b01f2000 JavaThread "Finalizer" daemon [_thread_blocked, id=1356389, stack(0x00007f73a06f6000,0x00007f73a07f7000)]
+  0x00007f73b0215000 JavaThread "Signal Dispatcher" daemon [_thread_blocked, id=1356390, stack(0x00007f73a05f5000,0x00007f73a06f6000)]
+  0x00007f73b0217800 JavaThread "Service Thread" daemon [_thread_blocked, id=1356391, stack(0x00007f73a04f4000,0x00007f73a05f5000)]
+  0x00007f73b021a000 JavaThread "C2 CompilerThread0" daemon [_thread_in_native, id=1356392, stack(0x00007f73a03f3000,0x00007f73a04f4000)]
+  0x00007f73b021d000 JavaThread "C1 CompilerThread0" daemon [_thread_in_native, id=1356393, stack(0x00007f73a02f2000,0x00007f73a03f3000)]
+  0x00007f73b021f800 JavaThread "Sweeper thread" daemon [_thread_blocked, id=1356394, stack(0x00007f73a01f1000,0x00007f73a02f2000)]
+  0x00007f73b027e000 JavaThread "Common-Cleaner" daemon [_thread_blocked, id=1356395, stack(0x00007f73a00f0000,0x00007f73a01f1000)]
+  0x00007f7370060800 JavaThread "C1 CompilerThread1" daemon [_thread_in_native, id=1356396, stack(0x00007f738b121000,0x00007f738b222000)]
+  0x00007f736c096000 JavaThread "C1 CompilerThread2" daemon [_thread_in_native, id=1356397, stack(0x00007f738b020000,0x00007f738b121000)]
+  0x00007f736c098800 JavaThread "C1 CompilerThread3" daemon [_thread_in_native, id=1356398, stack(0x00007f738af1f000,0x00007f738b020000)]
+  0x00007f737014f800 JavaThread "C2 CompilerThread1" daemon [_thread_blocked, id=1356399, stack(0x00007f738ae1e000,0x00007f738af1f000)]
+  0x00007f73640c4000 JavaThread "C1 CompilerThread4" daemon [_thread_in_native, id=1356403, stack(0x00007f738aa17000,0x00007f738ab18000)]
+
+Other Threads:
+  0x00007f73b01d9000 VMThread "VM Thread" [stack: 0x00007f73a08fa000,0x00007f73a09fa000] [id=1356387]
+  0x00007f73b0077000 GCTaskThread "Shenandoah GC Threads#0" [stack: 0x00007f73b5ef1000,0x00007f73b5ff1000] [id=1356384]
+  0x00007f7398001800 GCTaskThread "Shenandoah GC Threads#1" [stack: 0x00007f738ad1e000,0x00007f738ae1e000] [id=1356400]
+=>0x00007f7398004000 GCTaskThread "Shenandoah GC Threads#2" [stack: 0x00007f738ac1c000,0x00007f738ad1c000] [id=1356401]
+  0x00007f7398006000 GCTaskThread "Shenandoah GC Threads#3" [stack: 0x00007f738ab1a000,0x00007f738ac1a000] [id=1356402]
+  0x00007f7398008000 GCTaskThread "Shenandoah GC Threads#4" [stack: 0x00007f738a917000,0x00007f738aa17000] [id=1356404]
+  0x00007f739800a000 GCTaskThread "Shenandoah GC Threads#5" [stack: 0x00007f738a815000,0x00007f738a915000] [id=1356405]
+  0x00007f739800b800 GCTaskThread "Shenandoah GC Threads#6" [stack: 0x00007f738a713000,0x00007f738a813000] [id=1356406]
+  0x00007f738c001000 GCTaskThread "Shenandoah GC Threads#7" [stack: 0x00007f738a611000,0x00007f738a711000] [id=1356407]
+  0x00007f738c003800 GCTaskThread "Shenandoah GC Threads#8" [stack: 0x00007f738a50f000,0x00007f738a60f000] [id=1356408]
+  0x00007f738c005800 GCTaskThread "Shenandoah GC Threads#9" [stack: 0x00007f738a40d000,0x00007f738a50d000] [id=1356409]
+  0x00007f738c007800 GCTaskThread "Shenandoah GC Threads#10" [stack: 0x00007f738a30b000,0x00007f738a40b000] [id=1356410]
+  0x00007f738c009800 GCTaskThread "Shenandoah GC Threads#11" [stack: 0x00007f738a209000,0x00007f738a309000] [id=1356411]
+  0x00007f738c00c000 GCTaskThread "Shenandoah GC Threads#12" [stack: 0x00007f738a107000,0x00007f738a207000] [id=1356412]
+  0x00007f73b0079000 Thread "Safepoint Cleanup Thread#0" [stack: 0x00007f73b5def000,0x00007f73b5eef000] [id=1356385]
+
+Threads with active compile tasks:
+C2 CompilerThread0    267  171       4       sun.nio.fs.UnixPath::getName (106 bytes)
+C1 CompilerThread0    267  243       3       sun.nio.fs.UnixPath::getFileName (90 bytes)
+C1 CompilerThread1    267  255   !   3       java.nio.file.FileTreeWalker::visit (204 bytes)
+C1 CompilerThread2    267  242       3       sun.nio.fs.UnixFileSystemProvider::isHidden (37 bytes)
+C1 CompilerThread3    267  266   !   3       sun.nio.fs.UnixFileAttributeViews$Basic::readAttributes (35 bytes)
+C1 CompilerThread4    267  227       3       sun.nio.fs.Util::toString (12 bytes)
+
+VM state:not at safepoint (normal execution)
+
+VM Mutex/Monitor currently owned by a thread: None
+
+Heap address: 0x00000000ff000000, size: 16 MB, Compressed Oops mode: 32-bit
+Narrow klass base: 0x0000000000000000, Narrow klass shift: 3
+Compressed class space size: 1073741824 Address: 0x0000000100000000
+
+Heap:
+Shenandoah Heap
+ 16384K max, 16384K soft max, 5376K committed, 5376K used
+ 64 x 256K regions
+Status: marking, not cancelled
+Reserved region:
+ - [0x00000000ff000000, 0x0000000100000000) 
+Collection set:
+ - map (vanilla): 0x0000000000013fc0
+ - map (biased):  0x0000000000010000
+
+ Metaspace       used 5723K, capacity 5779K, committed 6016K, reserved 1056768K
+  class space    used 487K, capacity 525K, committed 640K, reserved 1048576K
+Heap Regions:
+EU=empty-uncommitted, EC=empty-committed, R=regular, H=humongous start, HC=humongous continuation, CS=collection set, T=trash, P=pinned
+BTE=bottom/top/end, U=used, T=TLAB allocs, G=GCLAB allocs, S=shared allocs, L=live data
+R=root, CP=critical pins, TAMS=top-at-mark-start, UWM=update watermark
+SN=alloc sequence number
+|    0|R  |BTE     ff000000,     ff040000,     ff040000|TAMS     ff040000|UWM     ff000000|U   256K|T   256K|G     0B|S     0B|L     0B|CP   0
+|    1|R  |BTE     ff040000,     ff080000,     ff080000|TAMS     ff080000|UWM     ff040000|U   256K|T   256K|G     0B|S     0B|L     0B|CP   0
+|    2|R  |BTE     ff080000,     ff0c0000,     ff0c0000|TAMS     ff0c0000|UWM     ff080000|U   256K|T   256K|G     0B|S     0B|L     0B|CP   0
+|    3|R  |BTE     ff0c0000,     ff100000,     ff100000|TAMS     ff100000|UWM     ff0c0000|U   256K|T   256K|G     0B|S     0B|L     0B|CP   0
+|    4|R  |BTE     ff100000,     ff140000,     ff140000|TAMS     ff140000|UWM     ff100000|U   256K|T   256K|G     0B|S     0B|L     0B|CP   0
+|    5|R  |BTE     ff140000,     ff180000,     ff180000|TAMS     ff180000|UWM     ff140000|U   256K|T   256K|G     0B|S     0B|L     0B|CP   0
+|    6|R  |BTE     ff180000,     ff1c0000,     ff1c0000|TAMS     ff1c0000|UWM     ff180000|U   256K|T   256K|G     0B|S     0B|L     0B|CP   0
+|    7|R  |BTE     ff1c0000,     ff200000,     ff200000|TAMS     ff200000|UWM     ff1c0000|U   256K|T   256K|G     0B|S     0B|L     0B|CP   0
+|    8|R  |BTE     ff200000,     ff240000,     ff240000|TAMS     ff240000|UWM     ff200000|U   256K|T   256K|G     0B|S     0B|L     0B|CP   0
+|    9|R  |BTE     ff240000,     ff280000,     ff280000|TAMS     ff280000|UWM     ff240000|U   256K|T   256K|G     0B|S     0B|L     0B|CP   0
+|   10|R  |BTE     ff280000,     ff2c0000,     ff2c0000|TAMS     ff2c0000|UWM     ff280000|U   256K|T   256K|G     0B|S     0B|L     0B|CP   0
+|   11|R  |BTE     ff2c0000,     ff300000,     ff300000|TAMS     ff300000|UWM     ff2c0000|U   256K|T   256K|G     0B|S     0B|L     0B|CP   0
+|   12|R  |BTE     ff300000,     ff340000,     ff340000|TAMS     ff340000|UWM     ff300000|U   256K|T   256K|G     0B|S     0B|L     0B|CP   0
+|   13|R  |BTE     ff340000,     ff380000,     ff380000|TAMS     ff380000|UWM     ff340000|U   256K|T   256K|G     0B|S     0B|L     0B|CP   0
+|   14|R  |BTE     ff380000,     ff3c0000,     ff3c0000|TAMS     ff3c0000|UWM     ff380000|U   256K|T   256K|G     0B|S     0B|L     0B|CP   0
+|   15|R  |BTE     ff3c0000,     ff400000,     ff400000|TAMS     ff400000|UWM     ff3c0000|U   256K|T   256K|G     0B|S     0B|L     0B|CP   0
+|   16|R  |BTE     ff400000,     ff440000,     ff440000|TAMS     ff440000|UWM     ff400000|U   256K|T   256K|G     0B|S     0B|L     0B|CP   0
+|   17|R  |BTE     ff440000,     ff480000,     ff480000|TAMS     ff440000|UWM     ff440000|U   256K|T   256K|G     0B|S     0B|L     0B|CP   0
+|   18|R  |BTE     ff480000,     ff4c0000,     ff4c0000|TAMS     ff480000|UWM     ff480000|U   256K|T   256K|G     0B|S     0B|L     0B|CP   0
+|   19|R  |BTE     ff4c0000,     ff500000,     ff500000|TAMS     ff4c0000|UWM     ff4c0000|U   256K|T   256K|G     0B|S     0B|L     0B|CP   0
+|   20|R  |BTE     ff500000,     ff540000,     ff540000|TAMS     ff500000|UWM     ff500000|U   256K|T   256K|G     0B|S     0B|L     0B|CP   0
+|   21|EU |BTE     ff540000,     ff540000,     ff580000|TAMS     ff540000|UWM     ff540000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   22|EU |BTE     ff580000,     ff580000,     ff5c0000|TAMS     ff580000|UWM     ff580000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   23|EU |BTE     ff5c0000,     ff5c0000,     ff600000|TAMS     ff5c0000|UWM     ff5c0000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   24|EU |BTE     ff600000,     ff600000,     ff640000|TAMS     ff600000|UWM     ff600000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   25|EU |BTE     ff640000,     ff640000,     ff680000|TAMS     ff640000|UWM     ff640000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   26|EU |BTE     ff680000,     ff680000,     ff6c0000|TAMS     ff680000|UWM     ff680000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   27|EU |BTE     ff6c0000,     ff6c0000,     ff700000|TAMS     ff6c0000|UWM     ff6c0000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   28|EU |BTE     ff700000,     ff700000,     ff740000|TAMS     ff700000|UWM     ff700000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   29|EU |BTE     ff740000,     ff740000,     ff780000|TAMS     ff740000|UWM     ff740000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   30|EU |BTE     ff780000,     ff780000,     ff7c0000|TAMS     ff780000|UWM     ff780000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   31|EU |BTE     ff7c0000,     ff7c0000,     ff800000|TAMS     ff7c0000|UWM     ff7c0000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   32|EU |BTE     ff800000,     ff800000,     ff840000|TAMS     ff800000|UWM     ff800000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   33|EU |BTE     ff840000,     ff840000,     ff880000|TAMS     ff840000|UWM     ff840000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   34|EU |BTE     ff880000,     ff880000,     ff8c0000|TAMS     ff880000|UWM     ff880000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   35|EU |BTE     ff8c0000,     ff8c0000,     ff900000|TAMS     ff8c0000|UWM     ff8c0000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   36|EU |BTE     ff900000,     ff900000,     ff940000|TAMS     ff900000|UWM     ff900000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   37|EU |BTE     ff940000,     ff940000,     ff980000|TAMS     ff940000|UWM     ff940000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   38|EU |BTE     ff980000,     ff980000,     ff9c0000|TAMS     ff980000|UWM     ff980000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   39|EU |BTE     ff9c0000,     ff9c0000,     ffa00000|TAMS     ff9c0000|UWM     ff9c0000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   40|EU |BTE     ffa00000,     ffa00000,     ffa40000|TAMS     ffa00000|UWM     ffa00000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   41|EU |BTE     ffa40000,     ffa40000,     ffa80000|TAMS     ffa40000|UWM     ffa40000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   42|EU |BTE     ffa80000,     ffa80000,     ffac0000|TAMS     ffa80000|UWM     ffa80000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   43|EU |BTE     ffac0000,     ffac0000,     ffb00000|TAMS     ffac0000|UWM     ffac0000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   44|EU |BTE     ffb00000,     ffb00000,     ffb40000|TAMS     ffb00000|UWM     ffb00000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   45|EU |BTE     ffb40000,     ffb40000,     ffb80000|TAMS     ffb40000|UWM     ffb40000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   46|EU |BTE     ffb80000,     ffb80000,     ffbc0000|TAMS     ffb80000|UWM     ffb80000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   47|EU |BTE     ffbc0000,     ffbc0000,     ffc00000|TAMS     ffbc0000|UWM     ffbc0000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   48|EU |BTE     ffc00000,     ffc00000,     ffc40000|TAMS     ffc00000|UWM     ffc00000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   49|EU |BTE     ffc40000,     ffc40000,     ffc80000|TAMS     ffc40000|UWM     ffc40000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   50|EU |BTE     ffc80000,     ffc80000,     ffcc0000|TAMS     ffc80000|UWM     ffc80000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   51|EU |BTE     ffcc0000,     ffcc0000,     ffd00000|TAMS     ffcc0000|UWM     ffcc0000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   52|EU |BTE     ffd00000,     ffd00000,     ffd40000|TAMS     ffd00000|UWM     ffd00000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   53|EU |BTE     ffd40000,     ffd40000,     ffd80000|TAMS     ffd40000|UWM     ffd40000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   54|EU |BTE     ffd80000,     ffd80000,     ffdc0000|TAMS     ffd80000|UWM     ffd80000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   55|EU |BTE     ffdc0000,     ffdc0000,     ffe00000|TAMS     ffdc0000|UWM     ffdc0000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   56|EU |BTE     ffe00000,     ffe00000,     ffe40000|TAMS     ffe00000|UWM     ffe00000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   57|EU |BTE     ffe40000,     ffe40000,     ffe80000|TAMS     ffe40000|UWM     ffe40000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   58|EU |BTE     ffe80000,     ffe80000,     ffec0000|TAMS     ffe80000|UWM     ffe80000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   59|EU |BTE     ffec0000,     ffec0000,     fff00000|TAMS     ffec0000|UWM     ffec0000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   60|EU |BTE     fff00000,     fff00000,     fff40000|TAMS     fff00000|UWM     fff00000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   61|EU |BTE     fff40000,     fff40000,     fff80000|TAMS     fff40000|UWM     fff40000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   62|EU |BTE     fff80000,     fff80000,     fffc0000|TAMS     fff80000|UWM     fff80000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+|   63|EU |BTE     fffc0000,     fffc0000,    100000000|TAMS     fffc0000|UWM     fffc0000|U     0B|T     0B|G     0B|S     0B|L     0B|CP   0
+
+ShenandoahBarrierSet
+Polling page: 0x00007f73b8b6b000
+
+Metaspace:
+
+Usage:
+  Non-class:      5.13 MB capacity,     5.11 MB (>99%) used,    12.50 KB ( <1%) free+waste,     4.75 KB ( <1%) overhead. 
+      Class:    525.00 KB capacity,   487.13 KB ( 93%) used,    35.05 KB (  7%) free+waste,     2.81 KB ( <1%) overhead. 
+       Both:      5.64 MB capacity,     5.59 MB (>99%) used,    47.55 KB ( <1%) free+waste,     7.56 KB ( <1%) overhead. 
+
+Virtual space:
+  Non-class space:        8.00 MB reserved,       5.25 MB ( 66%) committed 
+      Class space:        1.00 GB reserved,     640.00 KB ( <1%) committed 
+             Both:        1.01 GB reserved,       5.88 MB ( <1%) committed 
+
+Chunk freelists:
+   Non-Class:  22.00 KB
+       Class:  19.00 KB
+        Both:  41.00 KB
+
+MaxMetaspaceSize: unlimited
+CompressedClassSpaceSize: 1.00 GB
+Initial GC threshold: 20.80 MB
+Current GC threshold: 20.80 MB
+CDS: off
+
+CodeHeap 'non-profiled nmethods': size=118884Kb used=82Kb max_used=82Kb free=118801Kb
+ bounds [0x00007f73a8be7000, 0x00007f73a8e57000, 0x00007f73b0000000]
+CodeHeap 'profiled nmethods': size=118884Kb used=583Kb max_used=583Kb free=118301Kb
+ bounds [0x00007f73a17ce000, 0x00007f73a1a3e000, 0x00007f73a8be7000]
+CodeHeap 'non-nmethods': size=7992Kb used=4017Kb max_used=4018Kb free=3974Kb
+ bounds [0x00007f73a1000000, 0x00007f73a13f0000, 0x00007f73a17ce000]
+ total_blobs=1134 nmethods=260 adapters=789
+ compilation: enabled
+              stopped_count=0, restarted_count=0
+ full_count=0
+
+Compilation events (250 events):
+Event: 0.192 Thread 0x00007f7370060800   73       3       java.lang.AbstractStringBuilder::getCoder (15 bytes)
+Event: 0.192 Thread 0x00007f7370060800 nmethod 73 0x00007f73a17e5910 code [0x00007f73a17e5ac0, 0x00007f73a17e5bf8]
+Event: 0.193 Thread 0x00007f7370060800   74       3       java.lang.String::getBytes (44 bytes)
+Event: 0.193 Thread 0x00007f73b021d000 nmethod 72 0x00007f73a17e5d10 code [0x00007f73a17e5f20, 0x00007f73a17e62b8]
+Event: 0.193 Thread 0x00007f73b021d000   75       3       java.util.concurrent.ConcurrentHashMap::get (162 bytes)
+Event: 0.193 Thread 0x00007f7370060800 nmethod 74 0x00007f73a17e6510 code [0x00007f73a17e6760, 0x00007f73a17e6c18]
+Event: 0.193 Thread 0x00007f7370060800   76       1       java.lang.invoke.MethodType::ptypes (5 bytes)
+Event: 0.193 Thread 0x00007f7370060800 nmethod 76 0x00007f73a8bee310 code [0x00007f73a8bee4e0, 0x00007f73a8bee638]
+Event: 0.196 Thread 0x00007f73b021d000 nmethod 75 0x00007f73a17e6e90 code [0x00007f73a17e7220, 0x00007f73a17e8378]
+Event: 0.200 Thread 0x00007f7370060800   77       3       java.lang.Class::getClassLoader (28 bytes)
+Event: 0.202 Thread 0x00007f73b021d000   79       3       java.lang.invoke.MemberName::testAllFlags (7 bytes)
+Event: 0.202 Thread 0x00007f73b021d000 nmethod 79 0x00007f73a17e8a90 code [0x00007f73a17e8c60, 0x00007f73a17e8e38]
+Event: 0.202 Thread 0x00007f73b021d000   80       3       java.lang.StringLatin1::replace (196 bytes)
+Event: 0.202 Thread 0x00007f7370060800 nmethod 77 0x00007f73a17e8f90 code [0x00007f73a17e92a0, 0x00007f73a17e9ef8]
+Event: 0.202 Thread 0x00007f7370060800   81       3       java.lang.Class::getName (18 bytes)
+Event: 0.203 Thread 0x00007f7370060800 nmethod 81 0x00007f73a17ea490 code [0x00007f73a17ea680, 0x00007f73a17ea8a8]
+Event: 0.203 Thread 0x00007f7370060800   83       3       java.lang.ref.Reference::<init> (7 bytes)
+Event: 0.204 Thread 0x00007f7370060800 nmethod 83 0x00007f73a17ea990 code [0x00007f73a17eabc0, 0x00007f73a17eaeb8]
+Event: 0.204 Thread 0x00007f7370060800   84       1       java.lang.invoke.MethodType::form (5 bytes)
+Event: 0.204 Thread 0x00007f7370060800 nmethod 84 0x00007f73a8bef190 code [0x00007f73a8bef360, 0x00007f73a8bef4b8]
+Event: 0.205 Thread 0x00007f73b021d000 nmethod 80 0x00007f73a17eb010 code [0x00007f73a17eb340, 0x00007f73a17ec0b8]
+Event: 0.207 Thread 0x00007f7370060800   89       3       java.lang.AbstractStringBuilder::append (77 bytes)
+Event: 0.207 Thread 0x00007f73b021d000   87       3       java.lang.invoke.MethodType::<init> (15 bytes)
+Event: 0.207 Thread 0x00007f73b021d000 nmethod 87 0x00007f73a17ec910 code [0x00007f73a17ecb20, 0x00007f73a17ecd98]
+Event: 0.207 Thread 0x00007f73b021d000   90       3       java.lang.StringBuilder::append (8 bytes)
+Event: 0.207 Thread 0x00007f73b021d000 nmethod 90 0x00007f73a17ece90 code [0x00007f73a17ed060, 0x00007f73a17ed1a8]
+Event: 0.207 Thread 0x00007f73b021d000   91       3       java.lang.AbstractStringBuilder::append (45 bytes)
+Event: 0.209 Thread 0x00007f7370060800 nmethod 89 0x00007f73a17ed290 code [0x00007f73a17ed520, 0x00007f73a17edd08]
+Event: 0.209 Thread 0x00007f7370060800   88       3       java.lang.ref.WeakReference::<init> (6 bytes)
+Event: 0.209 Thread 0x00007f73b021d000 nmethod 91 0x00007f73a17ee290 code [0x00007f73a17ee500, 0x00007f73a17eeb58]
+Event: 0.209 Thread 0x00007f73b021d000   93       3       java.lang.invoke.MethodType::makeImpl (108 bytes)
+Event: 0.210 Thread 0x00007f7370060800 nmethod 88 0x00007f73a17ef010 code [0x00007f73a17ef240, 0x00007f73a17ef598]
+Event: 0.210 Thread 0x00007f7370060800   94       3       java.lang.invoke.MethodType$ConcurrentWeakInternSet::get (54 bytes)
+Event: 0.213 Thread 0x00007f73b021d000 nmethod 93 0x00007f73a17ef710 code [0x00007f73a17efb40, 0x00007f73a17f0b78]
+Event: 0.213 Thread 0x00007f73b021d000   97   !   3       java.lang.invoke.MemberName::getMethodType (203 bytes)
+Event: 0.213 Thread 0x00007f7370060800 nmethod 94 0x00007f73a17f1310 code [0x00007f73a17f1680, 0x00007f73a17f26d8]
+Event: 0.213 Thread 0x00007f7370060800   95       3       java.lang.invoke.MethodType$ConcurrentWeakInternSet$WeakEntry::<init> (14 bytes)
+Event: 0.214 Thread 0x00007f7370060800 nmethod 95 0x00007f73a17f2e10 code [0x00007f73a17f3060, 0x00007f73a17f3508]
+Event: 0.214 Thread 0x00007f7370060800  104       3       jdk.internal.org.objectweb.asm.Type::getArgumentsAndReturnSizes (151 bytes)
+Event: 0.217 Thread 0x00007f73b021d000 nmethod 97 0x00007f73a17f3710 code [0x00007f73a17f3be0, 0x00007f73a17f57b8]
+Event: 0.217 Thread 0x00007f73b021d000  100       3       java.lang.invoke.MethodType::parameterCount (6 bytes)
+Event: 0.217 Thread 0x00007f73b021d000 nmethod 100 0x00007f73a17f6310 code [0x00007f73a17f6500, 0x00007f73a17f66b8]
+Event: 0.217 Thread 0x00007f73b021d000  103       3       java.lang.ref.Reference::<init> (25 bytes)
+Event: 0.217 Thread 0x00007f73b021d000 nmethod 103 0x00007f73a17f6790 code [0x00007f73a17f69c0, 0x00007f73a17f6c98]
+Event: 0.217 Thread 0x00007f73b021d000  101       3       jdk.internal.org.objectweb.asm.Item::isEqualTo (354 bytes)
+Event: 0.220 Thread 0x00007f73b021d000 nmethod 101 0x00007f73a17f6e10 code [0x00007f73a17f7300, 0x00007f73a17f8848]
+Event: 0.220 Thread 0x00007f73b021d000  110   !   3       sun.nio.fs.UnixPath::initOffsets (189 bytes)
+Event: 0.221 Thread 0x00007f73b021a000  115       4       java.lang.String::isLatin1 (19 bytes)
+Event: 0.221 Thread 0x00007f7370060800 nmethod 104 0x00007f73a17f9190 code [0x00007f73a17f9660, 0x00007f73a17fb358]
+Event: 0.222 Thread 0x00007f7370060800  113       3       sun.nio.fs.UnixPath::compareTo (92 bytes)
+Event: 0.222 Thread 0x00007f73b021d000 nmethod 110 0x00007f73a17fc590 code [0x00007f73a17fc8c0, 0x00007f73a17fd5d8]
+Event: 0.222 Thread 0x00007f736c096000  109       1       sun.nio.fs.UnixPath::getFileSystem (5 bytes)
+Event: 0.222 Thread 0x00007f73b021d000  111       3       sun.nio.fs.UnixPath::<init> (15 bytes)
+Event: 0.223 Thread 0x00007f7370060800 nmethod 113 0x00007f73a17fdc90 code [0x00007f73a17fdf40, 0x00007f73a17fe6b8]
+Event: 0.223 Thread 0x00007f7370060800  114       3       java.lang.Character::charCount (12 bytes)
+Event: 0.223 Thread 0x00007f736c098800  112       3       sun.nio.fs.UnixPath::getName (106 bytes)
+Event: 0.223 Thread 0x00007f73b021a000 nmethod 115 0x00007f73a8bf0890 code [0x00007f73a8bf0a40, 0x00007f73a8bf0ad8]
+Event: 0.224 Thread 0x00007f73b021d000 nmethod 111 0x00007f73a17fea90 code [0x00007f73a17feca0, 0x00007f73a17fef18]
+Event: 0.224 Thread 0x00007f73b021d000  116       3       java.lang.CharacterData::of (120 bytes)
+Event: 0.224 Thread 0x00007f7370060800 nmethod 114 0x00007f73a17ff010 code [0x00007f73a17ff1c0, 0x00007f73a17ff318]
+Event: 0.224 Thread 0x00007f7370060800  117       3       java.lang.CharacterDataLatin1::getProperties (11 bytes)
+Event: 0.224 Thread 0x00007f736c096000 nmethod 109 0x00007f73a8bf0b90 code [0x00007f73a8bf0d60, 0x00007f73a8bf0eb8]
+Event: 0.224 Thread 0x00007f7370060800 nmethod 117 0x00007f73a17ff410 code [0x00007f73a17ff600, 0x00007f73a17ff798]
+Event: 0.224 Thread 0x00007f7370060800  118       3       java.lang.Character::codePointAt (51 bytes)
+Event: 0.224 Thread 0x00007f736c096000  119       3       java.lang.Character::isHighSurrogate (18 bytes)
+Event: 0.225 Thread 0x00007f73b021d000 nmethod 116 0x00007f73a17ff890 code [0x00007f73a17ffb80, 0x00007f73a18005f8]
+Event: 0.225 Thread 0x00007f73b021d000  121       3       sun.nio.fs.UnixPath::equals (30 bytes)
+Event: 0.225 Thread 0x00007f73b021a000  127   !   4       sun.nio.fs.UnixPath::initOffsets (189 bytes)
+Event: 0.225 Thread 0x00007f736c096000 nmethod 119 0x00007f73a1800990 code [0x00007f73a1800b40, 0x00007f73a1800cd8]
+Event: 0.225 Thread 0x00007f736c096000  122       3       java.lang.Character::isJavaIdentifierPart (9 bytes)
+Event: 0.225 Thread 0x00007f7370060800 nmethod 118 0x00007f73a1800e10 code [0x00007f73a1801040, 0x00007f73a18016a8]
+Event: 0.225 Thread 0x00007f73b021d000 nmethod 121 0x00007f73a1801990 code [0x00007f73a1801b80, 0x00007f73a1801fa8]
+Event: 0.225 Thread 0x00007f7370060800  123       3       java.lang.CharacterDataLatin1::isJavaIdentifierPart (20 bytes)
+Event: 0.225 Thread 0x00007f73b021d000  128       3       java.lang.String::indexOf (29 bytes)
+Event: 0.226 Thread 0x00007f7370060800 nmethod 123 0x00007f73a1802110 code [0x00007f73a1802300, 0x00007f73a1802558]
+Event: 0.226 Thread 0x00007f7370060800  126       3       java.lang.System::getSecurityManager (4 bytes)
+Event: 0.226 Thread 0x00007f736c096000 nmethod 122 0x00007f73a1802710 code [0x00007f73a1802900, 0x00007f73a1802b18]
+Event: 0.226 Thread 0x00007f736c096000  125       1       java.util.concurrent.locks.ReentrantReadWriteLock::readLock (5 bytes)
+Event: 0.226 Thread 0x00007f73b021d000 nmethod 128 0x00007f73a1802c10 code [0x00007f73a1802e20, 0x00007f73a18031b8]
+Event: 0.226 Thread 0x00007f7370060800 nmethod 126 0x00007f73a1803390 code [0x00007f73a1803560, 0x00007f73a18036d8]
+Event: 0.226 Thread 0x00007f73b021d000  124       1       java.util.concurrent.locks.AbstractQueuedSynchronizer::getState (5 bytes)
+Event: 0.226 Thread 0x00007f7370060800  120       1       sun.nio.fs.NativeBuffer::address (5 bytes)
+Event: 0.226 Thread 0x00007f73b021d000 nmethod 124 0x00007f73a8bf1690 code [0x00007f73a8bf1840, 0x00007f73a8bf1918]
+Event: 0.226 Thread 0x00007f7370060800 nmethod 120 0x00007f73a8bf1990 code [0x00007f73a8bf1b40, 0x00007f73a8bf1c18]
+Event: 0.226 Thread 0x00007f73b021d000   99       1       java.lang.invoke.LambdaForm$Name::index (5 bytes)
+Event: 0.226 Thread 0x00007f7370060800  131       3       java.lang.String::substring (58 bytes)
+Event: 0.226 Thread 0x00007f736c096000 nmethod 125 0x00007f73a8bf1c90 code [0x00007f73a8bf1e60, 0x00007f73a8bf1fb8]
+Event: 0.226 Thread 0x00007f73b021d000 nmethod 99 0x00007f73a8bf2090 code [0x00007f73a8bf2240, 0x00007f73a8bf2318]
+Event: 0.226 Thread 0x00007f73b021d000  130       1       sun.nio.fs.UnixFileSystem::provider (5 bytes)
+Event: 0.226 Thread 0x00007f736c096000  132       3       java.lang.String::checkBoundsBeginEnd (60 bytes)
+Event: 0.226 Thread 0x00007f73b021d000 nmethod 130 0x00007f73a8bf2390 code [0x00007f73a8bf2560, 0x00007f73a8bf26b8]
+Event: 0.226 Thread 0x00007f73b021d000  133       1       java.nio.file.FileTreeWalker$Event::file (5 bytes)
+Event: 0.227 Thread 0x00007f73b021d000 nmethod 133 0x00007f73a8bf2790 code [0x00007f73a8bf2960, 0x00007f73a8bf2ab8]
+Event: 0.227 Thread 0x00007f73b021d000  136       3       java.lang.Math::floorMod (10 bytes)
+Event: 0.227 Thread 0x00007f73b021d000 nmethod 136 0x00007f73a1803790 code [0x00007f73a1803960, 0x00007f73a1803b78]
+Event: 0.227 Thread 0x00007f73b021d000  137       3       java.lang.Math::floorDiv (22 bytes)
+Event: 0.227 Thread 0x00007f73b021d000 nmethod 137 0x00007f73a1805310 code [0x00007f73a18054e0, 0x00007f73a1805698]
+Event: 0.227 Thread 0x00007f736c098800 nmethod 112 0x00007f73a1803d10 code [0x00007f73a18040e0, 0x00007f73a1804d38]
+Event: 0.228 Thread 0x00007f73b021d000  135       3       sun.nio.fs.UnixPath::isEmpty (14 bytes)
+Event: 0.228 Thread 0x00007f736c098800  134       3       sun.nio.fs.UnixPath::getNameCount (10 bytes)
+Event: 0.228 Thread 0x00007f7370060800 nmethod 131 0x00007f73a1805790 code [0x00007f73a1805a40, 0x00007f73a1806288]
+Event: 0.228 Thread 0x00007f7370060800  138       3       java.util.ImmutableCollections$SetN::probe (56 bytes)
+Event: 0.228 Thread 0x00007f73b021d000 nmethod 135 0x00007f73a1806710 code [0x00007f73a1806900, 0x00007f73a1806b18]
+Event: 0.228 Thread 0x00007f73b021d000  108       1       java.lang.Class::getModule (5 bytes)
+Event: 0.228 Thread 0x00007f73b021d000 nmethod 108 0x00007f73a8bf3010 code [0x00007f73a8bf31e0, 0x00007f73a8bf3338]
+Event: 0.228 Thread 0x00007f73b021d000  102       3       java.lang.reflect.Modifier::isStatic (13 bytes)
+Event: 0.228 Thread 0x00007f73b021d000 nmethod 102 0x00007f73a1806c90 code [0x00007f73a1806e40, 0x00007f73a1806f98]
+Event: 0.228 Thread 0x00007f73b021d000  140       3       java.lang.Class::cast (27 bytes)
+Event: 0.228 Thread 0x00007f736c098800 nmethod 134 0x00007f73a1807090 code [0x00007f73a1807280, 0x00007f73a1807468]
+Event: 0.228 Thread 0x00007f736c098800  141       3       java.lang.String::isEmpty (14 bytes)
+Event: 0.229 Thread 0x00007f73b021d000 nmethod 140 0x00007f73a1807590 code [0x00007f73a1807780, 0x00007f73a1807a58]
+Event: 0.229 Thread 0x00007f7370060800 nmethod 138 0x00007f73a1807c10 code [0x00007f73a1807ec0, 0x00007f73a18086d8]
+Event: 0.229 Thread 0x00007f73b021d000  146       3       jdk.internal.module.Checks::isJavaIdentifier (76 bytes)
+Event: 0.229 Thread 0x00007f7370060800  144       3       sun.nio.fs.UnixPath::toUnixPath (32 bytes)
+Event: 0.229 Thread 0x00007f736c098800 nmethod 141 0x00007f73a1808a90 code [0x00007f73a1808c80, 0x00007f73a1808e98]
+Event: 0.229 Thread 0x00007f736c098800  143       3       java.util.stream.ReferencePipeline$3$1::accept (23 bytes)
+Event: 0.230 Thread 0x00007f7370060800 nmethod 144 0x00007f73a1809010 code [0x00007f73a1809220, 0x00007f73a18096b8]
+Event: 0.230 Thread 0x00007f7370060800  149       3       java.lang.Character::isJavaIdentifierStart (9 bytes)
+Event: 0.230 Thread 0x00007f7370060800 nmethod 149 0x00007f73a1809910 code [0x00007f73a1809b00, 0x00007f73a1809d18]
+Event: 0.230 Thread 0x00007f7370060800  150       3       java.lang.CharacterDataLatin1::isJavaIdentifierStart (23 bytes)
+Event: 0.230 Thread 0x00007f7370060800 nmethod 150 0x00007f73a1809e10 code [0x00007f73a180a000, 0x00007f73a180a258]
+Event: 0.230 Thread 0x00007f7370060800  148       3       java.util.ImmutableCollections$SetN::contains (26 bytes)
+Event: 0.231 Thread 0x00007f736c098800 nmethod 143 0x00007f73a180a410 code [0x00007f73a180a660, 0x00007f73a180aad8]
+Event: 0.231 Thread 0x00007f736c098800  147       3       java.util.concurrent.locks.AbstractQueuedSynchronizer::compareAndSetState (10 bytes)
+Event: 0.231 Thread 0x00007f7370060800 nmethod 148 0x00007f73a180ac90 code [0x00007f73a180ae80, 0x00007f73a180b1d8]
+Event: 0.231 Thread 0x00007f7370060800  164       3       sun.nio.fs.UnixPath::hasDotOrDotDot (69 bytes)
+Event: 0.231 Thread 0x00007f73b021d000 nmethod 146 0x00007f73a180b410 code [0x00007f73a180b740, 0x00007f73a180c438]
+Event: 0.232 Thread 0x00007f73b021d000  156       3       java.lang.ThreadLocal::getMap (5 bytes)
+Event: 0.232 Thread 0x00007f73b021d000 nmethod 156 0x00007f73a180cc90 code [0x00007f73a180ce80, 0x00007f73a180d038]
+Event: 0.232 Thread 0x00007f73b021d000  157       3       java.lang.ThreadLocal::get (38 bytes)
+Event: 0.232 Thread 0x00007f7370060800 nmethod 164 0x00007f73a180d110 code [0x00007f73a180d3a0, 0x00007f73a180d9b8]
+Event: 0.232 Thread 0x00007f7370060800  158       3       java.lang.ThreadLocal$ThreadLocalMap::getEntry (42 bytes)
+Event: 0.232 Thread 0x00007f737014f800  151       4       sun.nio.fs.UnixPath::compareTo (92 bytes)
+Event: 0.233 Thread 0x00007f736c096000 nmethod 132 0x00007f73a180dd90 code [0x00007f73a180e0c0, 0x00007f73a180ecf8]
+Event: 0.233 Thread 0x00007f73b021d000 nmethod 157 0x00007f73a180f490 code [0x00007f73a180f6e0, 0x00007f73a180fb38]
+Event: 0.233 Thread 0x00007f7370060800 nmethod 158 0x00007f73a180fd90 code [0x00007f73a180ffe0, 0x00007f73a1810488]
+Event: 0.233 Thread 0x00007f7370060800  160       1       java.nio.file.FileTreeWalker$DirectoryNode::skipped (5 bytes)
+Event: 0.233 Thread 0x00007f73b021d000  161       1       java.nio.file.FileTreeWalker$DirectoryNode::iterator (5 bytes)
+Event: 0.233 Thread 0x00007f736c096000  159       1       java.nio.file.FileTreeWalker$Event::ioeException (5 bytes)
+Event: 0.233 Thread 0x00007f7370060800 nmethod 160 0x00007f73a8bf3810 code [0x00007f73a8bf39c0, 0x00007f73a8bf3a98]
+Event: 0.233 Thread 0x00007f7370060800  163       1       java.nio.file.FileTreeWalker$Event::type (5 bytes)
+Event: 0.233 Thread 0x00007f73b021d000 nmethod 161 0x00007f73a8bf3b10 code [0x00007f73a8bf3ce0, 0x00007f73a8bf3e38]
+Event: 0.233 Thread 0x00007f73b021d000  152       1       sun.nio.fs.UnixFileSystem::needToResolveAgainstDefaultDirectory (5 bytes)
+Event: 0.233 Thread 0x00007f736c096000 nmethod 159 0x00007f73a8bf3f10 code [0x00007f73a8bf40e0, 0x00007f73a8bf4238]
+Event: 0.233 Thread 0x00007f736c096000  169       3       sun.nio.fs.UnixDirectoryStream::readLock (8 bytes)
+Event: 0.233 Thread 0x00007f7370060800 nmethod 163 0x00007f73a8bf4310 code [0x00007f73a8bf44e0, 0x00007f73a8bf4638]
+Event: 0.233 Thread 0x00007f73b021d000 nmethod 152 0x00007f73a8bf4710 code [0x00007f73a8bf48c0, 0x00007f73a8bf4998]
+Event: 0.233 Thread 0x00007f7370060800  153       1       sun.nio.fs.NativeBuffer::size (5 bytes)
+Event: 0.233 Thread 0x00007f73b021d000  154       1       sun.nio.fs.NativeBuffer::owner (5 bytes)
+Event: 0.233 Thread 0x00007f7370060800 nmethod 153 0x00007f73a8bf4a10 code [0x00007f73a8bf4bc0, 0x00007f73a8bf4c98]
+Event: 0.233 Thread 0x00007f7370060800  170       1       java.util.stream.Streams$AbstractStreamBuilderImpl::characteristics (4 bytes)
+Event: 0.233 Thread 0x00007f73b021d000 nmethod 154 0x00007f73a8bf4d10 code [0x00007f73a8bf4ee0, 0x00007f73a8bf5038]
+Event: 0.233 Thread 0x00007f73b021d000  172       3       java.lang.invoke.VarHandleGuards::guard_LII_Z (70 bytes)
+Event: 0.233 Thread 0x00007f736c096000 nmethod 169 0x00007f73a1810690 code [0x00007f73a1810880, 0x00007f73a1810ad8]
+Event: 0.233 Thread 0x00007f736c096000  173       3       java.lang.StringCoding::hasNegatives (25 bytes)
+Event: 0.234 Thread 0x00007f7370060800 nmethod 170 0x00007f73a8bf5110 code [0x00007f73a8bf52c0, 0x00007f73a8bf5398]
+Event: 0.234 Thread 0x00007f7370060800  165       1       java.nio.file.Files$AcceptAllFilter::accept (2 bytes)
+Event: 0.234 Thread 0x00007f7370060800 nmethod 165 0x00007f73a8bf5410 code [0x00007f73a8bf55c0, 0x00007f73a8bf5698]
+Event: 0.234 Thread 0x00007f7370060800  174       3       java.lang.invoke.VarForm::getMemberName (21 bytes)
+Event: 0.234 Thread 0x00007f736c096000 nmethod 173 0x00007f73a1810c10 code [0x00007f73a1810e00, 0x00007f73a1811058]
+Event: 0.234 Thread 0x00007f736c096000  175       3       java.lang.invoke.VarHandleInts$FieldInstanceReadWrite::compareAndSet (24 bytes)
+Event: 0.234 Thread 0x00007f7370060800 nmethod 174 0x00007f73a1811210 code [0x00007f73a1811420, 0x00007f73a1811748]
+Event: 0.234 Thread 0x00007f7370060800  162       1       sun.nio.fs.NativeBuffer::setOwner (6 bytes)
+Event: 0.234 Thread 0x00007f7370060800 nmethod 162 0x00007f73a8bf6290 code [0x00007f73a8bf6480, 0x00007f73a8bf65b8]
+Event: 0.234 Thread 0x00007f7370060800  166       1       java.nio.file.FileTreeWalker$Event::attributes (5 bytes)
+Event: 0.235 Thread 0x00007f7370060800 nmethod 166 0x00007f73a8bf6690 code [0x00007f73a8bf6860, 0x00007f73a8bf69b8]
+Event: 0.235 Thread 0x00007f736c098800 nmethod 147 0x00007f73a1811910 code [0x00007f73a1811b80, 0x00007f73a1812338]
+Event: 0.235 Thread 0x00007f7370060800  168       1       sun.nio.fs.UnixPath::asByteArray (5 bytes)
+Event: 0.235 Thread 0x00007f736c098800  179       3       jdk.internal.misc.Unsafe::checkPrimitivePointer (19 bytes)
+Event: 0.235 Thread 0x00007f7370060800 nmethod 168 0x00007f73a8bf6a90 code [0x00007f73a8bf6c60, 0x00007f73a8bf6db8]
+Event: 0.235 Thread 0x00007f7370060800  180       3       jdk.internal.misc.Unsafe::checkPointer (19 bytes)
+Event: 0.235 Thread 0x00007f736c096000 nmethod 175 0x00007f73a1812690 code [0x00007f73a18128e0, 0x00007f73a1812e68]
+Event: 0.235 Thread 0x00007f736c096000  186       3       java.nio.file.FileTreeIterator::fetchNextIfNeeded (65 bytes)
+Event: 0.236 Thread 0x00007f7370060800 nmethod 180 0x00007f73a1813210 code [0x00007f73a1813400, 0x00007f73a18137a8]
+Event: 0.236 Thread 0x00007f7370060800  182       3       sun.nio.fs.UnixPath::getFileSystem (5 bytes)
+Event: 0.236 Thread 0x00007f7370060800 nmethod 182 0x00007f73a1813a10 code [0x00007f73a1813be0, 0x00007f73a1813d98]
+Event: 0.236 Thread 0x00007f7370060800  183       3       java.nio.file.Files::provider (10 bytes)
+Event: 0.236 Thread 0x00007f7370060800 nmethod 183 0x00007f73a1813e90 code [0x00007f73a1814080, 0x00007f73a1814318]
+Event: 0.236 Thread 0x00007f7370060800  184       3       sun.nio.fs.UnixPath::checkRead (17 bytes)
+Event: 0.236 Thread 0x00007f736c096000 nmethod 186 0x00007f73a1814490 code [0x00007f73a1814760, 0x00007f73a1814ea8]
+Event: 0.236 Thread 0x00007f736c096000  185       3       java.nio.file.FileTreeWalker::isOpen (13 bytes)
+Event: 0.237 Thread 0x00007f736c098800 nmethod 179 0x00007f73a1815290 code [0x00007f73a1815500, 0x00007f73a1815c28]
+Event: 0.237 Thread 0x00007f736c098800  181       3       java.util.HashMap::hash (20 bytes)
+Event: 0.237 Thread 0x00007f736c096000 nmethod 185 0x00007f73a1816010 code [0x00007f73a18161c0, 0x00007f73a1816338]
+Event: 0.237 Thread 0x00007f736c096000  177       3       java.util.concurrent.locks.AbstractQueuedSynchronizer::hasQueuedPredecessors (76 bytes)
+Event: 0.237 Thread 0x00007f73b021d000 nmethod 172 0x00007f73a1816410 code [0x00007f73a1816980, 0x00007f73a18181c8]
+Event: 0.237 Thread 0x00007f73b021d000  187       3       sun.nio.fs.UnixPath::isAbsolute (25 bytes)
+Event: 0.237 Thread 0x00007f736c098800 nmethod 181 0x00007f73a1818b10 code [0x00007f73a1818ce0, 0x00007f73a1818f08]
+Event: 0.237 Thread 0x00007f736c098800  188       3       java.lang.String::replace (42 bytes)
+Event: 0.238 Thread 0x00007f73b021d000 nmethod 187 0x00007f73a1819010 code [0x00007f73a1819200, 0x00007f73a1819478]
+Event: 0.238 Thread 0x00007f73b021d000  192   !   3       sun.nio.fs.UnixDirectoryStream$UnixDirectoryIterator::readNextEntry (185 bytes)
+Event: 0.238 Thread 0x00007f736c098800 nmethod 188 0x00007f73a1819610 code [0x00007f73a1819820, 0x00007f73a1819c58]
+Event: 0.238 Thread 0x00007f736c098800  189       3       java.util.ArrayDeque::peek (5 bytes)
+Event: 0.238 Thread 0x00007f736c096000 nmethod 177 0x00007f73a1819e90 code [0x00007f73a181a120, 0x00007f73a181a7b8]
+Event: 0.238 Thread 0x00007f736c096000  190       3       java.util.ArrayDeque::peekFirst (12 bytes)
+Event: 0.239 Thread 0x00007f7370060800 nmethod 184 0x00007f73a181ab10 code [0x00007f73a181ae60, 0x00007f73a181bb38]
+Event: 0.239 Thread 0x00007f736c096000 nmethod 190 0x00007f73a181c090 code [0x00007f73a181c2a0, 0x00007f73a181c578]
+Event: 0.239 Thread 0x00007f7370060800  191  s    3       sun.nio.fs.UnixDirectoryStream$UnixDirectoryIterator::hasNext (35 bytes)
+Event: 0.239 Thread 0x00007f736c096000  193       3       java.util.HashSet::add (20 bytes)
+Event: 0.239 Thread 0x00007f736c098800 nmethod 189 0x00007f73a181c710 code [0x00007f73a181c940, 0x00007f73a181cc98]
+Event: 0.239 Thread 0x00007f736c098800  106       3       java.lang.AbstractStringBuilder::<init> (39 bytes)
+Event: 0.239 Thread 0x00007f736c098800 nmethod 106 0x00007f73a181ce10 code [0x00007f73a181d020, 0x00007f73a181d2f8]
+Event: 0.239 Thread 0x00007f736c098800  194       3       java.util.concurrent.locks.ReentrantReadWriteLock$Sync::exclusiveCount (5 bytes)
+Event: 0.239 Thread 0x00007f7370060800 nmethod 191 0x00007f73a181d490 code [0x00007f73a181d6c0, 0x00007f73a181dbe8]
+Event: 0.239 Thread 0x00007f736c098800 nmethod 194 0x00007f73a181dd90 code [0x00007f73a181df40, 0x00007f73a181e038]
+Event: 0.239 Thread 0x00007f7370060800  107       3       java.lang.StringBuilder::toString (35 bytes)
+Event: 0.239 Thread 0x00007f736c098800  105       3       java.lang.StringBuilder::<init> (7 bytes)
+Event: 0.240 Thread 0x00007f736c096000 nmethod 193 0x00007f73a181e110 code [0x00007f73a181e340, 0x00007f73a181e838]
+Event: 0.240 Thread 0x00007f736c098800 nmethod 105 0x00007f73a181ea90 code [0x00007f73a181ec60, 0x00007f73a181eda8]
+Event: 0.240 Thread 0x00007f736c096000  195       3       java.util.stream.PipelineHelper::<init> (5 bytes)
+Event: 0.240 Thread 0x00007f736c098800  196       3       java.util.stream.AbstractPipeline::isParallel (8 bytes)
+Event: 0.240 Thread 0x00007f736c096000 nmethod 195 0x00007f73a181ee90 code [0x00007f73a181f060, 0x00007f73a181f1d8]
+Event: 0.240 Thread 0x00007f736c098800 nmethod 196 0x00007f73a181f290 code [0x00007f73a181f480, 0x00007f73a181f638]
+Event: 0.240 Thread 0x00007f736c096000  204       3       sun.nio.fs.UnixPath::relativize (408 bytes)
+Event: 0.240 Thread 0x00007f736c098800  197   !   3       java.lang.StringCoding::decode (362 bytes)
+Event: 0.241 Thread 0x00007f7370060800 nmethod 107 0x00007f73a181f710 code [0x00007f73a181f980, 0x00007f73a181ff38]
+Event: 0.241 Thread 0x00007f7370060800  202   !   3       jdk.internal.module.ModulePath::isHidden (8 bytes)
+Event: 0.241 Thread 0x00007f7370060800 nmethod 202 0x00007f73a1820290 code [0x00007f73a18204c0, 0x00007f73a1820948]
+Event: 0.241 Thread 0x00007f7370060800  203       3       java.nio.file.Files::isHidden (9 bytes)
+Event: 0.242 Thread 0x00007f7370060800 nmethod 203 0x00007f73a1820c10 code [0x00007f73a1820e20, 0x00007f73a1821208]
+Event: 0.242 Thread 0x00007f7370060800  198       3       java.lang.StringCoding::decodeUTF8 (45 bytes)
+Event: 0.243 Thread 0x00007f7370060800 nmethod 198 0x00007f73a1821390 code [0x00007f73a1821620, 0x00007f73a1821c68]
+Event: 0.243 Thread 0x00007f7370060800   92       3       java.lang.invoke.MethodType::checkSlotCount (33 bytes)
+Event: 0.244 Thread 0x00007f73b021d000 nmethod 192 0x00007f73a1821f90 code [0x00007f73a1822660, 0x00007f73a1824628]
+Event: 0.244 Thread 0x00007f73b021d000  205       3       java.lang.String::indexOf (7 bytes)
+Event: 0.245 Thread 0x00007f73b021d000 nmethod 205 0x00007f73a1825790 code [0x00007f73a18259c0, 0x00007f73a1825db8]
+Event: 0.245 Thread 0x00007f73b021d000  206  s    3       java.io.BufferedInputStream::read (49 bytes)
+Event: 0.245 Thread 0x00007f7370060800 nmethod 92 0x00007f73a1826010 code [0x00007f73a18262e0, 0x00007f73a1826cb8]
+Event: 0.245 Thread 0x00007f7370060800  207       3       java.util.concurrent.locks.ReentrantReadWriteLock$Sync::sharedCount (5 bytes)
+Event: 0.246 Thread 0x00007f7370060800 nmethod 207 0x00007f73a1827290 code [0x00007f73a1827440, 0x00007f73a1827538]
+Event: 0.246 Thread 0x00007f7370060800  213       3       jdk.internal.module.Checks::isTypeName (49 bytes)
+Event: 0.246 Thread 0x00007f73b021d000 nmethod 206 0x00007f73a1827610 code [0x00007f73a1827840, 0x00007f73a1827df8]
+Event: 0.246 Thread 0x00007f73b021d000  208       3       java.util.concurrent.locks.ReentrantReadWriteLock$FairSync::readerShouldBlock (5 bytes)
+Event: 0.246 Thread 0x00007f73b021d000 nmethod 208 0x00007f73a1828110 code [0x00007f73a18282e0, 0x00007f73a1828428]
+Event: 0.246 Thread 0x00007f73b021d000  199       3       java.lang.StringCoding$Result::with (12 bytes)
+Event: 0.246 Thread 0x00007f73b021d000 nmethod 199 0x00007f73a1828510 code [0x00007f73a1828700, 0x00007f73a1828898]
+Event: 0.246 Thread 0x00007f73b021d000  200       3       java.util.stream.StreamSupport::stream (19 bytes)
+Event: 0.247 Thread 0x00007f7370060800 nmethod 213 0x00007f73a1828990 code [0x00007f73a1828c00, 0x00007f73a18291f8]
+Event: 0.247 Thread 0x00007f7370060800  201       3       java.util.stream.StreamOpFlag::fromCharacteristics (37 bytes)
+Event: 0.247 Thread 0x00007f73b021d000 nmethod 200 0x00007f73a1829610 code [0x00007f73a1829820, 0x00007f73a1829c48]
+Event: 0.247 Thread 0x00007f73b021d000  215   !   3       java.nio.file.FileTreeWalker::next (144 bytes)
+Event: 0.247 Thread 0x00007f7370060800 nmethod 201 0x00007f73a1829f10 code [0x00007f73a182a100, 0x00007f73a182a418]
+Event: 0.247 Thread 0x00007f7370060800  216       3       jdk.internal.misc.Unsafe::checkOffset (32 bytes)
+Event: 0.248 Thread 0x00007f7370060800 nmethod 216 0x00007f73a182a590 code [0x00007f73a182a760, 0x00007f73a182a9e8]
+Event: 0.248 Thread 0x00007f7370060800  221       3       java.util.HashMap::putVal (300 bytes)
+Event: 0.249 Thread 0x00007f736c098800 nmethod 197 0x00007f73a182ab90 code [0x00007f73a182b1e0, 0x00007f73a182db08]
+Event: 0.250 Thread 0x00007f736c098800  225       3       java.util.concurrent.locks.ReentrantReadWriteLock$Sync::tryReleaseShared (146 bytes)
+Event: 0.253 Thread 0x00007f73640c4000  226       3       java.util.concurrent.locks.AbstractQueuedSynchronizer::doReleaseShared (79 bytes)
+Event: 0.253 Thread 0x00007f7370060800 nmethod 221 0x00007f73a182f290 code [0x00007f73a182f720, 0x00007f73a1830d58]
+Event: 0.253 Thread 0x00007f7370060800  223       3       java.util.concurrent.locks.ReentrantReadWriteLock$Sync::tryAcquireShared (177 bytes)
+
+GC Heap History (0 events):
+No events
+
+Deoptimization events (0 events):
+No events
+
+Classes redefined (0 events):
+No events
+
+Internal exceptions (15 events):
+Event: 0.146 Thread 0x00007f73b0062000 Exception <a 'java/lang/NoSuchMethodError'{0x00000000ff0cdef0}: 'java.lang.Object java.lang.invoke.DirectMethodHandle$Holder.invokeStatic(java.lang.Object, java.lang.Object, java.lang.Object)'> (0x00000000ff0cdef0) thrown at [/home/grads/t/tiendat.ng.cs/github_repos/jdk11u/src/hotspot/share/interpreter/linkResolver.cpp, line 772]
+Event: 0.148 Thread 0x00007f73b0062000 Exception <a 'java/lang/NoSuchMethodError'{0x00000000ff0d8648}: 'java.lang.Object java.lang.invoke.Invokers$Holder.invokeExact_MT(java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)'> (0x00000000ff0d8648) thrown at [/home/grads/t/tiendat.ng.cs/github_repos/jdk11u/src/hotspot/share/interpreter/linkResolver.cpp, line 772]
+Event: 0.153 Thread 0x00007f73b0062000 Exception <a 'java/lang/NoSuchMethodError'{0x00000000ff0e78a8}: 'java.lang.Object java.lang.invoke.Invokers$Holder.linkToTargetMethod(java.lang.Object, java.lang.Object, java.lang.Object)'> (0x00000000ff0e78a8) thrown at [/home/grads/t/tiendat.ng.cs/github_repos/jdk11u/src/hotspot/share/interpreter/linkResolver.cpp, line 772]
+Event: 0.168 Thread 0x00007f73b0062000 Exception <a 'java/lang/NoSuchMethodError'{0x00000000ff1005d8}: 'java.lang.Object java.lang.invoke.DirectMethodHandle$Holder.invokeSpecial(java.lang.Object, java.lang.Object, java.lang.Object)'> (0x00000000ff1005d8) thrown at [/home/grads/t/tiendat.ng.cs/github_repos/jdk11u/src/hotspot/share/interpreter/linkResolver.cpp, line 772]
+Event: 0.177 Thread 0x00007f73b0062000 Exception <a 'java/lang/NoSuchMethodError'{0x00000000ff117c88}: 'java.lang.Object java.lang.invoke.DirectMethodHandle$Holder.invokeStatic(java.lang.Object, java.lang.Object)'> (0x00000000ff117c88) thrown at [/home/grads/t/tiendat.ng.cs/github_repos/jdk11u/src/hotspot/share/interpreter/linkResolver.cpp, line 772]
+Event: 0.177 Thread 0x00007f73b0062000 Exception <a 'java/lang/NoSuchMethodError'{0x00000000ff11ba30}: 'java.lang.Object java.lang.invoke.Invokers$Holder.linkToTargetMethod(java.lang.Object, java.lang.Object)'> (0x00000000ff11ba30) thrown at [/home/grads/t/tiendat.ng.cs/github_repos/jdk11u/src/hotspot/share/interpreter/linkResolver.cpp, line 772]
+Event: 0.188 Thread 0x00007f73b0062000 Exception <a 'java/lang/NoSuchMethodError'{0x00000000ff12bea8}: 'void java.lang.invoke.DirectMethodHandle$Holder.invokeVirtual(java.lang.Object, java.lang.Object)'> (0x00000000ff12bea8) thrown at [/home/grads/t/tiendat.ng.cs/github_repos/jdk11u/src/hotspot/share/interpreter/linkResolver.cpp, line 772]
+Event: 0.201 Thread 0x00007f73b0062000 Exception <a 'java/lang/NoSuchMethodError'{0x00000000ff1856e8}: 'java.lang.Object java.lang.invoke.DirectMethodHandle$Holder.invokeStatic(java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)'> (0x00000000ff1856e8) thrown at [/home/grads/t/tiendat.ng.cs/github_repos/jdk11u/src/hotspot/share/interpreter/linkResolver.cpp, line 772]
+Event: 0.202 Thread 0x00007f73b0062000 Exception <a 'java/lang/NoSuchMethodError'{0x00000000ff18a3c8}: 'java.lang.Object java.lang.invoke.DirectMethodHandle$Holder.getObject(java.lang.Object, java.lang.Object)'> (0x00000000ff18a3c8) thrown at [/home/grads/t/tiendat.ng.cs/github_repos/jdk11u/src/hotspot/share/interpreter/linkResolver.cpp, line 772]
+Event: 0.202 Thread 0x00007f73b0062000 Exception <a 'java/lang/NoSuchMethodError'{0x00000000ff18ec48}: 'java.lang.Object java.lang.invoke.LambdaForm$Holder.identity_L(java.lang.Object, java.lang.Object)'> (0x00000000ff18ec48) thrown at [/home/grads/t/tiendat.ng.cs/github_repos/jdk11u/src/hotspot/share/interpreter/linkResolver.cpp, line 772]
+Event: 0.203 Thread 0x00007f73b0062000 Exception <a 'java/lang/NoSuchMethodError'{0x00000000ff191838}: 'java.lang.Object java.lang.invoke.LambdaForm$Holder.zero_L(java.lang.Object)'> (0x00000000ff191838) thrown at [/home/grads/t/tiendat.ng.cs/github_repos/jdk11u/src/hotspot/share/interpreter/linkResolver.cpp, line 772]
+Event: 0.206 Thread 0x00007f73b0062000 Exception <a 'java/lang/NoSuchMethodError'{0x00000000ff197a18}: 'java.lang.Object java.lang.invoke.DirectMethodHandle$Holder.invokeSpecial(java.lang.Object, java.lang.Object)'> (0x00000000ff197a18) thrown at [/home/grads/t/tiendat.ng.cs/github_repos/jdk11u/src/hotspot/share/interpreter/linkResolver.cpp, line 772]
+Event: 0.206 Thread 0x00007f73b0062000 Exception <a 'java/lang/NoSuchMethodError'{0x00000000ff19b038}: 'java.lang.Object java.lang.invoke.Invokers$Holder.linkToTargetMethod(java.lang.Object)'> (0x00000000ff19b038) thrown at [/home/grads/t/tiendat.ng.cs/github_repos/jdk11u/src/hotspot/share/interpreter/linkResolver.cpp, line 772]
+Event: 0.211 Thread 0x00007f73b0062000 Exception <a 'java/lang/NoSuchMethodError'{0x00000000ff1ab078}: 'java.lang.Object java.lang.invoke.DirectMethodHandle$Holder.newInvokeSpecial(java.lang.Object)'> (0x00000000ff1ab078) thrown at [/home/grads/t/tiendat.ng.cs/github_repos/jdk11u/src/hotspot/share/interpreter/linkResolver.cpp, line 772]
+Event: 0.212 Thread 0x00007f73b0062000 Exception <a 'java/lang/NoSuchMethodError'{0x00000000ff1b17b8}: 'int java.lang.invoke.DirectMethodHandle$Holder.invokeInterface(java.lang.Object, java.lang.Object, java.lang.Object)'> (0x00000000ff1b17b8) thrown at [/home/grads/t/tiendat.ng.cs/github_repos/jdk11u/src/hotspot/share/interpreter/linkResolver.cpp, line 772]
+
+Events (250 events):
+Event: 0.181 loading class java/util/Spliterator$OfPrimitive
+Event: 0.181 loading class java/util/Spliterator$OfPrimitive done
+Event: 0.182 loading class java/util/Spliterator$OfInt done
+Event: 0.182 loading class java/util/Spliterators$EmptySpliterator$OfInt done
+Event: 0.182 loading class java/util/Spliterators$EmptySpliterator$OfLong
+Event: 0.182 loading class java/util/Spliterator$OfLong
+Event: 0.182 loading class java/util/Spliterator$OfLong done
+Event: 0.182 loading class java/util/Spliterators$EmptySpliterator$OfLong done
+Event: 0.182 loading class java/util/Spliterators$EmptySpliterator$OfDouble
+Event: 0.182 loading class java/util/Spliterator$OfDouble
+Event: 0.182 loading class java/util/Spliterator$OfDouble done
+Event: 0.182 loading class java/util/Spliterators$EmptySpliterator$OfDouble done
+Event: 0.182 loading class java/util/Spliterators$IteratorSpliterator
+Event: 0.183 loading class java/util/Spliterators$IteratorSpliterator done
+Event: 0.183 loading class java/util/stream/StreamSupport
+Event: 0.183 loading class java/util/stream/StreamSupport done
+Event: 0.183 loading class java/util/stream/ReferencePipeline$Head
+Event: 0.183 loading class java/util/stream/ReferencePipeline
+Event: 0.183 loading class java/util/stream/Stream
+Event: 0.183 loading class java/util/stream/BaseStream
+Event: 0.183 loading class java/util/stream/BaseStream done
+Event: 0.183 loading class java/util/stream/Stream done
+Event: 0.183 loading class java/util/stream/AbstractPipeline
+Event: 0.184 loading class java/util/stream/PipelineHelper
+Event: 0.184 loading class java/util/stream/PipelineHelper done
+Event: 0.184 loading class java/util/stream/AbstractPipeline done
+Event: 0.184 loading class java/util/stream/ReferencePipeline done
+Event: 0.184 loading class java/util/stream/ReferencePipeline$Head done
+Event: 0.184 loading class java/util/stream/StreamOpFlag
+Event: 0.184 loading class java/util/stream/StreamOpFlag done
+Event: 0.185 loading class java/util/stream/StreamOpFlag$Type
+Event: 0.185 loading class java/util/stream/StreamOpFlag$Type done
+Event: 0.185 loading class java/util/stream/StreamOpFlag$MaskBuilder
+Event: 0.185 loading class java/util/stream/StreamOpFlag$MaskBuilder done
+Event: 0.185 loading class java/util/EnumMap
+Event: 0.185 loading class java/util/EnumMap done
+Event: 0.185 loading class java/util/EnumMap$1
+Event: 0.185 loading class java/util/EnumMap$1 done
+Event: 0.185 loading class java/lang/PublicMethods$MethodList
+Event: 0.185 loading class java/lang/PublicMethods$MethodList done
+Event: 0.185 loading class java/lang/PublicMethods$Key
+Event: 0.185 loading class java/lang/PublicMethods$Key done
+Event: 0.186 loading class java/lang/Class$3
+Event: 0.186 loading class java/lang/Class$3 done
+Event: 0.186 loading class java/util/HashMap$EntrySet
+Event: 0.186 loading class java/util/HashMap$EntrySet done
+Event: 0.186 loading class java/util/HashMap$EntryIterator
+Event: 0.186 loading class java/util/HashMap$EntryIterator done
+Event: 0.186 loading class sun/reflect/annotation/AnnotationParser
+Event: 0.187 loading class sun/reflect/annotation/AnnotationParser done
+Event: 0.187 loading class jdk/internal/reflect/NativeMethodAccessorImpl
+Event: 0.187 loading class jdk/internal/reflect/NativeMethodAccessorImpl done
+Event: 0.187 loading class jdk/internal/reflect/DelegatingMethodAccessorImpl
+Event: 0.187 loading class jdk/internal/reflect/DelegatingMethodAccessorImpl done
+Event: 0.189 loading class java/util/function/Predicate
+Event: 0.189 loading class java/util/function/Predicate done
+Event: 0.190 loading class java/util/stream/ReferencePipeline$2
+Event: 0.190 loading class java/util/stream/ReferencePipeline$StatelessOp
+Event: 0.190 loading class java/util/stream/ReferencePipeline$StatelessOp done
+Event: 0.190 loading class java/util/stream/ReferencePipeline$2 done
+Event: 0.190 loading class java/util/stream/StreamShape
+Event: 0.190 loading class java/util/stream/StreamShape done
+Event: 0.191 loading class java/lang/invoke/InnerClassLambdaMetafactory$1
+Event: 0.191 loading class java/lang/invoke/InnerClassLambdaMetafactory$1 done
+Event: 0.191 loading class jdk/internal/reflect/NativeConstructorAccessorImpl
+Event: 0.191 loading class jdk/internal/reflect/NativeConstructorAccessorImpl done
+Event: 0.192 loading class jdk/internal/reflect/DelegatingConstructorAccessorImpl
+Event: 0.192 loading class jdk/internal/reflect/DelegatingConstructorAccessorImpl done
+Event: 0.192 loading class java/lang/invoke/BoundMethodHandle
+Event: 0.192 loading class java/lang/invoke/BoundMethodHandle done
+Event: 0.192 loading class java/lang/invoke/BoundMethodHandle$Specializer
+Event: 0.192 loading class java/lang/invoke/ClassSpecializer
+Event: 0.192 loading class java/lang/invoke/ClassSpecializer done
+Event: 0.192 loading class java/lang/invoke/BoundMethodHandle$Specializer done
+Event: 0.193 loading class java/lang/invoke/ClassSpecializer$1
+Event: 0.193 loading class java/lang/invoke/ClassSpecializer$1 done
+Event: 0.193 loading class java/lang/invoke/BoundMethodHandle$SpeciesData
+Event: 0.193 loading class java/lang/invoke/ClassSpecializer$SpeciesData
+Event: 0.193 loading class java/lang/invoke/ClassSpecializer$SpeciesData done
+Event: 0.193 loading class java/lang/invoke/BoundMethodHandle$SpeciesData done
+Event: 0.193 loading class java/util/ImmutableCollections$SubList
+Event: 0.194 loading class java/util/ImmutableCollections$SubList done
+Event: 0.194 loading class java/lang/invoke/BoundMethodHandle$Specializer$Factory
+Event: 0.194 loading class java/lang/invoke/ClassSpecializer$Factory
+Event: 0.194 loading class java/lang/invoke/ClassSpecializer$Factory done
+Event: 0.194 loading class java/lang/invoke/BoundMethodHandle$Specializer$Factory done
+Event: 0.194 loading class java/lang/invoke/SimpleMethodHandle
+Event: 0.195 loading class java/lang/invoke/SimpleMethodHandle done
+Event: 0.195 loading class jdk/internal/loader/BootLoader
+Event: 0.195 loading class jdk/internal/loader/BootLoader done
+Event: 0.195 loading class jdk/internal/module/ServicesCatalog
+Event: 0.195 loading class jdk/internal/module/ServicesCatalog done
+Event: 0.195 loading class jdk/internal/loader/ClassLoaderValue
+Event: 0.195 loading class jdk/internal/loader/AbstractClassLoaderValue
+Event: 0.195 loading class jdk/internal/loader/AbstractClassLoaderValue done
+Event: 0.195 loading class jdk/internal/loader/ClassLoaderValue done
+Event: 0.195 loading class jdk/internal/loader/ClassLoaders$BootClassLoader
+Event: 0.195 loading class jdk/internal/loader/ClassLoaders$BootClassLoader done
+Event: 0.196 loading class java/lang/ClassLoader$ParallelLoaders
+Event: 0.196 loading class java/lang/ClassLoader$ParallelLoaders done
+Event: 0.196 loading class java/util/WeakHashMap
+Event: 0.196 loading class java/util/WeakHashMap done
+Event: 0.196 loading class java/util/WeakHashMap$Entry
+Event: 0.196 loading class java/util/WeakHashMap$Entry done
+Event: 0.196 loading class java/util/WeakHashMap$KeySet
+Event: 0.196 loading class java/util/WeakHashMap$KeySet done
+Event: 0.197 loading class java/util/Vector
+Event: 0.197 loading class java/util/Vector done
+Event: 0.197 loading class jdk/internal/loader/URLClassPath
+Event: 0.198 loading class jdk/internal/loader/URLClassPath done
+Event: 0.198 loading class java/net/URL$DefaultFactory
+Event: 0.198 loading class java/net/URLStreamHandlerFactory
+Event: 0.198 loading class java/net/URLStreamHandlerFactory done
+Event: 0.198 loading class java/net/URL$DefaultFactory done
+Event: 0.198 loading class java/net/URL$3
+Event: 0.198 loading class jdk/internal/misc/JavaNetURLAccess
+Event: 0.198 loading class jdk/internal/misc/JavaNetURLAccess done
+Event: 0.198 loading class java/net/URL$3 done
+Event: 0.198 loading class sun/net/www/ParseUtil
+Event: 0.199 loading class sun/net/www/ParseUtil done
+Event: 0.199 loading class sun/net/www/protocol/file/Handler
+Event: 0.199 loading class java/net/URLStreamHandler
+Event: 0.199 loading class java/net/URLStreamHandler done
+Event: 0.199 loading class sun/net/www/protocol/file/Handler done
+Event: 0.199 loading class java/lang/Class$1
+Event: 0.199 loading class java/lang/Class$1 done
+Event: 0.200 loading class sun/net/util/IPAddressUtil
+Event: 0.200 loading class sun/net/util/IPAddressUtil done
+Event: 0.200 loading class java/lang/invoke/BoundMethodHandle$Species_L
+Event: 0.200 loading class java/lang/invoke/BoundMethodHandle$Species_L done
+Event: 0.201 loading class java/lang/invoke/DirectMethodHandle$1
+Event: 0.201 loading class java/lang/invoke/DirectMethodHandle$1 done
+Event: 0.202 loading class java/lang/invoke/DirectMethodHandle$Accessor
+Event: 0.202 loading class java/lang/invoke/DirectMethodHandle$Accessor done
+Event: 0.203 loading class sun/invoke/util/Wrapper$1
+Event: 0.203 loading class sun/invoke/util/Wrapper$1 done
+Event: 0.203 loading class java/lang/invoke/MethodHandleImpl$IntrinsicMethodHandle
+Event: 0.203 loading class java/lang/invoke/DelegatingMethodHandle
+Event: 0.203 loading class java/lang/invoke/DelegatingMethodHandle done
+Event: 0.203 loading class java/lang/invoke/MethodHandleImpl$IntrinsicMethodHandle done
+Event: 0.204 loading class java/lang/invoke/DelegatingMethodHandle$Holder
+Event: 0.204 loading class java/lang/invoke/DelegatingMethodHandle$Holder done
+Event: 0.204 loading class java/lang/invoke/LambdaFormEditor
+Event: 0.204 loading class java/lang/invoke/LambdaFormEditor done
+Event: 0.204 loading class java/lang/invoke/LambdaFormEditor$Transform
+Event: 0.204 loading class java/lang/invoke/LambdaFormEditor$Transform done
+Event: 0.205 loading class java/lang/invoke/LambdaFormBuffer
+Event: 0.205 loading class java/lang/invoke/LambdaFormBuffer done
+Event: 0.206 loading class java/util/stream/ReferencePipeline$3
+Event: 0.206 loading class java/util/stream/ReferencePipeline$3 done
+Event: 0.208 loading class java/util/stream/ReferencePipeline$7
+Event: 0.208 loading class java/util/stream/ReferencePipeline$7 done
+Event: 0.208 loading class java/util/stream/Collectors
+Event: 0.209 loading class java/util/stream/Collectors done
+Event: 0.209 loading class java/util/stream/Collector$Characteristics
+Event: 0.209 loading class java/util/stream/Collector$Characteristics done
+Event: 0.209 loading class java/util/EnumSet
+Event: 0.209 loading class java/util/EnumSet done
+Event: 0.210 loading class java/util/RegularEnumSet
+Event: 0.210 loading class java/util/RegularEnumSet done
+Event: 0.210 loading class java/util/Collections$UnmodifiableSet
+Event: 0.210 loading class java/util/Collections$UnmodifiableCollection
+Event: 0.210 loading class java/util/Collections$UnmodifiableCollection done
+Event: 0.210 loading class java/util/Collections$UnmodifiableSet done
+Event: 0.210 loading class java/util/stream/Collectors$CollectorImpl
+Event: 0.210 loading class java/util/stream/Collector
+Event: 0.211 loading class java/util/stream/Collector done
+Event: 0.211 loading class java/util/stream/Collectors$CollectorImpl done
+Event: 0.211 loading class java/lang/invoke/DirectMethodHandle$Constructor
+Event: 0.211 loading class java/lang/invoke/DirectMethodHandle$Constructor done
+Event: 0.212 loading class java/lang/invoke/DirectMethodHandle$Interface
+Event: 0.213 loading class java/lang/invoke/DirectMethodHandle$Interface done
+Event: 0.213 loading class java/util/function/BiConsumer
+Event: 0.213 loading class java/util/function/BiConsumer done
+Event: 0.214 loading class java/util/function/BinaryOperator
+Event: 0.214 loading class java/util/function/BinaryOperator done
+Event: 0.215 loading class java/util/stream/ReduceOps
+Event: 0.215 loading class java/util/stream/ReduceOps done
+Event: 0.215 loading class java/util/stream/ReduceOps$3
+Event: 0.215 loading class java/util/stream/ReduceOps$ReduceOp
+Event: 0.215 loading class java/util/stream/TerminalOp
+Event: 0.215 loading class java/util/stream/TerminalOp done
+Event: 0.215 loading class java/util/stream/ReduceOps$ReduceOp done
+Event: 0.215 loading class java/util/stream/ReduceOps$3 done
+Event: 0.215 loading class java/util/stream/ReduceOps$3ReducingSink
+Event: 0.215 loading class java/util/stream/ReduceOps$AccumulatingSink
+Event: 0.215 loading class java/util/stream/TerminalSink
+Event: 0.215 loading class java/util/stream/Sink
+Event: 0.215 loading class java/util/stream/Sink done
+Event: 0.216 loading class java/util/stream/TerminalSink done
+Event: 0.216 loading class java/util/stream/ReduceOps$AccumulatingSink done
+Event: 0.216 loading class java/util/stream/ReduceOps$Box
+Event: 0.216 loading class java/util/stream/ReduceOps$Box done
+Event: 0.216 loading class java/util/stream/ReduceOps$3ReducingSink done
+Event: 0.216 loading class java/util/stream/ReferencePipeline$7$1
+Event: 0.216 loading class java/util/stream/Sink$ChainedReference
+Event: 0.216 loading class java/util/stream/Sink$ChainedReference done
+Event: 0.216 loading class java/util/stream/ReferencePipeline$7$1 done
+Event: 0.216 loading class java/util/stream/ReferencePipeline$3$1
+Event: 0.216 loading class java/util/stream/ReferencePipeline$3$1 done
+Event: 0.217 loading class java/util/stream/ReferencePipeline$2$1
+Event: 0.217 loading class java/util/stream/ReferencePipeline$2$1 done
+Event: 0.217 loading class sun/nio/fs/BasicFileAttributesHolder
+Event: 0.217 loading class sun/nio/fs/BasicFileAttributesHolder done
+Event: 0.218 loading class java/util/stream/Streams$StreamBuilderImpl
+Event: 0.218 loading class java/util/stream/Stream$Builder
+Event: 0.218 loading class java/util/stream/Stream$Builder done
+Event: 0.218 loading class java/util/stream/Streams$AbstractStreamBuilderImpl
+Event: 0.218 loading class java/util/stream/Streams$AbstractStreamBuilderImpl done
+Event: 0.218 loading class java/util/stream/Streams$StreamBuilderImpl done
+Event: 0.218 loading class java/util/stream/Streams
+Event: 0.218 loading class java/util/stream/Streams done
+Event: 0.222 Thread 0x00007f736c096000 Thread added: 0x00007f736c096000
+Event: 0.222 Protecting memory [0x00007f738b020000,0x00007f738b024000] with protection modes 0
+Event: 0.222 Thread 0x00007f736c098800 Thread added: 0x00007f736c098800
+Event: 0.222 Protecting memory [0x00007f738af1f000,0x00007f738af23000] with protection modes 0
+Event: 0.232 Thread 0x00007f737014f800 Thread added: 0x00007f737014f800
+Event: 0.232 Protecting memory [0x00007f738ae1e000,0x00007f738ae22000] with protection modes 0
+Event: 0.240 loading class java/util/Collections$UnmodifiableCollection$1
+Event: 0.240 loading class java/util/Collections$UnmodifiableCollection$1 done
+Event: 0.240 loading class java/util/HashMap$Values
+Event: 0.240 loading class java/util/HashMap$Values done
+Event: 0.241 loading class java/util/HashMap$ValueIterator
+Event: 0.241 loading class java/util/HashMap$ValueIterator done
+Event: 0.241 loading class jdk/internal/module/ModuleInfo$Attributes
+Event: 0.241 loading class jdk/internal/module/ModuleInfo$Attributes done
+Event: 0.241 loading class jdk/internal/module/ModuleReferences
+Event: 0.241 loading class jdk/internal/module/ModuleReferences done
+Event: 0.242 loading class java/lang/module/ModuleReader
+Event: 0.242 loading class java/lang/module/ModuleReader done
+Event: 0.242 loading class sun/nio/fs/UnixUriUtils
+Event: 0.243 loading class sun/nio/fs/UnixUriUtils done
+Event: 0.243 loading class java/net/URI$Parser
+Event: 0.243 loading class java/net/URI$Parser done
+Event: 0.244 loading class jdk/internal/module/ModuleReferenceImpl
+Event: 0.244 loading class java/lang/module/ModuleReference
+Event: 0.244 loading class java/lang/module/ModuleReference done
+Event: 0.244 loading class jdk/internal/module/ModuleReferenceImpl done
+Event: 0.245 Loaded shared library /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/libnio.so
+Event: 0.249 Concurrent reset
+Event: 0.250 Thread 0x00007f73640c4000 Thread added: 0x00007f73640c4000
+Event: 0.250 Protecting memory [0x00007f738aa17000,0x00007f738aa1b000] with protection modes 0
+Event: 0.250 Concurrent reset done
+Event: 0.250 Executing VM operation: ShenandoahInitMark
+Event: 0.250 Protecting memory [0x00007f73b8b6b000,0x00007f73b8b6c000] with protection modes 0
+Event: 0.251 Pause Init Mark (process weakrefs)
+Event: 0.252 Pause Init Mark (process weakrefs) done
+Event: 0.252 Protecting memory [0x00007f73b8b6b000,0x00007f73b8b6c000] with protection modes 1
+Event: 0.252 Executing VM operation: ShenandoahInitMark done
+Event: 0.253 Concurrent marking (process weakrefs)
+
+
+Dynamic libraries:
+00010000-00011000 rw-p 00000000 00:00 0 
+00011000-00013000 ---p 00000000 00:00 0 
+00013000-00014000 rw-p 00000000 00:00 0 
+ff000000-ff540000 rw-p 00000000 00:00 0 
+ff540000-100000000 ---p 00000000 00:00 0 
+100000000-1000a0000 rw-p 00000000 00:00 0 
+1000a0000-140000000 ---p 00000000 00:00 0 
+5592da50c000-5592da50d000 r--p 00000000 fd:01 16521875                   /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/bin/java
+5592da50d000-5592da50e000 r-xp 00001000 fd:01 16521875                   /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/bin/java
+5592da50e000-5592da50f000 r--p 00002000 fd:01 16521875                   /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/bin/java
+5592da50f000-5592da510000 r--p 00002000 fd:01 16521875                   /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/bin/java
+5592da510000-5592da511000 rw-p 00003000 fd:01 16521875                   /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/bin/java
+5592db8d9000-5592db8fa000 rw-p 00000000 00:00 0                          [heap]
+7f7328000000-7f7328021000 rw-p 00000000 00:00 0 
+7f7328021000-7f732c000000 ---p 00000000 00:00 0 
+7f732c000000-7f732c021000 rw-p 00000000 00:00 0 
+7f732c021000-7f7330000000 ---p 00000000 00:00 0 
+7f7330000000-7f7330021000 rw-p 00000000 00:00 0 
+7f7330021000-7f7334000000 ---p 00000000 00:00 0 
+7f7334000000-7f7334021000 rw-p 00000000 00:00 0 
+7f7334021000-7f7338000000 ---p 00000000 00:00 0 
+7f7338000000-7f7338021000 rw-p 00000000 00:00 0 
+7f7338021000-7f733c000000 ---p 00000000 00:00 0 
+7f733c000000-7f733c021000 rw-p 00000000 00:00 0 
+7f733c021000-7f7340000000 ---p 00000000 00:00 0 
+7f7340000000-7f7340021000 rw-p 00000000 00:00 0 
+7f7340021000-7f7344000000 ---p 00000000 00:00 0 
+7f7344000000-7f7344021000 rw-p 00000000 00:00 0 
+7f7344021000-7f7348000000 ---p 00000000 00:00 0 
+7f7348000000-7f7348021000 rw-p 00000000 00:00 0 
+7f7348021000-7f734c000000 ---p 00000000 00:00 0 
+7f734c000000-7f734c021000 rw-p 00000000 00:00 0 
+7f734c021000-7f7350000000 ---p 00000000 00:00 0 
+7f7350000000-7f7350021000 rw-p 00000000 00:00 0 
+7f7350021000-7f7354000000 ---p 00000000 00:00 0 
+7f7354000000-7f7354021000 rw-p 00000000 00:00 0 
+7f7354021000-7f7358000000 ---p 00000000 00:00 0 
+7f7358000000-7f73580c2000 rw-p 00000000 00:00 0 
+7f73580c2000-7f735c000000 ---p 00000000 00:00 0 
+7f735c000000-7f735c021000 rw-p 00000000 00:00 0 
+7f735c021000-7f7360000000 ---p 00000000 00:00 0 
+7f7360000000-7f73600db000 rw-p 00000000 00:00 0 
+7f73600db000-7f7364000000 ---p 00000000 00:00 0 
+7f7364000000-7f73640e5000 rw-p 00000000 00:00 0 
+7f73640e5000-7f7368000000 ---p 00000000 00:00 0 
+7f7368000000-7f7368021000 rw-p 00000000 00:00 0 
+7f7368021000-7f736c000000 ---p 00000000 00:00 0 
+7f736c000000-7f736c1a5000 rw-p 00000000 00:00 0 
+7f736c1a5000-7f7370000000 ---p 00000000 00:00 0 
+7f7370000000-7f737027e000 rw-p 00000000 00:00 0 
+7f737027e000-7f7374000000 ---p 00000000 00:00 0 
+7f7374000000-7f7374021000 rw-p 00000000 00:00 0 
+7f7374021000-7f7378000000 ---p 00000000 00:00 0 
+7f7378000000-7f7378021000 rw-p 00000000 00:00 0 
+7f7378021000-7f737c000000 ---p 00000000 00:00 0 
+7f737c000000-7f737c18b000 rw-p 00000000 00:00 0 
+7f737c18b000-7f7380000000 ---p 00000000 00:00 0 
+7f7380000000-7f7380021000 rw-p 00000000 00:00 0 
+7f7380021000-7f7384000000 ---p 00000000 00:00 0 
+7f7384000000-7f7384021000 rw-p 00000000 00:00 0 
+7f7384021000-7f7388000000 ---p 00000000 00:00 0 
+7f7389c73000-7f738a105000 rw-p 00000000 00:00 0 
+7f738a105000-7f738a106000 ---p 00000000 00:00 0 
+7f738a106000-7f738a207000 rw-p 00000000 00:00 0 
+7f738a207000-7f738a208000 ---p 00000000 00:00 0 
+7f738a208000-7f738a309000 rw-p 00000000 00:00 0 
+7f738a309000-7f738a30a000 ---p 00000000 00:00 0 
+7f738a30a000-7f738a40b000 rw-p 00000000 00:00 0 
+7f738a40b000-7f738a40c000 ---p 00000000 00:00 0 
+7f738a40c000-7f738a50d000 rw-p 00000000 00:00 0 
+7f738a50d000-7f738a50e000 ---p 00000000 00:00 0 
+7f738a50e000-7f738a60f000 rw-p 00000000 00:00 0 
+7f738a60f000-7f738a610000 ---p 00000000 00:00 0 
+7f738a610000-7f738a711000 rw-p 00000000 00:00 0 
+7f738a711000-7f738a712000 ---p 00000000 00:00 0 
+7f738a712000-7f738a813000 rw-p 00000000 00:00 0 
+7f738a813000-7f738a814000 ---p 00000000 00:00 0 
+7f738a814000-7f738a915000 rw-p 00000000 00:00 0 
+7f738a915000-7f738a916000 ---p 00000000 00:00 0 
+7f738a916000-7f738aa17000 rw-p 00000000 00:00 0 
+7f738aa17000-7f738aa1b000 ---p 00000000 00:00 0 
+7f738aa1b000-7f738ab18000 rw-p 00000000 00:00 0 
+7f738ab18000-7f738ab19000 ---p 00000000 00:00 0 
+7f738ab19000-7f738ac1a000 rw-p 00000000 00:00 0 
+7f738ac1a000-7f738ac1b000 ---p 00000000 00:00 0 
+7f738ac1b000-7f738ad1c000 rw-p 00000000 00:00 0 
+7f738ad1c000-7f738ad1d000 ---p 00000000 00:00 0 
+7f738ad1d000-7f738ae1e000 rw-p 00000000 00:00 0 
+7f738ae1e000-7f738ae22000 ---p 00000000 00:00 0 
+7f738ae22000-7f738af1f000 rw-p 00000000 00:00 0 
+7f738af1f000-7f738af23000 ---p 00000000 00:00 0 
+7f738af23000-7f738b020000 rw-p 00000000 00:00 0 
+7f738b020000-7f738b024000 ---p 00000000 00:00 0 
+7f738b024000-7f738b121000 rw-p 00000000 00:00 0 
+7f738b121000-7f738b125000 ---p 00000000 00:00 0 
+7f738b125000-7f738b222000 rw-p 00000000 00:00 0 
+7f738b222000-7f738c000000 r--p 00000000 fd:01 18351472                   /usr/lib/locale/locale-archive
+7f738c000000-7f738c021000 rw-p 00000000 00:00 0 
+7f738c021000-7f7390000000 ---p 00000000 00:00 0 
+7f7390000000-7f7390021000 rw-p 00000000 00:00 0 
+7f7390021000-7f7394000000 ---p 00000000 00:00 0 
+7f7394000000-7f7394021000 rw-p 00000000 00:00 0 
+7f7394021000-7f7398000000 ---p 00000000 00:00 0 
+7f7398000000-7f7398021000 rw-p 00000000 00:00 0 
+7f7398021000-7f739c000000 ---p 00000000 00:00 0 
+7f739c000000-7f739c021000 rw-p 00000000 00:00 0 
+7f739c021000-7f73a0000000 ---p 00000000 00:00 0 
+7f73a00f0000-7f73a00f4000 ---p 00000000 00:00 0 
+7f73a00f4000-7f73a01f1000 rw-p 00000000 00:00 0 
+7f73a01f1000-7f73a01f5000 ---p 00000000 00:00 0 
+7f73a01f5000-7f73a02f2000 rw-p 00000000 00:00 0 
+7f73a02f2000-7f73a02f6000 ---p 00000000 00:00 0 
+7f73a02f6000-7f73a03f3000 rw-p 00000000 00:00 0 
+7f73a03f3000-7f73a03f7000 ---p 00000000 00:00 0 
+7f73a03f7000-7f73a04f4000 rw-p 00000000 00:00 0 
+7f73a04f4000-7f73a04f8000 ---p 00000000 00:00 0 
+7f73a04f8000-7f73a05f5000 rw-p 00000000 00:00 0 
+7f73a05f5000-7f73a05f9000 ---p 00000000 00:00 0 
+7f73a05f9000-7f73a06f6000 rw-p 00000000 00:00 0 
+7f73a06f6000-7f73a06fa000 ---p 00000000 00:00 0 
+7f73a06fa000-7f73a07f7000 rw-p 00000000 00:00 0 
+7f73a07f7000-7f73a07fb000 ---p 00000000 00:00 0 
+7f73a07fb000-7f73a08f8000 rw-p 00000000 00:00 0 
+7f73a08f8000-7f73a08f9000 ---p 00000000 00:00 0 
+7f73a08f9000-7f73a1000000 rw-p 00000000 00:00 0 
+7f73a1000000-7f73a13f0000 rwxp 00000000 00:00 0 
+7f73a13f0000-7f73a17ce000 ---p 00000000 00:00 0 
+7f73a17ce000-7f73a1a3e000 rwxp 00000000 00:00 0 
+7f73a1a3e000-7f73a8be7000 ---p 00000000 00:00 0 
+7f73a8be7000-7f73a8e57000 rwxp 00000000 00:00 0 
+7f73a8e57000-7f73b0000000 ---p 00000000 00:00 0 
+7f73b0000000-7f73b0430000 rw-p 00000000 00:00 0 
+7f73b0430000-7f73b4000000 ---p 00000000 00:00 0 
+7f73b408d000-7f73b40be000 rw-p 00000000 00:00 0 
+7f73b40be000-7f73b40c2000 r--p 00000000 fd:01 6833769                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/libnet.so
+7f73b40c2000-7f73b40d2000 r-xp 00004000 fd:01 6833769                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/libnet.so
+7f73b40d2000-7f73b40d6000 r--p 00014000 fd:01 6833769                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/libnet.so
+7f73b40d6000-7f73b40d7000 r--p 00017000 fd:01 6833769                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/libnet.so
+7f73b40d7000-7f73b40d8000 rw-p 00018000 fd:01 6833769                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/libnet.so
+7f73b40d8000-7f73b40de000 r--p 00000000 fd:01 6833777                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/libnio.so
+7f73b40de000-7f73b40e6000 r-xp 00006000 fd:01 6833777                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/libnio.so
+7f73b40e6000-7f73b40e9000 r--p 0000e000 fd:01 6833777                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/libnio.so
+7f73b40e9000-7f73b40ea000 ---p 00011000 fd:01 6833777                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/libnio.so
+7f73b40ea000-7f73b40eb000 r--p 00011000 fd:01 6833777                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/libnio.so
+7f73b40eb000-7f73b40ec000 rw-p 00012000 fd:01 6833777                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/libnio.so
+7f73b40ec000-7f73b5429000 rw-p 00000000 00:00 0 
+7f73b5429000-7f73b5969000 rw-p 00000000 00:00 0 
+7f73b5969000-7f73b5c29000 ---p 00000000 00:00 0 
+7f73b5c29000-7f73b5c6b000 rw-p 00000000 00:00 0 
+7f73b5c6b000-7f73b5c6c000 ---p 00000000 00:00 0 
+7f73b5c6c000-7f73b5d6d000 rw-p 00000000 00:00 0 
+7f73b5d6d000-7f73b5dad000 ---p 00000000 00:00 0 
+7f73b5dad000-7f73b5dc2000 rw-p 00000000 00:00 0 
+7f73b5dc2000-7f73b5ded000 ---p 00000000 00:00 0 
+7f73b5ded000-7f73b5dee000 ---p 00000000 00:00 0 
+7f73b5dee000-7f73b5eef000 rw-p 00000000 00:00 0 
+7f73b5eef000-7f73b5ef0000 ---p 00000000 00:00 0 
+7f73b5ef0000-7f73b6032000 rw-p 00000000 00:00 0 
+7f73b6032000-7f73b6037000 rw-p 00000000 00:00 0 
+7f73b6037000-7f73b611b000 ---p 00000000 00:00 0 
+7f73b611b000-7f73b6120000 rw-p 00000000 00:00 0 
+7f73b6120000-7f73b6204000 ---p 00000000 00:00 0 
+7f73b6204000-7f73b620c000 rw-p 00000000 00:00 0 
+7f73b620c000-7f73b6214000 ---p 00000000 00:00 0 
+7f73b6214000-7f73b6249000 r--s 00000000 fd:01 15478528                   /var/cache/nscd/passwd
+7f73b6249000-7f73b626b000 rw-p 00000000 00:00 0 
+7f73b626b000-7f73b626e000 r--p 00000000 fd:01 18355266                   /usr/lib/x86_64-linux-gnu/libnuma.so.1.0.0
+7f73b626e000-7f73b6273000 r-xp 00003000 fd:01 18355266                   /usr/lib/x86_64-linux-gnu/libnuma.so.1.0.0
+7f73b6273000-7f73b6275000 r--p 00008000 fd:01 18355266                   /usr/lib/x86_64-linux-gnu/libnuma.so.1.0.0
+7f73b6275000-7f73b6276000 ---p 0000a000 fd:01 18355266                   /usr/lib/x86_64-linux-gnu/libnuma.so.1.0.0
+7f73b6276000-7f73b6277000 r--p 0000a000 fd:01 18355266                   /usr/lib/x86_64-linux-gnu/libnuma.so.1.0.0
+7f73b6277000-7f73b6278000 rw-p 0000b000 fd:01 18355266                   /usr/lib/x86_64-linux-gnu/libnuma.so.1.0.0
+7f73b627c000-7f73b627e000 r--p 00000000 fd:01 6833759                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/libzip.so
+7f73b627e000-7f73b6282000 r-xp 00002000 fd:01 6833759                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/libzip.so
+7f73b6282000-7f73b6284000 r--p 00006000 fd:01 6833759                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/libzip.so
+7f73b6284000-7f73b6285000 r--p 00007000 fd:01 6833759                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/libzip.so
+7f73b6285000-7f73b6286000 rw-p 00008000 fd:01 6833759                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/libzip.so
+7f73b6286000-7f73b628e000 rw-s 00000000 fd:01 22413367                   /tmp/hsperfdata_tiendat.ng.cs/1356382
+7f73b628e000-7f73b6292000 r--p 00000000 fd:01 6833771                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/libjimage.so
+7f73b6292000-7f73b62a6000 r-xp 00004000 fd:01 6833771                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/libjimage.so
+7f73b62a6000-7f73b62ad000 r--p 00018000 fd:01 6833771                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/libjimage.so
+7f73b62ad000-7f73b62af000 r--p 0001e000 fd:01 6833771                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/libjimage.so
+7f73b62af000-7f73b62b0000 rw-p 00020000 fd:01 6833771                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/libjimage.so
+7f73b62b0000-7f73b62bd000 r--p 00000000 fd:01 6833743                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/libjava.so
+7f73b62bd000-7f73b62d2000 r-xp 0000d000 fd:01 6833743                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/libjava.so
+7f73b62d2000-7f73b62d9000 r--p 00022000 fd:01 6833743                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/libjava.so
+7f73b62d9000-7f73b62da000 r--p 00028000 fd:01 6833743                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/libjava.so
+7f73b62da000-7f73b62db000 rw-p 00029000 fd:01 6833743                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/libjava.so
+7f73b62db000-7f73b62dc000 rw-p 00000000 00:00 0 
+7f73b62dc000-7f73b62df000 r--p 00000000 fd:01 6818861                    /lib/x86_64-linux-gnu/librt-2.31.so
+7f73b62df000-7f73b62e3000 r-xp 00003000 fd:01 6818861                    /lib/x86_64-linux-gnu/librt-2.31.so
+7f73b62e3000-7f73b62e4000 r--p 00007000 fd:01 6818861                    /lib/x86_64-linux-gnu/librt-2.31.so
+7f73b62e4000-7f73b62e5000 ---p 00008000 fd:01 6818861                    /lib/x86_64-linux-gnu/librt-2.31.so
+7f73b62e5000-7f73b62e6000 r--p 00008000 fd:01 6818861                    /lib/x86_64-linux-gnu/librt-2.31.so
+7f73b62e6000-7f73b62e7000 rw-p 00009000 fd:01 6818861                    /lib/x86_64-linux-gnu/librt-2.31.so
+7f73b62e7000-7f73b62eb000 ---p 00000000 00:00 0 
+7f73b62eb000-7f73b63e8000 rw-p 00000000 00:00 0 
+7f73b63e8000-7f73b63f7000 r--p 00000000 fd:01 6818848                    /lib/x86_64-linux-gnu/libm-2.31.so
+7f73b63f7000-7f73b649e000 r-xp 0000f000 fd:01 6818848                    /lib/x86_64-linux-gnu/libm-2.31.so
+7f73b649e000-7f73b6535000 r--p 000b6000 fd:01 6818848                    /lib/x86_64-linux-gnu/libm-2.31.so
+7f73b6535000-7f73b6536000 r--p 0014c000 fd:01 6818848                    /lib/x86_64-linux-gnu/libm-2.31.so
+7f73b6536000-7f73b6537000 rw-p 0014d000 fd:01 6818848                    /lib/x86_64-linux-gnu/libm-2.31.so
+7f73b6537000-7f73b6838000 r--p 00000000 fd:01 6963288                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/server/libjvm.so
+7f73b6838000-7f73b82c9000 r-xp 00301000 fd:01 6963288                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/server/libjvm.so
+7f73b82c9000-7f73b86f9000 r--p 01d92000 fd:01 6963288                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/server/libjvm.so
+7f73b86f9000-7f73b86fa000 ---p 021c2000 fd:01 6963288                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/server/libjvm.so
+7f73b86fa000-7f73b87ea000 r--p 021c2000 fd:01 6963288                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/server/libjvm.so
+7f73b87ea000-7f73b8828000 rw-p 022b2000 fd:01 6963288                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/server/libjvm.so
+7f73b8828000-7f73b88db000 rw-p 00000000 00:00 0 
+7f73b88db000-7f73b88e2000 r--p 00000000 fd:01 6818859                    /lib/x86_64-linux-gnu/libpthread-2.31.so
+7f73b88e2000-7f73b88f3000 r-xp 00007000 fd:01 6818859                    /lib/x86_64-linux-gnu/libpthread-2.31.so
+7f73b88f3000-7f73b88f8000 r--p 00018000 fd:01 6818859                    /lib/x86_64-linux-gnu/libpthread-2.31.so
+7f73b88f8000-7f73b88f9000 r--p 0001c000 fd:01 6818859                    /lib/x86_64-linux-gnu/libpthread-2.31.so
+7f73b88f9000-7f73b88fa000 rw-p 0001d000 fd:01 6818859                    /lib/x86_64-linux-gnu/libpthread-2.31.so
+7f73b88fa000-7f73b8900000 rw-p 00000000 00:00 0 
+7f73b8900000-7f73b8901000 r--p 00000000 fd:01 6818847                    /lib/x86_64-linux-gnu/libdl-2.31.so
+7f73b8901000-7f73b8903000 r-xp 00001000 fd:01 6818847                    /lib/x86_64-linux-gnu/libdl-2.31.so
+7f73b8903000-7f73b8904000 r--p 00003000 fd:01 6818847                    /lib/x86_64-linux-gnu/libdl-2.31.so
+7f73b8904000-7f73b8905000 r--p 00003000 fd:01 6818847                    /lib/x86_64-linux-gnu/libdl-2.31.so
+7f73b8905000-7f73b8906000 rw-p 00004000 fd:01 6818847                    /lib/x86_64-linux-gnu/libdl-2.31.so
+7f73b8906000-7f73b8908000 r--p 00000000 fd:01 6815914                    /lib/x86_64-linux-gnu/libz.so.1.2.11
+7f73b8908000-7f73b8919000 r-xp 00002000 fd:01 6815914                    /lib/x86_64-linux-gnu/libz.so.1.2.11
+7f73b8919000-7f73b891f000 r--p 00013000 fd:01 6815914                    /lib/x86_64-linux-gnu/libz.so.1.2.11
+7f73b891f000-7f73b8920000 ---p 00019000 fd:01 6815914                    /lib/x86_64-linux-gnu/libz.so.1.2.11
+7f73b8920000-7f73b8921000 r--p 00019000 fd:01 6815914                    /lib/x86_64-linux-gnu/libz.so.1.2.11
+7f73b8921000-7f73b8922000 rw-p 0001a000 fd:01 6815914                    /lib/x86_64-linux-gnu/libz.so.1.2.11
+7f73b8922000-7f73b8947000 r--p 00000000 fd:01 6818846                    /lib/x86_64-linux-gnu/libc-2.31.so
+7f73b8947000-7f73b8abf000 r-xp 00025000 fd:01 6818846                    /lib/x86_64-linux-gnu/libc-2.31.so
+7f73b8abf000-7f73b8b09000 r--p 0019d000 fd:01 6818846                    /lib/x86_64-linux-gnu/libc-2.31.so
+7f73b8b09000-7f73b8b0a000 ---p 001e7000 fd:01 6818846                    /lib/x86_64-linux-gnu/libc-2.31.so
+7f73b8b0a000-7f73b8b0d000 r--p 001e7000 fd:01 6818846                    /lib/x86_64-linux-gnu/libc-2.31.so
+7f73b8b0d000-7f73b8b10000 rw-p 001ea000 fd:01 6818846                    /lib/x86_64-linux-gnu/libc-2.31.so
+7f73b8b10000-7f73b8b14000 rw-p 00000000 00:00 0 
+7f73b8b15000-7f73b8b17000 rw-p 00000000 00:00 0 
+7f73b8b17000-7f73b8b1c000 r--p 00000000 fd:01 6833757                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/libverify.so
+7f73b8b1c000-7f73b8b24000 r-xp 00005000 fd:01 6833757                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/libverify.so
+7f73b8b24000-7f73b8b26000 r--p 0000d000 fd:01 6833757                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/libverify.so
+7f73b8b26000-7f73b8b27000 ---p 0000f000 fd:01 6833757                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/libverify.so
+7f73b8b27000-7f73b8b29000 r--p 0000f000 fd:01 6833757                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/libverify.so
+7f73b8b29000-7f73b8b2a000 rw-p 00011000 fd:01 6833757                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/libverify.so
+7f73b8b2a000-7f73b8b2d000 r--p 00000000 fd:01 7092261                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/jli/libjli.so
+7f73b8b2d000-7f73b8b37000 r-xp 00003000 fd:01 7092261                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/jli/libjli.so
+7f73b8b37000-7f73b8b3a000 r--p 0000d000 fd:01 7092261                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/jli/libjli.so
+7f73b8b3a000-7f73b8b3b000 ---p 00010000 fd:01 7092261                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/jli/libjli.so
+7f73b8b3b000-7f73b8b3c000 r--p 00010000 fd:01 7092261                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/jli/libjli.so
+7f73b8b3c000-7f73b8b3d000 rw-p 00011000 fd:01 7092261                    /home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/lib/jli/libjli.so
+7f73b8b3d000-7f73b8b3f000 rw-p 00000000 00:00 0 
+7f73b8b3f000-7f73b8b40000 r--p 00000000 fd:01 6818801                    /lib/x86_64-linux-gnu/ld-2.31.so
+7f73b8b40000-7f73b8b63000 r-xp 00001000 fd:01 6818801                    /lib/x86_64-linux-gnu/ld-2.31.so
+7f73b8b63000-7f73b8b6b000 r--p 00024000 fd:01 6818801                    /lib/x86_64-linux-gnu/ld-2.31.so
+7f73b8b6b000-7f73b8b6c000 r--p 00000000 00:00 0 
+7f73b8b6c000-7f73b8b6d000 r--p 0002c000 fd:01 6818801                    /lib/x86_64-linux-gnu/ld-2.31.so
+7f73b8b6d000-7f73b8b6e000 rw-p 0002d000 fd:01 6818801                    /lib/x86_64-linux-gnu/ld-2.31.so
+7f73b8b6e000-7f73b8b6f000 rw-p 00000000 00:00 0 
+7fff5c65b000-7fff5c67c000 rw-p 00000000 00:00 0                          [stack]
+7fff5c72c000-7fff5c72f000 r--p 00000000 00:00 0                          [vvar]
+7fff5c72f000-7fff5c730000 r-xp 00000000 00:00 0                          [vdso]
+ffffffffff600000-ffffffffff601000 --xp 00000000 00:00 0                  [vsyscall]
+
+
+VM Arguments:
+jvm_args: -XX:+UnlockExperimentalVMOptions -XX:+UseShenandoahGC -XX:ShenandoahHotnessThreshold=1000 -Xlog:gc*,gc+ref*,gc+ergo*,gc+heap*,gc+stats*,gc+compaction*,gc+age*:file=gc.log -Xms2m -Xmx16m --add-modules=ALL-DEFAULT 
+java_command: jdk.compiler/com.sun.tools.javac.launcher.Main gc_test.java
+java_class_path (initial): .
+Launcher Type: SUN_STANDARD
+
+[Global flags]
+     intx CICompilerCount                          = 15                                        {product} {ergonomic}     Number of compiler threads to run
+   size_t InitialHeapSize                          = 2097152                                   {product} {command line}  Initial heap size (in bytes); zero means use ergonomics
+   size_t MaxHeapSize                              = 16777216                                  {product} {command line}  Maximum heap size (in bytes)
+   size_t MinHeapDeltaBytes                        = 262144                                    {product} {ergonomic}     The minimum change in heap space due to GC (in bytes)
+    uintx NonNMethodCodeHeapSize                   = 8182140                                {pd product} {ergonomic}     Size of code heap with non-nmethods (in bytes)
+    uintx NonProfiledCodeHeapSize                  = 121738050                              {pd product} {ergonomic}     Size of code heap with non-profiled methods (in bytes)
+    uintx ProfiledCodeHeapSize                     = 121738050                              {pd product} {ergonomic}     Size of code heap with profiled methods (in bytes)
+    uintx ReservedCodeCacheSize                    = 251658240                              {pd product} {ergonomic}     Reserved code cache size (in bytes) - maximum code cache size
+     bool SegmentedCodeCache                       = true                                      {product} {ergonomic}     Use a segmented code cache
+    uintx ShenandoahHotnessThreshold               = 1000                                 {experimental} {command line}  How many times an object should be accessed to be classified as            hot.
+     bool UnlockExperimentalVMOptions              = true                                 {experimental} {command line}  Enable normal processing of flags relating to experimental features
+     bool UseCompressedClassPointers               = true                                 {lp64_product} {ergonomic}     Use 32-bit class pointers in 64-bit VM. lp64_product means flag is always constant in 32 bit VM
+     bool UseCompressedOops                        = true                                 {lp64_product} {ergonomic}     Use 32-bit object references in 64-bit VM. lp64_product means flag is always constant in 32 bit VM
+     bool UseFastUnorderedTimeStamps               = true                                 {experimental} {ergonomic}     Use platform unstable time where supported for timestamps only
+     bool UseNUMAInterleaving                      = true                                      {product} {ergonomic}     Interleave memory across NUMA nodes if available
+     bool UseShenandoahGC                          = true                                      {product} {command line}  Use the Shenandoah garbage collector
+
+Logging:
+Log output configuration:
+ #0: stdout all=warning uptime,level,tags
+ #1: stderr all=off uptime,level,tags
+ #2: file=gc.log all=off,gc*=info uptime,level,tags filecount=5,filesize=20480K
+
+Environment Variables:
+JAVA_HOME=/home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk
+PATH=/home/grads/t/tiendat.ng.cs/.local/bin:/home/grads/t/tiendat.ng.cs/github_repos/hadoop-3.3.1/bin:/home/grads/t/tiendat.ng.cs/github_repos/jdk11u/build/linux-x86_64-normal-server-fastdebug/jdk/bin:/opt/coe/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/grads/t/tiendat.ng.cs/bin
+LD_LIBRARY_PATH=/home/grads/t/tiendat.ng.cs/github_repos/hadoop-3.3.1/lib/native::/home/grads/t/tiendat.ng.cs/github_repos/tcmalloc/bazel-bin/tcmalloc
+SHELL=/bin/bash
+LANG=en_US.UTF-8
+
+Signal Handlers:
+SIGSEGV: [libjvm.so+0x1c77980], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGBUS: [libjvm.so+0x1c77980], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGFPE: [libjvm.so+0x1c77980], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGPIPE: [libjvm.so+0x1749590], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGXFSZ: [libjvm.so+0x1749590], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGILL: [libjvm.so+0x1c77980], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGUSR2: [libjvm.so+0x1749350], sa_mask[0]=00000000000000000000000000000000, sa_flags=SA_RESTART|SA_SIGINFO
+SIGHUP: [libjvm.so+0x1749a80], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGINT: [libjvm.so+0x1749a80], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGTERM: [libjvm.so+0x1749a80], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+SIGQUIT: [libjvm.so+0x1749a80], sa_mask[0]=11111111011111111101111111111110, sa_flags=SA_RESTART|SA_SIGINFO
+
+
+---------------  S Y S T E M  ---------------
+
+OS:DISTRIB_ID=Ubuntu
+DISTRIB_RELEASE=20.04
+DISTRIB_CODENAME=focal
+DISTRIB_DESCRIPTION="Ubuntu 20.04.3 LTS"
+uname:Linux csce-nguyen-s1.engr.tamu.edu 5.4.0-89-generic #100-Ubuntu SMP Fri Sep 24 14:50:10 UTC 2021 x86_64
+OS uptime: 15 days 5:17 hours
+libc:glibc 2.31 NPTL 2.31 
+rlimit (soft/hard): STACK 8192k/infinity , CORE 0k/infinity , NPROC 767302/767302 , NOFILE 1048576/1048576 , AS infinity/infinity , CPU infinity/infinity , DATA infinity/infinity , FSIZE infinity/infinity , MEMLOCK 65536k/65536k
+load average:4.41 2.43 2.03
+
+/proc/meminfo:
+MemTotal:       196527308 kB
+MemFree:        30690076 kB
+MemAvailable:   193390968 kB
+Buffers:         1567844 kB
+Cached:         159376400 kB
+SwapCached:          120 kB
+Active:         117438428 kB
+Inactive:       43933464 kB
+Active(anon):     231116 kB
+Inactive(anon):   202216 kB
+Active(file):   117207312 kB
+Inactive(file): 43731248 kB
+Unevictable:           0 kB
+Mlocked:               0 kB
+SwapTotal:      32767996 kB
+SwapFree:       32764668 kB
+Dirty:            996800 kB
+Writeback:             0 kB
+AnonPages:        428144 kB
+Mapped:           457716 kB
+Shmem:              5652 kB
+KReclaimable:    3208888 kB
+Slab:            3823732 kB
+SReclaimable:    3208888 kB
+SUnreclaim:       614844 kB
+KernelStack:       15888 kB
+PageTables:        11316 kB
+NFS_Unstable:          0 kB
+Bounce:                0 kB
+WritebackTmp:          0 kB
+CommitLimit:    131031648 kB
+Committed_AS:    3103092 kB
+VmallocTotal:   34359738367 kB
+VmallocUsed:      262416 kB
+VmallocChunk:          0 kB
+Percpu:            73536 kB
+HardwareCorrupted:     0 kB
+AnonHugePages:         0 kB
+ShmemHugePages:        0 kB
+ShmemPmdMapped:        0 kB
+FileHugePages:         0 kB
+FilePmdMapped:         0 kB
+CmaTotal:              0 kB
+CmaFree:               0 kB
+HugePages_Total:       0
+HugePages_Free:        0
+HugePages_Rsvd:        0
+HugePages_Surp:        0
+Hugepagesize:       2048 kB
+Hugetlb:               0 kB
+DirectMap4k:     1158112 kB
+DirectMap2M:    40263680 kB
+DirectMap1G:    160432128 kB
+
+/sys/kernel/mm/transparent_hugepage/enabled:
+always [madvise] never
+/sys/kernel/mm/transparent_hugepage/defrag (defrag/compaction efforts parameter):
+always defer defer+madvise [madvise] never
+
+Process Memory:
+Virtual Size: 3405604K (peak: 3405604K)
+Resident Set Size: 94512K (peak: 94512K) (anon: 65680K, file: 28832K, shmem: 0K)
+Swapped out: 0K
+C-Heap outstanding allocations: 12596K
+
+/proc/sys/kernel/threads-max (system-wide limit on the number of threads):
+1534605
+/proc/sys/vm/max_map_count (maximum number of memory map areas a process may have):
+65530
+/proc/sys/kernel/pid_max (system-wide limit on number of process identifiers):
+4194304
+
+container (cgroup) information:
+container_type: cgroupv1
+cpu_cpuset_cpus: 0-47
+cpu_memory_nodes: 0-1
+active_processor_count: 48
+cpu_quota: -1
+cpu_period: 100000
+cpu_shares: -1
+memory_limit_in_bytes: -1
+memory_and_swap_limit_in_bytes: -2
+memory_soft_limit_in_bytes: -1
+memory_usage_in_bytes: 27625455616
+memory_max_usage_in_bytes: 58361483264
+
+Steal ticks since vm start: 0
+Steal ticks percentage since vm start:  0.000
+
+CPU:total 48 (initial active 48) (12 cores per cpu, 2 threads per core) family 6 model 85 stepping 7 microcode 0x5003102, cmov, cx8, fxsr, mmx, sse, sse2, sse3, ssse3, sse4.1, sse4.2, popcnt, avx, avx2, aes, clmul, erms, 3dnowpref, lzcnt, ht, tsc, tscinvbit, bmi1, bmi2, adx, evex, fma
+CPU Model and flags from /proc/cpuinfo:
+model name	: Intel(R) Xeon(R) Silver 4214R CPU @ 2.40GHz
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp lm constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor ds_cpl vmx smx est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid dca sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb cat_l3 cdp_l3 invpcid_single intel_ppin ssbd mba ibrs ibpb stibp ibrs_enhanced tpr_shadow vnmi flexpriority ept vpid ept_ad fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid cqm mpx rdt_a avx512f avx512dq rdseed adx smap clflushopt clwb intel_pt avx512cd avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local dtherm ida arat pln pts pku ospke avx512_vnni md_clear flush_l1d arch_capabilities
+Online cpus:
+0-47
+Offline cpus:
+
+cache level:
+1
+cache type:
+Data
+cache size:
+32K
+cache coherency line size:
+64
+cache level:
+1
+cache type:
+Instruction
+cache size:
+32K
+cache coherency line size:
+64
+cache level:
+2
+cache type:
+Unified
+cache size:
+1024K
+cache coherency line size:
+64
+cache level:
+3
+cache type:
+Unified
+cache size:
+16896K
+cache coherency line size:
+64
+BIOS frequency limitation:
+<Not Available>
+Frequency switch latency (ns):
+0
+Available cpu frequencies:
+<Not Available>
+Maximum cpu frequency:
+3500000
+Minimum cpu frequency:
+1000000
+Current cpu frequency:
+2999998
+Available governors:
+performance powersave
+Current governor:
+powersave
+Core performance/turbo boost:
+<Not Available>
+
+Memory: 4k page, physical 196527308k(30689824k free), swap 32767996k(32764668k free)
+
+vm_info: OpenJDK 64-Bit Server VM (fastdebug 11.0.13-internal+0-adhoc.root.jdk11u) for linux-amd64 JRE (11.0.13-internal+0-adhoc.root.jdk11u), built on Nov  9 2021 18:46:06 by "root" with gcc 11.1.0
+
+END.
