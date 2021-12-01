@@ -458,7 +458,8 @@ void ShenandoahControlThread::service_concurrent_normal_cycle(GCCause::Cause cau
   heap->reset_histogram();
   heap->heuristics()->record_success_concurrent();
   heap->shenandoah_policy()->record_success_concurrent();
-  heap->increase_gc_epoch(1);
+  // heap->increase_gc_epoch(1);
+  oopDesc::add_static_gc_epoch(1);
   // printf("GC epoch = %lu\n", heap->gc_epoch());
 }
 

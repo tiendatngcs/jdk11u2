@@ -31,6 +31,7 @@
 #include "gc/shared/barrierSetAssembler.hpp"
 #include "gc/shared/collectedHeap.inline.hpp"
 #include "interpreter/interpreter.hpp"
+#include "interpreter/interpreterRuntime.hpp"
 #include "memory/resourceArea.hpp"
 #include "memory/universe.hpp"
 #include "oops/accessDecorators.hpp"
@@ -5453,6 +5454,7 @@ void MacroAssembler::store_klass(Register dst, Register src) {
 
 void MacroAssembler::access_load_at(BasicType type, DecoratorSet decorators, Register dst, Address src,
                                     Register tmp1, Register thread_tmp) {
+  // printf("MacroAssembler::access_load_at ----------- barrier here\n");
   BarrierSetAssembler* bs = BarrierSet::barrier_set()->barrier_set_assembler();
   decorators = AccessInternal::decorator_fixup(decorators);
   bool as_raw = (decorators & AS_RAW) != 0;
@@ -5461,10 +5463,12 @@ void MacroAssembler::access_load_at(BasicType type, DecoratorSet decorators, Reg
   } else {
     bs->load_at(this, decorators, type, dst, src, tmp1, thread_tmp);
   }
+  // tty->print_cr("MacroAssembler::access_load_at ----------- barrier here");
 }
 
 void MacroAssembler::access_store_at(BasicType type, DecoratorSet decorators, Address dst, Register src,
                                      Register tmp1, Register tmp2) {
+  // printf("MacroAssembler::access_store_at called ---------- barrier here??\n");
   BarrierSetAssembler* bs = BarrierSet::barrier_set()->barrier_set_assembler();
   decorators = AccessInternal::decorator_fixup(decorators);
   bool as_raw = (decorators & AS_RAW) != 0;

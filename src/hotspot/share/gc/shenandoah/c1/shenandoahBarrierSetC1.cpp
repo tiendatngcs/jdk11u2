@@ -52,6 +52,7 @@ ShenandoahBarrierSetC1::ShenandoahBarrierSetC1() :
   _load_reference_barrier_rt_code_blob(NULL) {}
 
 void ShenandoahBarrierSetC1::pre_barrier(LIRGenerator* gen, CodeEmitInfo* info, DecoratorSet decorators, LIR_Opr addr_opr, LIR_Opr pre_val) {
+  printf("ShenandoahBarrierSetC1::pre_barrier called\n");
   // First we test whether marking is in progress.
   BasicType flag_type;
   bool patch = (decorators & C1_NEEDS_PATCHING) != 0;
@@ -106,6 +107,7 @@ void ShenandoahBarrierSetC1::pre_barrier(LIRGenerator* gen, CodeEmitInfo* info, 
 }
 
 LIR_Opr ShenandoahBarrierSetC1::load_reference_barrier(LIRGenerator* gen, LIR_Opr obj, LIR_Opr addr) {
+  printf("ShenandoahBarrierSetC1::load_reference_barrier called\n");
   if (ShenandoahLoadRefBarrier) {
     return load_reference_barrier_impl(gen, obj, addr);
   } else {
@@ -114,6 +116,7 @@ LIR_Opr ShenandoahBarrierSetC1::load_reference_barrier(LIRGenerator* gen, LIR_Op
 }
 
 LIR_Opr ShenandoahBarrierSetC1::load_reference_barrier_impl(LIRGenerator* gen, LIR_Opr obj, LIR_Opr addr) {
+  printf("ShenandoahBarrierSetC1::load_reference_barrier_impl called\n");
   assert(ShenandoahLoadRefBarrier, "Should be enabled");
 
   obj = ensure_in_register(gen, obj, T_OBJECT);
@@ -169,6 +172,7 @@ LIR_Opr ShenandoahBarrierSetC1::ensure_in_register(LIRGenerator* gen, LIR_Opr ob
 }
 
 LIR_Opr ShenandoahBarrierSetC1::iu_barrier(LIRGenerator* gen, LIR_Opr obj, CodeEmitInfo* info, DecoratorSet decorators) {
+  printf("ShenandoahBarrierSetC1::iu_barrier called\n");
   if (ShenandoahIUBarrier) {
     obj = ensure_in_register(gen, obj, T_OBJECT);
     pre_barrier(gen, info, decorators, LIR_OprFact::illegalOpr, obj);

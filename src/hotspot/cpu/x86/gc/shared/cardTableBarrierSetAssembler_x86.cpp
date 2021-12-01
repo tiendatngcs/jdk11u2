@@ -43,6 +43,7 @@
 
 void CardTableBarrierSetAssembler::gen_write_ref_array_post_barrier(MacroAssembler* masm, DecoratorSet decorators,
                                                                     Register addr, Register count, Register tmp) {
+  // tty->print_cr("ModRefBarrierSetAssembler::gen_write_ref_array_post_barrier called\n");
   BarrierSet *bs = BarrierSet::barrier_set();
   CardTableBarrierSet* ctbs = barrier_set_cast<CardTableBarrierSet>(bs);
   CardTable* ct = ctbs->card_table();
@@ -86,6 +87,7 @@ __ BIND(L_done);
 }
 
 void CardTableBarrierSetAssembler::store_check(MacroAssembler* masm, Register obj, Address dst) {
+  // tty->print_cr("ModRefBarrierSetAssembler::store_check called\n");
   // Does a store check for the oop in register obj. The content of
   // register obj is destroyed afterwards.
   BarrierSet* bs = BarrierSet::barrier_set();
@@ -133,6 +135,7 @@ void CardTableBarrierSetAssembler::store_check(MacroAssembler* masm, Register ob
 
 void CardTableBarrierSetAssembler::oop_store_at(MacroAssembler* masm, DecoratorSet decorators, BasicType type,
                                                 Address dst, Register val, Register tmp1, Register tmp2) {
+  // tty->print_cr("ModRefBarrierSetAssembler::oop_store_at called\n");
   bool in_heap = (decorators & IN_HEAP) != 0;
 
   bool is_array = (decorators & IS_ARRAY) != 0;

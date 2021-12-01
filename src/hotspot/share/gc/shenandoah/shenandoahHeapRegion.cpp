@@ -703,7 +703,7 @@ private:
     T o = RawAccess<>::oop_load(p);
     if (!CompressedOops::is_null(o)) {
       oop obj = CompressedOops::decode_not_null(o);
-      _heap->oop_check_to_reset_access_counter(obj);
+      // _heap->oop_check_to_reset_access_counter(obj);
       // assert(_ctx->is_marked(obj), "must be marked");
       // if (obj->is_forwarded()) {
       //   oop forw = obj->forwardee();

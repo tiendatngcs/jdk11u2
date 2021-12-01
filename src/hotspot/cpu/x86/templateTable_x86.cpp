@@ -151,18 +151,67 @@ static Assembler::Condition j_not(TemplateTable::Condition cc) {
 static void do_oop_store(InterpreterMacroAssembler* _masm,
                          Address dst,
                          Register val,
+                         BarrierSet::Name barrier,
                          DecoratorSet decorators = 0) {
+  // printf("TemplateTable::do_oop_store called\n");
   assert(val == noreg || val == rax, "parameter is just for looks");
+  // switch(barrier) {
+  //   // case BarrierSet::CardTableBarrierSet:
+  //   // case BarrierSet::ModRef: 
+  //   case BarrierSet::ShenandoahBarrierSet:
+  //     __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
+  //     break;
+  //   default:
+  //     break;
+  // }
+  // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
+  // if (barrier == BarrierSet::ShenandoahBarrierSet) {
+  //   // const Register rarg_a = LP64_ONLY(c_rarg2)   NOT_LP64(rax);
+  //   // const Register rarg_b  = LP64_ONLY(c_rarg1)   NOT_LP64(rbx);
+  //   // const Register rarg_c  = LP64_ONLY(c_rarg3)   NOT_LP64(rcx);
+  //   // const Register rarg_d  = LP64_ONLY(rscratch1) NOT_LP64(rdx);
+  //   __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
+  //   if (val != noreg) {
+  //     __ movptr(rax, val);
+  //     __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::oop_increase_access_counter), rax);
+  //   }
+  //   // if (decorators == IS_ARRAY && rdx != noreg){
+  //   //   // array oop is previously stored in rdx, please check before making any change
+  //   //   __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::oop_increase_access_counter), rdx);
+  //   // }
+  //   __ movptr(rcx, dst.base());
+  //   // array element or field
+  //   __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::oop_increase_access_counter), rcx);
+  //   // call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::oop_increase_access_counter), val);
+  // }
   __ store_heap_oop(dst, val, rdx, rbx, decorators);
-  printf("do_oop_store called\n");
 }
 
 static void do_oop_load(InterpreterMacroAssembler* _masm,
                         Address src,
                         Register dst,
+                        BarrierSet::Name barrier,
                         DecoratorSet decorators = 0) {
+  // printf("TemplateTable::do_oop_load called\n");
   __ load_heap_oop(dst, src, rdx, rbx, decorators);
-  printf("do_oop_load called\n");
+  // if (barrier == BarrierSet::ShenandoahBarrierSet) {
+  //   __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_load_barrier));
+  //   // const Register rarg_a = LP64_ONLY(c_rarg2)   NOT_LP64(rax);
+  //   // const Register rarg_b  = LP64_ONLY(c_rarg1)   NOT_LP64(rbx);
+  //   // const Register rarg_c  = LP64_ONLY(c_rarg3)   NOT_LP64(rcx);
+  //   // const Register rarg_d  = LP64_ONLY(rscratch1) NOT_LP64(rdx);
+  //   if (dst != noreg) {
+  //     __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::oop_increase_access_counter), dst);
+  //   }
+  //   if (decorators == IS_ARRAY){
+  //     // array oop is previously stored in rdx, please check before making any change
+  //     __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::oop_increase_access_counter), rdx);
+  //   }
+  //   // __ movptr(rcx, dst.base());
+  //   // array element or field
+  //   __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::oop_increase_access_counter), src.base());
+  //   // call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::oop_increase_access_counter), val);
+  // }
 }
 
 Address TemplateTable::at_bcp(int offset) {
@@ -419,6 +468,7 @@ void TemplateTable::ldc(bool wide) {
 
 // Fast path for caching oop constants.
 void TemplateTable::fast_aldc(bool wide) {
+  // printf("TemplateTable::fast_aldc called\n");
   transition(vtos, atos);
 
   Register result = rax;
@@ -748,6 +798,7 @@ void TemplateTable::index_check(Register array, Register index) {
 }
 
 void TemplateTable::index_check_without_pop(Register array, Register index) {
+  // printf("TemplateTable::index_check_without_pop called\n");
   // destroys rbx
   // check array
   __ null_check(array, arrayOopDesc::length_offset_in_bytes());
@@ -769,11 +820,12 @@ void TemplateTable::index_check_without_pop(Register array, Register index) {
 }
 
 void TemplateTable::iaload() {
-  printf("iaload called\n");
+  // printf("TemplateTable::iaload called\n");
   transition(itos, itos);
   // rax: index
   // rdx: array
   index_check(rdx, rax); // kills rbx
+  // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
   __ access_load_at(T_INT, IN_HEAP | IS_ARRAY, rax,
                     Address(rdx, rax, Address::times_4,
                             arrayOopDesc::base_offset_in_bytes(T_INT)),
@@ -781,13 +833,14 @@ void TemplateTable::iaload() {
 }
 
 void TemplateTable::laload() {
-  printf("laload called\n");
+  // printf("TemplateTable::laload called\n");
   transition(itos, ltos);
   // rax: index
   // rdx: array
   index_check(rdx, rax); // kills rbx
   NOT_LP64(__ mov(rbx, rax));
   // rbx,: index
+  // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
   __ access_load_at(T_LONG, IN_HEAP | IS_ARRAY, noreg /* ltos */,
                     Address(rdx, rbx, Address::times_8,
                             arrayOopDesc::base_offset_in_bytes(T_LONG)),
@@ -797,11 +850,12 @@ void TemplateTable::laload() {
 
 
 void TemplateTable::faload() {
-  printf("faload called\n");
+  // printf("TemplateTable::faload called\n");
   transition(itos, ftos);
   // rax: index
   // rdx: array
   index_check(rdx, rax); // kills rbx
+  // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
   __ access_load_at(T_FLOAT, IN_HEAP | IS_ARRAY, noreg /* ftos */,
                     Address(rdx, rax,
                             Address::times_4,
@@ -810,11 +864,12 @@ void TemplateTable::faload() {
 }
 
 void TemplateTable::daload() {
-  printf("daload called\n");
+  // printf("TemplateTable::daload called\n");
   transition(itos, dtos);
   // rax: index
   // rdx: array
   index_check(rdx, rax); // kills rbx
+  // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
   __ access_load_at(T_DOUBLE, IN_HEAP | IS_ARRAY, noreg /* dtos */,
                     Address(rdx, rax,
                             Address::times_8,
@@ -823,7 +878,7 @@ void TemplateTable::daload() {
 }
 
 void TemplateTable::aaload() {
-  printf("aaload called\n");
+  // printf("TemplateTable::aaload called\n");
   transition(itos, atos);
   // rax: index
   // rdx: array
@@ -833,26 +888,29 @@ void TemplateTable::aaload() {
                       UseCompressedOops ? Address::times_4 : Address::times_ptr,
                       arrayOopDesc::base_offset_in_bytes(T_OBJECT)),
               rax,
+              _bs->kind(),
               IS_ARRAY);
 }
 
 void TemplateTable::baload() {
-  printf("baload called\n");
+  // printf("TemplateTable::baload called\n");
   transition(itos, itos);
   // rax: index
   // rdx: array
   index_check(rdx, rax); // kills rbx
+  // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
   __ access_load_at(T_BYTE, IN_HEAP | IS_ARRAY, rax,
                     Address(rdx, rax, Address::times_1, arrayOopDesc::base_offset_in_bytes(T_BYTE)),
                     noreg, noreg);
 }
 
 void TemplateTable::caload() {
-  printf("caload called\n");
+  // printf("TemplateTable::caload called\n");
   transition(itos, itos);
   // rax: index
   // rdx: array
   index_check(rdx, rax); // kills rbx
+  // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
   __ access_load_at(T_CHAR, IN_HEAP | IS_ARRAY, rax,
                     Address(rdx, rax, Address::times_2, arrayOopDesc::base_offset_in_bytes(T_CHAR)),
                     noreg, noreg);
@@ -860,7 +918,7 @@ void TemplateTable::caload() {
 
 // iload followed by caload frequent pair
 void TemplateTable::fast_icaload() {
-  printf("fast_icaload called\n");
+  // printf("TemplateTable::fast_icaload called\n");
   transition(vtos, itos);
   // load index out of locals
   locals_index(rbx);
@@ -869,6 +927,7 @@ void TemplateTable::fast_icaload() {
   // rax: index
   // rdx: array
   index_check(rdx, rax); // kills rbx
+  // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
   __ access_load_at(T_CHAR, IN_HEAP | IS_ARRAY, rax,
                     Address(rdx, rax, Address::times_2, arrayOopDesc::base_offset_in_bytes(T_CHAR)),
                     noreg, noreg);
@@ -876,59 +935,60 @@ void TemplateTable::fast_icaload() {
 
 
 void TemplateTable::saload() {
-  printf("saload called\n");
+  // printf("TemplateTable::saload called\n");
   transition(itos, itos);
   // rax: index
   // rdx: array
   index_check(rdx, rax); // kills rbx
+  // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
   __ access_load_at(T_SHORT, IN_HEAP | IS_ARRAY, rax,
                     Address(rdx, rax, Address::times_2, arrayOopDesc::base_offset_in_bytes(T_SHORT)),
                     noreg, noreg);
 }
 
 void TemplateTable::iload(int n) {
-  printf("iload called\n");
+  // printf("TemplateTable::iload called\n");
   transition(vtos, itos);
   __ movl(rax, iaddress(n));
 }
 
 void TemplateTable::lload(int n) {
-  printf("lload called\n");
+  // printf("TemplateTable::lload called\n");
   transition(vtos, ltos);
   __ movptr(rax, laddress(n));
   NOT_LP64(__ movptr(rdx, haddress(n)));
 }
 
 void TemplateTable::fload(int n) {
-  printf("fload called\n");
+  // printf("TemplateTable::fload called\n");
   transition(vtos, ftos);
   __ load_float(faddress(n));
 }
 
 void TemplateTable::dload(int n) {
-  printf("dload called\n");
+  // printf("TemplateTable::dload called\n");
   transition(vtos, dtos);
   __ load_double(daddress(n));
 }
 
 void TemplateTable::aload(int n) {
-  printf("aload called\n");
+  // printf("TemplateTable::aload called\n");
   transition(vtos, atos);
   __ movptr(rax, aaddress(n));
 }
 
 void TemplateTable::aload_0() {
-  printf("aload_0 called\n");
+  // printf("TemplateTable::aload_0 called\n");
   aload_0_internal();
 }
 
 void TemplateTable::nofast_aload_0() {
-  printf("nofast_aload_0 called\n");
+  // printf("TemplateTable::nofast_aload_0 called\n");
   aload_0_internal(may_not_rewrite);
 }
 
 void TemplateTable::aload_0_internal(RewriteControl rc) {
-  printf("aload_0_internal called\n");
+  // printf("TemplateTable::aload_0_internal called\n");
   transition(vtos, atos);
   // According to bytecode histograms, the pairs:
   //
@@ -999,7 +1059,7 @@ void TemplateTable::aload_0_internal(RewriteControl rc) {
 }
 
 void TemplateTable::istore() {
-  printf("istore called\n");
+  // printf("TemplateTable::istore called\n");
   transition(itos, vtos);
   locals_index(rbx);
   __ movl(iaddress(rbx), rax);
@@ -1007,7 +1067,7 @@ void TemplateTable::istore() {
 
 
 void TemplateTable::lstore() {
-  printf("lstore called\n");
+  // printf("TemplateTable::lstore called\n");
   transition(ltos, vtos);
   locals_index(rbx);
   __ movptr(laddress(rbx), rax);
@@ -1015,21 +1075,21 @@ void TemplateTable::lstore() {
 }
 
 void TemplateTable::fstore() {
-  printf("fstore called\n");
+  // printf("TemplateTable::fstore called\n");
   transition(ftos, vtos);
   locals_index(rbx);
   __ store_float(faddress(rbx));
 }
 
 void TemplateTable::dstore() {
-  printf("dstore called\n");
+  // printf("TemplateTable::dstore called\n");
   transition(dtos, vtos);
   locals_index(rbx);
   __ store_double(daddress(rbx));
 }
 
 void TemplateTable::astore() {
-  printf("astore called\n");
+  // printf("TemplateTable::astore called\n");
   transition(vtos, vtos);
   __ pop_ptr(rax);
   locals_index(rbx);
@@ -1037,7 +1097,7 @@ void TemplateTable::astore() {
 }
 
 void TemplateTable::wide_istore() {
-  printf("wide_istore called\n");
+  // printf("TemplateTable::wide_istore called\n");
   transition(vtos, vtos);
   __ pop_i();
   locals_index_wide(rbx);
@@ -1045,7 +1105,7 @@ void TemplateTable::wide_istore() {
 }
 
 void TemplateTable::wide_lstore() {
-  printf("wide_lstore called\n");
+  // printf("TemplateTable::wide_lstore called\n");
   transition(vtos, vtos);
   NOT_LP64(__ pop_l(rax, rdx));
   LP64_ONLY(__ pop_l());
@@ -1055,7 +1115,7 @@ void TemplateTable::wide_lstore() {
 }
 
 void TemplateTable::wide_fstore() {
-  printf("wide_fstore called\n");
+  // printf("TemplateTable::wide_fstore called\n");
 #ifdef _LP64
   transition(vtos, vtos);
   __ pop_f(xmm0);
@@ -1067,7 +1127,7 @@ void TemplateTable::wide_fstore() {
 }
 
 void TemplateTable::wide_dstore() {
-  printf("wide_dstore called\n");
+  // printf("TemplateTable::wide_dstore called\n");
 #ifdef _LP64
   transition(vtos, vtos);
   __ pop_d(xmm0);
@@ -1079,7 +1139,7 @@ void TemplateTable::wide_dstore() {
 }
 
 void TemplateTable::wide_astore() {
-  printf("wide_astore called\n");
+  // printf("TemplateTable::wide_astore called\n");
   transition(vtos, vtos);
   __ pop_ptr(rax);
   locals_index_wide(rbx);
@@ -1087,7 +1147,7 @@ void TemplateTable::wide_astore() {
 }
 
 void TemplateTable::iastore() {
-  printf("iastore called\n");
+  // printf("TemplateTable::iastore called\n");
   transition(itos, vtos);
   __ pop_i(rbx);
   // rax: value
@@ -1101,7 +1161,7 @@ void TemplateTable::iastore() {
 }
 
 void TemplateTable::lastore() {
-  printf("lastore called\n");
+  // printf("TemplateTable::lastore called\n");
   transition(ltos, vtos);
   __ pop_i(rbx);
   // rax,: low(value)
@@ -1117,7 +1177,7 @@ void TemplateTable::lastore() {
 
 
 void TemplateTable::fastore() {
-  printf("fastore called\n");
+  // printf("TemplateTable::fastore called\n");
   transition(ftos, vtos);
   __ pop_i(rbx);
   // value is in UseSSE >= 1 ? xmm0 : ST(0)
@@ -1131,7 +1191,7 @@ void TemplateTable::fastore() {
 }
 
 void TemplateTable::dastore() {
-  printf("dastore called\n");
+  // printf("TemplateTable::dastore called\n");
   transition(dtos, vtos);
   __ pop_i(rbx);
   // value is in UseSSE >= 2 ? xmm0 : ST(0)
@@ -1145,7 +1205,7 @@ void TemplateTable::dastore() {
 }
 
 void TemplateTable::aastore() {
-  printf("aastore called\n");
+  // printf("TemplateTable::aastore called\n");
   Label is_null, ok_is_subtype, done;
   transition(vtos, vtos);
   // stack: ..., array, index, value
@@ -1183,7 +1243,8 @@ void TemplateTable::aastore() {
   __ movptr(rax, at_tos());
   __ movl(rcx, at_tos_p1()); // index
   // Now store using the appropriate barrier
-  do_oop_store(_masm, element_address, rax, IS_ARRAY);
+  // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
+  do_oop_store(_masm, element_address, rax, _bs->kind(), IS_ARRAY);
   __ jmp(done);
 
   // Have a NULL in rax, rdx=array, ecx=index.  Store NULL at ary[idx]
@@ -1191,7 +1252,8 @@ void TemplateTable::aastore() {
   __ profile_null_seen(rbx);
 
   // Store a NULL
-  do_oop_store(_masm, element_address, noreg, IS_ARRAY);
+  // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
+  do_oop_store(_masm, element_address, noreg, _bs->kind(), IS_ARRAY);
 
   // Pop stack arguments
   __ bind(done);
@@ -1199,7 +1261,7 @@ void TemplateTable::aastore() {
 }
 
 void TemplateTable::bastore() {
-  printf("bastore called\n");
+  // printf("TemplateTable::bastore called\n");
   transition(itos, vtos);
   __ pop_i(rbx);
   // rax: value
@@ -1223,7 +1285,7 @@ void TemplateTable::bastore() {
 }
 
 void TemplateTable::castore() {
-  printf("castore called\n");
+  // printf("TemplateTable::castore called\n");
   transition(itos, vtos);
   __ pop_i(rbx);
   // rax: value
@@ -1238,58 +1300,58 @@ void TemplateTable::castore() {
 
 
 void TemplateTable::sastore() {
-  printf("sastore called\n");
+  // printf("TemplateTable::sastore called\n");
   castore();
 }
 
 void TemplateTable::istore(int n) {
-  printf("istore called\n");
+  // printf("TemplateTable::istore called\n");
   transition(itos, vtos);
   __ movl(iaddress(n), rax);
 }
 
 void TemplateTable::lstore(int n) {
-  printf("lstore called\n");
+  // printf("TemplateTable::lstore called\n");
   transition(ltos, vtos);
   __ movptr(laddress(n), rax);
   NOT_LP64(__ movptr(haddress(n), rdx));
 }
 
 void TemplateTable::fstore(int n) {
-  printf("fstore called\n");
+  // printf("TemplateTable::fstore called\n");
   transition(ftos, vtos);
   __ store_float(faddress(n));
 }
 
 void TemplateTable::dstore(int n) {
-  printf("dstore called\n");
+  // printf("TemplateTable::dstore called\n");
   transition(dtos, vtos);
   __ store_double(daddress(n));
 }
 
 
 void TemplateTable::astore(int n) {
-  printf("astore called\n");
+  // printf("TemplateTable::astore called\n");
   transition(vtos, vtos);
   __ pop_ptr(rax);
   __ movptr(aaddress(n), rax);
 }
 
 void TemplateTable::pop() {
-  printf("pop called\n");
+  // printf("TemplateTable::pop called\n");
   transition(vtos, vtos);
   __ addptr(rsp, Interpreter::stackElementSize);
 }
 
 void TemplateTable::pop2() {
-  printf("pop2 called\n");
+  // printf("TemplateTable::pop2 called\n");
   transition(vtos, vtos);
   __ addptr(rsp, 2 * Interpreter::stackElementSize);
 }
 
 
 void TemplateTable::dup() {
-  printf("dup called\n");
+  // printf("TemplateTable::dup called\n");
   transition(vtos, vtos);
   __ load_ptr(0, rax);
   __ push_ptr(rax);
@@ -1297,7 +1359,7 @@ void TemplateTable::dup() {
 }
 
 void TemplateTable::dup_x1() {
-  printf("dup_x1 called\n");
+  // printf("TemplateTable::dup_x1 called\n");
   transition(vtos, vtos);
   // stack: ..., a, b
   __ load_ptr( 0, rax);  // load b
@@ -1309,7 +1371,7 @@ void TemplateTable::dup_x1() {
 }
 
 void TemplateTable::dup_x2() {
-  printf("dup_x2 called\n");
+  // printf("TemplateTable::dup_x2 called\n");
   transition(vtos, vtos);
   // stack: ..., a, b, c
   __ load_ptr( 0, rax);  // load c
@@ -1325,7 +1387,7 @@ void TemplateTable::dup_x2() {
 }
 
 void TemplateTable::dup2() {
-  printf("dup2 called\n");
+  // printf("TemplateTable::dup2 called\n");
   transition(vtos, vtos);
   // stack: ..., a, b
   __ load_ptr(1, rax);  // load a
@@ -1337,7 +1399,7 @@ void TemplateTable::dup2() {
 
 
 void TemplateTable::dup2_x1() {
-  printf("dup2_x1 called\n");
+  // printf("TemplateTable::dup2_x1 called\n");
   transition(vtos, vtos);
   // stack: ..., a, b, c
   __ load_ptr( 0, rcx);  // load c
@@ -1355,7 +1417,7 @@ void TemplateTable::dup2_x1() {
 }
 
 void TemplateTable::dup2_x2() {
-  printf("dup2_x2 called\n");
+  // printf("TemplateTable::dup2_x2 called\n");
   transition(vtos, vtos);
   // stack: ..., a, b, c, d
   __ load_ptr( 0, rcx);  // load d
@@ -1375,7 +1437,7 @@ void TemplateTable::dup2_x2() {
 }
 
 void TemplateTable::swap() {
-  printf("swap called\n");
+  // printf("TemplateTable::swap called\n");
   transition(vtos, vtos);
   // stack: ..., a, b
   __ load_ptr( 1, rcx);  // load a
@@ -1386,7 +1448,7 @@ void TemplateTable::swap() {
 }
 
 void TemplateTable::iop2(Operation op) {
-  printf("iop2 called\n");
+  // printf("TemplateTable::iop2 called\n");
   transition(itos, itos);
   switch (op) {
   case add  :                    __ pop_i(rdx); __ addl (rax, rdx); break;
@@ -1403,7 +1465,7 @@ void TemplateTable::iop2(Operation op) {
 }
 
 void TemplateTable::lop2(Operation op) {
-  printf("lop2 called\n");
+  // printf("TemplateTable::lop2 called\n");
   transition(ltos, ltos);
 #ifdef _LP64
   switch (op) {
@@ -1429,7 +1491,7 @@ void TemplateTable::lop2(Operation op) {
 }
 
 void TemplateTable::idiv() {
-  printf("idiv called\n");
+  // printf("TemplateTable::idiv called\n");
   transition(itos, itos);
   __ movl(rcx, rax);
   __ pop_i(rax);
@@ -1441,7 +1503,7 @@ void TemplateTable::idiv() {
 }
 
 void TemplateTable::irem() {
-  printf("irem called\n");
+  // printf("TemplateTable::irem called\n");
   transition(itos, itos);
   __ movl(rcx, rax);
   __ pop_i(rax);
@@ -1454,7 +1516,7 @@ void TemplateTable::irem() {
 }
 
 void TemplateTable::lmul() {
-  printf("lmul called\n");
+  // printf("TemplateTable::lmul called\n");
   transition(ltos, ltos);
 #ifdef _LP64
   __ pop_l(rdx);
@@ -1469,7 +1531,7 @@ void TemplateTable::lmul() {
 }
 
 void TemplateTable::ldiv() {
-  printf("ldiv called\n");
+  // printf("TemplateTable::ldiv called\n");
   transition(ltos, ltos);
 #ifdef _LP64
   __ mov(rcx, rax);
@@ -1497,7 +1559,7 @@ void TemplateTable::ldiv() {
 }
 
 void TemplateTable::lrem() {
-  printf("lrem called\n");
+  // printf("TemplateTable::lrem called\n");
   transition(ltos, ltos);
 #ifdef _LP64
   __ mov(rcx, rax);
@@ -1525,7 +1587,7 @@ void TemplateTable::lrem() {
 }
 
 void TemplateTable::lshl() {
-  printf("lshl called\n");
+  // printf("TemplateTable::lshl called\n");
   transition(itos, ltos);
   __ movl(rcx, rax);                             // get shift count
   #ifdef _LP64
@@ -1538,7 +1600,7 @@ void TemplateTable::lshl() {
 }
 
 void TemplateTable::lshr() {
-  printf("lshr called\n");
+  // printf("TemplateTable::lshr called\n");
 #ifdef _LP64
   transition(itos, ltos);
   __ movl(rcx, rax);                             // get shift count
@@ -1553,7 +1615,7 @@ void TemplateTable::lshr() {
 }
 
 void TemplateTable::lushr() {
-  printf("lushr called\n");
+  // printf("TemplateTable::lushr called\n");
   transition(itos, ltos);
 #ifdef _LP64
   __ movl(rcx, rax);                             // get shift count
@@ -1567,7 +1629,7 @@ void TemplateTable::lushr() {
 }
 
 void TemplateTable::fop2(Operation op) {
-  printf("fop2 called\n");
+  // printf("TemplateTable::fop2 called\n");
   transition(ftos, ftos);
 
   if (UseSSE >= 1) {
@@ -1640,7 +1702,7 @@ void TemplateTable::fop2(Operation op) {
 }
 
 void TemplateTable::dop2(Operation op) {
-  printf("dop2 called\n");
+  // printf("TemplateTable::dop2 called\n");
   transition(dtos, dtos);
   if (UseSSE >= 2) {
     switch (op) {
@@ -1743,13 +1805,13 @@ void TemplateTable::dop2(Operation op) {
 }
 
 void TemplateTable::ineg() {
-  printf("ineg called\n");
+  // printf("TemplateTable::ineg called\n");
   transition(itos, itos);
   __ negl(rax);
 }
 
 void TemplateTable::lneg() {
-  printf("lneg called\n");
+  // printf("TemplateTable::lneg called\n");
   transition(ltos, ltos);
   LP64_ONLY(__ negq(rax));
   NOT_LP64(__ lneg(rdx, rax));
@@ -1782,7 +1844,7 @@ void TemplateTable::fneg() {
 }
 
 void TemplateTable::dneg() {
-  printf("dneg called\n");
+  // printf("TemplateTable::dneg called\n");
   transition(dtos, dtos);
   if (UseSSE >= 2) {
     static jlong *double_signflip =
@@ -1798,7 +1860,7 @@ void TemplateTable::dneg() {
 }
 
 void TemplateTable::iinc() {
-  printf("iinc called\n");
+  // printf("TemplateTable::iinc called\n");
   transition(vtos, vtos);
   __ load_signed_byte(rdx, at_bcp(2)); // get constant
   locals_index(rbx);
@@ -1806,6 +1868,7 @@ void TemplateTable::iinc() {
 }
 
 void TemplateTable::wide_iinc() {
+  // printf("TemplateTable::wide_iinc called\n");
   transition(vtos, vtos);
   __ movl(rdx, at_bcp(4)); // get constant
   locals_index_wide(rbx);
@@ -2889,6 +2952,7 @@ void TemplateTable::jvmti_post_field_access(Register cache,
                                             Register index,
                                             bool is_static,
                                             bool has_tos) {
+  // printf("TemplateTable::jvmti_post_field_access called\n");
   if (JvmtiExport::can_post_field_access()) {
     // Check to see if a field access watch has been set before we take
     // the time to call into the VM.
@@ -2952,6 +3016,7 @@ void TemplateTable::getfield_or_static(int byte_no, bool is_static, RewriteContr
 
   __ jcc(Assembler::notZero, notByte);
   // btos
+  // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
   __ access_load_at(T_BYTE, IN_HEAP, rax, field, noreg, noreg);
   __ push(btos);
   // Rewrite bytecode to be faster
@@ -2965,6 +3030,7 @@ void TemplateTable::getfield_or_static(int byte_no, bool is_static, RewriteContr
   __ jcc(Assembler::notEqual, notBool);
 
   // ztos (same code as btos)
+  // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
   __ access_load_at(T_BOOLEAN, IN_HEAP, rax, field, noreg, noreg);
   __ push(ztos);
   // Rewrite bytecode to be faster
@@ -2978,7 +3044,7 @@ void TemplateTable::getfield_or_static(int byte_no, bool is_static, RewriteContr
   __ cmpl(flags, atos);
   __ jcc(Assembler::notEqual, notObj);
   // atos
-  do_oop_load(_masm, field, rax);
+  do_oop_load(_masm, field, rax, _bs->kind());
   __ push(atos);
   if (!is_static && rc == may_rewrite) {
     patch_bytecode(Bytecodes::_fast_agetfield, bc, rbx);
@@ -2989,6 +3055,7 @@ void TemplateTable::getfield_or_static(int byte_no, bool is_static, RewriteContr
   __ cmpl(flags, itos);
   __ jcc(Assembler::notEqual, notInt);
   // itos
+  // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
   __ access_load_at(T_INT, IN_HEAP, rax, field, noreg, noreg);
   __ push(itos);
   // Rewrite bytecode to be faster
@@ -3001,6 +3068,7 @@ void TemplateTable::getfield_or_static(int byte_no, bool is_static, RewriteContr
   __ cmpl(flags, ctos);
   __ jcc(Assembler::notEqual, notChar);
   // ctos
+  // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
   __ access_load_at(T_CHAR, IN_HEAP, rax, field, noreg, noreg);
   __ push(ctos);
   // Rewrite bytecode to be faster
@@ -3013,6 +3081,7 @@ void TemplateTable::getfield_or_static(int byte_no, bool is_static, RewriteContr
   __ cmpl(flags, stos);
   __ jcc(Assembler::notEqual, notShort);
   // stos
+  // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
   __ access_load_at(T_SHORT, IN_HEAP, rax, field, noreg, noreg);
   __ push(stos);
   // Rewrite bytecode to be faster
@@ -3027,6 +3096,7 @@ void TemplateTable::getfield_or_static(int byte_no, bool is_static, RewriteContr
   // ltos
     // Generate code as if volatile (x86_32).  There just aren't enough registers to
     // save that information and this code is faster than the test.
+  // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
   __ access_load_at(T_LONG, IN_HEAP | MO_RELAXED, noreg /* ltos */, field, noreg, noreg);
   __ push(ltos);
   // Rewrite bytecode to be faster
@@ -3038,6 +3108,7 @@ void TemplateTable::getfield_or_static(int byte_no, bool is_static, RewriteContr
   __ jcc(Assembler::notEqual, notFloat);
   // ftos
 
+  // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
   __ access_load_at(T_FLOAT, IN_HEAP, noreg /* ftos */, field, noreg, noreg);
   __ push(ftos);
   // Rewrite bytecode to be faster
@@ -3052,6 +3123,7 @@ void TemplateTable::getfield_or_static(int byte_no, bool is_static, RewriteContr
   __ jcc(Assembler::notEqual, notDouble);
 #endif
   // dtos
+  // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
   __ access_load_at(T_DOUBLE, IN_HEAP, noreg /* dtos */, field, noreg, noreg);
   __ push(dtos);
   // Rewrite bytecode to be faster
@@ -3088,6 +3160,7 @@ void TemplateTable::getstatic(int byte_no) {
 // The registers cache and index expected to be set before call.
 // The function may destroy various registers, just not the cache and index registers.
 void TemplateTable::jvmti_post_field_mod(Register cache, Register index, bool is_static) {
+  // printf("TemplateTable::jvmti_post_field_mod called\n");
 
   const Register robj = LP64_ONLY(c_rarg2)   NOT_LP64(rax);
   const Register RBX  = LP64_ONLY(c_rarg1)   NOT_LP64(rbx);
@@ -3242,7 +3315,8 @@ void TemplateTable::putfield_or_static(int byte_no, bool is_static, RewriteContr
     __ pop(atos);
     if (!is_static) pop_and_check_object(obj);
     // Store into the field
-    do_oop_store(_masm, field, rax);
+    // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
+    do_oop_store(_masm, field, rax, _bs->kind());
     if (!is_static && rc == may_rewrite) {
       patch_bytecode(Bytecodes::_fast_aputfield, bc, rbx, true, byte_no);
     }
@@ -3490,7 +3564,8 @@ void TemplateTable::fast_storefield(TosState state) {
   // access field
   switch (bytecode()) {
   case Bytecodes::_fast_aputfield:
-    do_oop_store(_masm, field, rax);
+    // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
+    do_oop_store(_masm, field, rax, _bs->kind());
     break;
   case Bytecodes::_fast_lputfield:
 #ifdef _LP64
@@ -3580,7 +3655,7 @@ void TemplateTable::fast_accessfield(TosState state) {
   // access field
   switch (bytecode()) {
   case Bytecodes::_fast_agetfield:
-    do_oop_load(_masm, field, rax);
+    do_oop_load(_masm, field, rax, _bs->kind());
     __ verify_oop(rax);
     break;
   case Bytecodes::_fast_lgetfield:
@@ -3642,7 +3717,7 @@ void TemplateTable::fast_xaccess(TosState state) {
     __ access_load_at(T_INT, IN_HEAP, rax, field, noreg, noreg);
     break;
   case atos:
-    do_oop_load(_masm, field, rax);
+    do_oop_load(_masm, field, rax, _bs->kind());
     __ verify_oop(rax);
     break;
   case ftos:
@@ -3682,6 +3757,7 @@ void TemplateTable::prepare_invoke(int byte_no,
                                    Register recv,    // if caller wants to see it
                                    Register flags    // if caller wants to test it
                                    ) {
+  // printf("TemplateTable::prepare_invoke called\n");
   // determine flags
   const Bytecodes::Code code = bytecode();
   const bool is_invokeinterface  = code == Bytecodes::_invokeinterface;
@@ -4235,6 +4311,7 @@ void TemplateTable::arraylength() {
 }
 
 void TemplateTable::checkcast() {
+  // printf("TemplateTable::checkcast called\n");
   transition(atos, atos);
   Label done, is_null, ok_is_subtype, quicked, resolved;
   __ testptr(rax, rax); // object is in rax
@@ -4569,6 +4646,7 @@ void TemplateTable::monitorexit() {
 
 // Wide instructions
 void TemplateTable::wide() {
+  // printf("TemplateTable::wide called\n");
   transition(vtos, vtos);
   __ load_unsigned_byte(rbx, at_bcp(1));
   ExternalAddress wtable((address)Interpreter::_wentry_point);
@@ -4578,6 +4656,7 @@ void TemplateTable::wide() {
 
 // Multi arrays
 void TemplateTable::multianewarray() {
+  // printf("TemplateTable::multianewarray called\n");
   transition(vtos, atos);
 
   Register rarg = LP64_ONLY(c_rarg1) NOT_LP64(rax);

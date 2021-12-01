@@ -26,6 +26,8 @@
 #include "gc/shared/barrierSetAssembler.hpp"
 #include "gc/shared/collectedHeap.hpp"
 #include "interpreter/interp_masm.hpp"
+#include "interpreter/interpreterRuntime.hpp"
+
 #include "runtime/jniHandles.hpp"
 #include "runtime/thread.hpp"
 
@@ -33,7 +35,7 @@
 
 void BarrierSetAssembler::load_at(MacroAssembler* masm, DecoratorSet decorators, BasicType type,
                                   Register dst, Address src, Register tmp1, Register tmp_thread) {
-  // printf("BarrierSetAssembler::load_at called\n");
+  // tty->print_raw("Add barrier here\n");
   bool in_heap = (decorators & IN_HEAP) != 0;
   bool in_native = (decorators & IN_NATIVE) != 0;
   bool is_not_null = (decorators & IS_NOT_NULL) != 0;
@@ -56,6 +58,8 @@ void BarrierSetAssembler::load_at(MacroAssembler* masm, DecoratorSet decorators,
       {
         __ movptr(dst, src);
       }
+      // barrier here for dist 
+      // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
     } else {
       assert(in_native, "why else?");
       __ movptr(dst, src);
@@ -99,7 +103,7 @@ void BarrierSetAssembler::load_at(MacroAssembler* masm, DecoratorSet decorators,
 
 void BarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet decorators, BasicType type,
                                    Address dst, Register val, Register tmp1, Register tmp2) {
-  // printf("BarrierSetAssembler::store_at called\n");
+  // tty->print_raw("Add barrier here\n");
   bool in_heap = (decorators & IN_HEAP) != 0;
   bool in_native = (decorators & IN_NATIVE) != 0;
   bool is_not_null = (decorators & IS_NOT_NULL) != 0;
@@ -109,6 +113,7 @@ void BarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet decorators
   case T_OBJECT:
   case T_ARRAY: {
     if (in_heap) {
+      // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
       if (val == noreg) {
         assert(!is_not_null, "inconsistent access");
 #ifdef _LP64
@@ -120,7 +125,7 @@ void BarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet decorators
 #else
         __ movl(dst, (int32_t)NULL_WORD);
 #endif
-      } else {
+      } else { // val != noreg
 #ifdef _LP64
         if (UseCompressedOops) {
           assert(!dst.uses(val), "not enough registers");
@@ -136,7 +141,7 @@ void BarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet decorators
           __ movptr(dst, val);
         }
       }
-    } else {
+    } else { // !in_heap
       assert(in_native, "why else?");
       assert(val != noreg, "not supported");
       __ movptr(dst, val);
@@ -204,16 +209,19 @@ void BarrierSetAssembler::obj_equals(MacroAssembler* masm,
 #endif
 void BarrierSetAssembler::obj_equals(MacroAssembler* masm,
                                      Register obj1, Address obj2) {
+  // tty->print_cr("BarrierSetAssembler::obj_equals called\n");
   __ cmpptr(obj1, obj2);
 }
 
 void BarrierSetAssembler::obj_equals(MacroAssembler* masm,
                                      Register obj1, Register obj2) {
+  // tty->print_cr("BarrierSetAssembler::obj_equals called\n");
   __ cmpptr(obj1, obj2);
 }
 
 void BarrierSetAssembler::try_resolve_jobject_in_native(MacroAssembler* masm, Register jni_env,
                                                         Register obj, Register tmp, Label& slowpath) {
+  // tty->print_cr("BarrierSetAssembler::try_resolve_jobject_in_native called\n");
   __ clear_jweak_tag(obj);
   __ movptr(obj, Address(obj, 0));
 }
@@ -225,6 +233,7 @@ void BarrierSetAssembler::tlab_allocate(MacroAssembler* masm,
                                         Register t1,
                                         Register t2,
                                         Label& slow_case) {
+  // tty->print_cr("BarrierSetAssembler::tlab_allocate called\n");
   assert_different_registers(obj, t1, t2);
   assert_different_registers(obj, var_size_in_bytes, t1);
   Register end = t2;
@@ -266,6 +275,7 @@ void BarrierSetAssembler::eden_allocate(MacroAssembler* masm,
                                         int con_size_in_bytes,
                                         Register t1,
                                         Label& slow_case) {
+  // tty->print_cr("BarrierSetAssembler::eden_allocate called\n");
   assert(obj == rax, "obj must be in rax, for cmpxchg");
   assert_different_registers(obj, var_size_in_bytes, t1);
   if (!Universe::heap()->supports_inline_contig_alloc()) {
@@ -299,6 +309,7 @@ void BarrierSetAssembler::incr_allocated_bytes(MacroAssembler* masm, Register th
                                                Register var_size_in_bytes,
                                                int con_size_in_bytes,
                                                Register t1) {
+  // tty->print_cr("BarrierSetAssembler::incr_allocated_bytes called\n");
   if (!thread->is_valid()) {
 #ifdef _LP64
     thread = r15_thread;

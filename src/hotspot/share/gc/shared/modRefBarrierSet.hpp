@@ -27,6 +27,7 @@
 
 #include "gc/shared/barrierSet.hpp"
 #include "memory/memRegion.hpp"
+#include "oops/compressedOops.inline.hpp"
 
 class Klass;
 
@@ -64,6 +65,17 @@ public:
   // Below count is the # array elements being written, starting
   // at the address "start", which may not necessarily be HeapWord-aligned
   inline void write_ref_array(HeapWord* start, size_t count);
+
+  static void oop_increase_access_counter(oop p) {
+    if (!CompressedOops::is_null(p)) {
+      // ShenandoahHeap* heap = ShenandoahHeap::heap();
+      // ShenandoahHeap *const heap = ShenandoahHeap::heap();
+      // if (heap != NULL){
+      //   heap->oop_check_to_reset_access_counter(p);
+      // }
+      p->add_access_counter(1);
+    }
+  }
 
  protected:
   virtual void write_ref_array_work(MemRegion mr) = 0;

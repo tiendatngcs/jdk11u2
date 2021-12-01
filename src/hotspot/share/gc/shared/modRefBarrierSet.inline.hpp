@@ -27,7 +27,6 @@
 
 #include "gc/shared/barrierSet.hpp"
 #include "gc/shared/modRefBarrierSet.hpp"
-#include "oops/compressedOops.inline.hpp"
 #include "oops/klass.inline.hpp"
 #include "oops/objArrayOop.hpp"
 #include "oops/oop.hpp"
@@ -54,10 +53,23 @@ void ModRefBarrierSet::write_ref_array(HeapWord* start, size_t count) {
   write_ref_array_work(MemRegion(aligned_start, aligned_end));
 }
 
+// void ModRefBarrierSet::oop_increase_access_counter(oop p) {
+//   if (!CompressedOops::is_null(p)) {
+//     // ShenandoahHeap* heap = ShenandoahHeap::heap();
+//     // ShenandoahHeap *const heap = ShenandoahHeap::heap();
+//     // if (heap != NULL){
+//     //   heap->oop_check_to_reset_access_counter(p);
+//     // }
+//     p->add_access_counter(1);
+//   }
+// }
+
 template <DecoratorSet decorators, typename BarrierSetT>
 template <typename T>
 inline void ModRefBarrierSet::AccessBarrier<decorators, BarrierSetT>::
 oop_store_in_heap(T* addr, oop value) {
+  oop_increase_access_counter(RawAccess<>::oop_load(addr));
+  oop_increase_access_counter(value);
   BarrierSetT *bs = barrier_set_cast<BarrierSetT>(barrier_set());
   bs->template write_ref_field_pre<decorators>(addr);
   Raw::oop_store(addr, value);
@@ -74,6 +86,8 @@ oop_atomic_cmpxchg_in_heap(oop new_value, T* addr, oop compare_value) {
   if (result == compare_value) {
     bs->template write_ref_field_post<decorators>(addr, new_value);
   }
+  oop_increase_access_counter(new_value);
+  oop_increase_access_counter(result);
   return result;
 }
 
@@ -85,6 +99,8 @@ oop_atomic_xchg_in_heap(oop new_value, T* addr) {
   bs->template write_ref_field_pre<decorators>(addr);
   oop result = Raw::oop_atomic_xchg(new_value, addr);
   bs->template write_ref_field_post<decorators>(addr, new_value);
+  oop_increase_access_counter(new_value);
+  oop_increase_access_counter(result);
   return result;
 }
 
@@ -98,6 +114,10 @@ oop_arraycopy_in_heap(arrayOop src_obj, size_t src_offset_in_bytes, T* src_raw,
 
   src_raw = arrayOopDesc::obj_offset_to_raw(src_obj, src_offset_in_bytes, src_raw);
   dst_raw = arrayOopDesc::obj_offset_to_raw(dst_obj, dst_offset_in_bytes, dst_raw);
+
+
+  oop_increase_access_counter(src_obj);
+  oop_increase_access_counter(dst_obj);
 
   if (!HasDecorator<decorators, ARRAYCOPY_CHECKCAST>::value) {
     // Optimized covariant case
@@ -114,6 +134,7 @@ oop_arraycopy_in_heap(arrayOop src_obj, size_t src_offset_in_bytes, T* src_raw,
       T element = *from;
       if (oopDesc::is_instanceof_or_null(CompressedOops::decode(element), bound)) {
         bs->template write_ref_field_pre<decorators>(p);
+        oop_increase_access_counter(CompressedOops::decode(element));
         *p = element;
       } else {
         // We must do a barrier to cover the partial copy.
@@ -133,6 +154,8 @@ oop_arraycopy_in_heap(arrayOop src_obj, size_t src_offset_in_bytes, T* src_raw,
 template <DecoratorSet decorators, typename BarrierSetT>
 inline void ModRefBarrierSet::AccessBarrier<decorators, BarrierSetT>::
 clone_in_heap(oop src, oop dst, size_t size) {
+  oop_increase_access_counter(src);
+  oop_increase_access_counter(dst);
   Raw::clone(src, dst, size);
   BarrierSetT *bs = barrier_set_cast<BarrierSetT>(barrier_set());
   bs->write_region(MemRegion((HeapWord*)(void*)dst, size));

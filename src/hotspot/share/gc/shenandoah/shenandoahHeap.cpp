@@ -465,7 +465,7 @@ ShenandoahHeap::ShenandoahHeap(ShenandoahCollectorPolicy* policy) :
   _size_histogram(),
   // _neutral_to_hot_count(0),
   // _neutral_to_cold_count(0),
-  _gc_epoch(0),
+  // _gc_epoch(0),
   _cold_to_hot_count(0),
   _hot_to_cold_count(0),
   _max_workers(MAX2(ConcGCThreads, ParallelGCThreads)),
@@ -695,10 +695,10 @@ const size_t* ShenandoahHeap::size_histogram()   const {
   return _size_histogram;
 }
 
-uintptr_t ShenandoahHeap::gc_epoch() const{
-  OrderAccess::acquire();
-  return _gc_epoch;
-}
+// uintptr_t ShenandoahHeap::gc_epoch() const{
+//   OrderAccess::acquire();
+//   return _gc_epoch;
+// }
 
 // uint32_t ShenandoahHeap::neutral_to_hot_count() const {
 //   OrderAccess::acquire();
@@ -799,7 +799,7 @@ void ShenandoahHeap::increase_hotness_size(size_t bytes, ShenandoahRegionAccessR
 
 void ShenandoahHeap::increase_hotness_size(oop obj) {
   if (obj == NULL) return;
-  oop_check_to_reset_access_counter(obj);
+  // oop_check_to_reset_access_counter(obj);
   increase_hotness_size(obj->size(), get_access_rate_from_access_counter(obj->access_counter()));
 }
 
@@ -820,7 +820,7 @@ void ShenandoahHeap::decrease_hotness_size(size_t bytes, ShenandoahRegionAccessR
 
 void ShenandoahHeap::decrease_hotness_size(oop obj) {
   if (obj == NULL) return;
-  oop_check_to_reset_access_counter(obj);
+  // oop_check_to_reset_access_counter(obj);
   decrease_hotness_size(obj->size(), get_access_rate_from_access_counter(obj->access_counter()));
 }
 
@@ -856,7 +856,7 @@ void ShenandoahHeap::increase_hard_hotness_size(size_t bytes, ShenandoahRegionAc
 
 void ShenandoahHeap::increase_hard_hotness_size(oop obj){
   if (obj == NULL) return;
-  oop_check_to_reset_access_counter(obj);
+  // oop_check_to_reset_access_counter(obj);
   increase_hard_hotness_size(obj->size(), get_access_rate_from_access_counter(obj->access_counter()));
 }
 
@@ -877,7 +877,7 @@ void ShenandoahHeap::decrease_hard_hotness_size(size_t bytes, ShenandoahRegionAc
 
 void ShenandoahHeap::decrease_hard_hotness_size(oop obj){
   if (obj == NULL) return;
-  oop_check_to_reset_access_counter(obj);
+  // oop_check_to_reset_access_counter(obj);
   decrease_hard_hotness_size(obj->size(), get_access_rate_from_access_counter(obj->access_counter()));
 }
 
@@ -947,7 +947,7 @@ void ShenandoahHeap::set_region_count(size_t num, ShenandoahRegionAccessRate acc
 void ShenandoahHeap::update_histogram(oop obj) {
   // uintptr_t ac
   if (obj == NULL) return;
-  oop_check_to_reset_access_counter(obj);
+  // oop_check_to_reset_access_counter(obj);
   uintptr_t ac = obj->access_counter();
   if (ac == 0){
     _histogram[0] += 1;
@@ -975,10 +975,10 @@ void ShenandoahHeap::reset_histogram() {
   memset(_size_histogram, 0, sizeof(_size_histogram));
 }
 
-void ShenandoahHeap::increase_gc_epoch(uintptr_t increment) {
-  // Atomic::add(increment, &_gc_epoch);
-  _gc_epoch += increment;
-}
+// void ShenandoahHeap::increase_gc_epoch(uintptr_t increment) {
+//   // Atomic::add(increment, &_gc_epoch);
+//   _gc_epoch += increment;
+// }
 
 
 // void ShenandoahHeap::increase_neutral_to_hot_count(uint32_t increment) {
@@ -1013,36 +1013,36 @@ void ShenandoahHeap::set_hot_to_cold_count(uint32_t value) {
   OrderAccess::release_store_fence(&_hot_to_cold_count, value);
 }
 
-void ShenandoahHeap::oop_check_to_reset_access_counter(oop obj) {
-  if (!CompressedOops::is_null(obj)) {
-    // printf("obj gc_epoch: %lu | heap gc_epoch: %lu\n", obj->gc_epoch(), _heap->gc_epoch());
-    if (obj->gc_epoch() < _heap->gc_epoch()) {
-      if (obj->access_counter() != 0){
-        // only reset gc_epoch if that obj was accessed in the last cycle. This would make objs the never see a barrier to stay at 0;
-        obj->set_access_counter(1 << 12);
-        obj->set_gc_epoch(_heap->gc_epoch());
-      }
-    }
-    else if (obj->gc_epoch() > _heap->gc_epoch()) {
-      // printf("Newly created obj\n");
-      obj->set_access_counter(0);
-      obj->set_gc_epoch(_heap->gc_epoch());
-    }
-    else {
-      if (obj->access_counter() != 0 && obj->access_counter() < 1 << 12){
-        // promote obj if it was accessed at least 1
-        obj->set_access_counter(obj->access_counter() + 1 << 12);
-      }
-    }
-  }
-  // if (obj != NULL) {
-  //   // printf("obj gc_epoch: %lu | heap gc_epoch: %lu\n", obj->gc_epoch(), _heap->gc_epoch());
-  //   if (obj->gc_epoch() != _heap->gc_epoch()) {
-  //     obj->set_access_counter(0);
-  //     obj->set_gc_epoch(_heap->gc_epoch());
-  //   }
-  // }
-}
+// void ShenandoahHeap::oop_check_to_reset_access_counter(oop obj) {
+//   if (!CompressedOops::is_null(obj)) {
+//     // printf("obj gc_epoch: %lu | heap gc_epoch: %lu\n", obj->gc_epoch(), _heap->gc_epoch());
+//     if (obj->gc_epoch() < _heap->gc_epoch()) {
+//       if (obj->access_counter() != 0){
+//         // only reset gc_epoch if that obj was accessed in the last cycle. This would make objs the never see a barrier to stay at 0;
+//         obj->set_access_counter(1 << 12);
+//         obj->set_gc_epoch(_heap->gc_epoch());
+//       }
+//     }
+//     else if (obj->gc_epoch() > _heap->gc_epoch()) {
+//       // printf("Newly created obj\n");
+//       obj->set_access_counter(0);
+//       obj->set_gc_epoch(_heap->gc_epoch());
+//     }
+//     else {
+//       if (obj->access_counter() != 0 && obj->access_counter() < 1 << 12){
+//         // promote obj if it was accessed at least 1
+//         obj->set_access_counter(obj->access_counter() + 1 << 12);
+//       }
+//     }
+//   }
+//   // if (obj != NULL) {
+//   //   // printf("obj gc_epoch: %lu | heap gc_epoch: %lu\n", obj->gc_epoch(), _heap->gc_epoch());
+//   //   if (obj->gc_epoch() != _heap->gc_epoch()) {
+//   //     obj->set_access_counter(0);
+//   //     obj->set_gc_epoch(_heap->gc_epoch());
+//   //   }
+//   // }
+// }
 
 void ShenandoahHeap::increase_allocated(size_t bytes) {
   Atomic::add(bytes, &_bytes_allocated_since_gc_start);

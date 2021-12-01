@@ -66,8 +66,10 @@ class oopDesc {
 
  public:
   oopDesc();
-  inline uintptr_t access_counter() const;
+  static uintptr_t static_gc_epoch;
+  inline uintptr_t access_counter();
   inline uintptr_t gc_epoch() const;
+  // static inline uintptr_t static_gc_epoch();
   inline markOop  mark()          const;
   inline markOop  mark_raw()      const;
   inline markOop* mark_addr_raw() const;
@@ -77,6 +79,10 @@ class oopDesc {
 
   inline void set_gc_epoch(uintptr_t new_value);
   inline void add_gc_epoch(uintptr_t increment);
+
+  static inline void set_static_gc_epoch(uintptr_t new_value);
+  static inline void add_static_gc_epoch(uintptr_t increment);
+
 
   inline void set_mark(volatile markOop m);
   inline void set_mark_raw(volatile markOop m);
@@ -336,6 +342,7 @@ class oopDesc {
   // for code generation
   static int access_counter_offset_in_bytes() { return offset_of(oopDesc, _access_counter); }
   static int gc_epoch_offset_in_bytes() { return offset_of(oopDesc, _gc_epoch); }
+  // static int static_gc_epoch_offset_in_bytes() { return offset_of(oopDesc, _static_gc_epoch); }
   static int mark_offset_in_bytes()      { return offset_of(oopDesc, _mark); }
   static int klass_offset_in_bytes()     { return offset_of(oopDesc, _metadata._klass); }
   static int klass_gap_offset_in_bytes() {

@@ -31,6 +31,7 @@
 #include "gc/shenandoah/shenandoahThreadLocalData.hpp"
 #include "gc/shenandoah/heuristics/shenandoahHeuristics.hpp"
 #include "interpreter/interpreter.hpp"
+#include "interpreter/interpreterRuntime.hpp"
 #include "interpreter/interp_masm.hpp"
 #include "runtime/sharedRuntime.hpp"
 #include "runtime/thread.hpp"
@@ -120,7 +121,7 @@ static void restore_machine_state(MacroAssembler* masm, bool handle_gpr, bool ha
 void ShenandoahBarrierSetAssembler::arraycopy_prologue(MacroAssembler* masm, DecoratorSet decorators, BasicType type,
                                                        Register src, Register dst, Register count) {
 
-  printf("ShenandoahBarrierSetAssembler::arraycopy_prologue called\n");
+  tty->print_cr("ShenandoahBarrierSetAssembler::arraycopy_prologue called\n");
   bool dest_uninitialized = (decorators & IS_DEST_UNINITIALIZED) != 0;
 
   if (type == T_OBJECT || type == T_ARRAY) {
@@ -192,6 +193,7 @@ void ShenandoahBarrierSetAssembler::shenandoah_write_barrier_pre(MacroAssembler*
                                                                  Register tmp,
                                                                  bool tosca_live,
                                                                  bool expand_call) {
+  tty->print_cr("ShenandoahBarrierSetAssembler::shenandoah_write_barrier_pre called\n");
 
   if (ShenandoahSATBBarrier) {
     satb_write_barrier_pre(masm, obj, pre_val, thread, tmp, tosca_live, expand_call);
@@ -205,6 +207,7 @@ void ShenandoahBarrierSetAssembler::satb_write_barrier_pre(MacroAssembler* masm,
                                                            Register tmp,
                                                            bool tosca_live,
                                                            bool expand_call) {
+  tty->print_cr("ShenandoahBarrierSetAssembler::satb_write_barrier_pre called\n");
   // If expand_call is true then we expand the call_VM_leaf macro
   // directly to skip generating the check by
   // InterpreterMacroAssembler::call_VM_leaf_base that checks _last_sp.
@@ -321,6 +324,7 @@ void ShenandoahBarrierSetAssembler::satb_write_barrier_pre(MacroAssembler* masm,
 }
 
 void ShenandoahBarrierSetAssembler::load_reference_barrier_not_null(MacroAssembler* masm, Register dst, Address src) {
+  tty->print_cr("ShenandoahBarrierSetAssembler::load_reference_barrier_not_null called\n");
   assert(ShenandoahLoadRefBarrier, "Should be enabled");
 
   Label done;
@@ -388,12 +392,14 @@ void ShenandoahBarrierSetAssembler::load_reference_barrier_not_null(MacroAssembl
 }
 
 void ShenandoahBarrierSetAssembler::iu_barrier(MacroAssembler* masm, Register dst, Register tmp) {
+  tty->print_cr("ShenandoahBarrierSetAssembler::iu_barrier called\n");
   if (ShenandoahIUBarrier) {
     iu_barrier_impl(masm, dst, tmp);
   }
 }
 
 void ShenandoahBarrierSetAssembler::iu_barrier_impl(MacroAssembler* masm, Register dst, Register tmp) {
+  tty->print_cr("ShenandoahBarrierSetAssembler::iu_barrier_impl called\n");
   assert(ShenandoahIUBarrier, "should be enabled");
 
   if (dst == noreg) return;
@@ -422,6 +428,7 @@ void ShenandoahBarrierSetAssembler::iu_barrier_impl(MacroAssembler* masm, Regist
 }
 
 void ShenandoahBarrierSetAssembler::load_reference_barrier(MacroAssembler* masm, Register dst, Address src) {
+  tty->print_cr("ShenandoahBarrierSetAssembler::load_reference_barrier called\n");
   if (ShenandoahLoadRefBarrier) {
     Label done;
     __ testptr(dst, dst);
@@ -446,6 +453,7 @@ void ShenandoahBarrierSetAssembler::load_reference_barrier(MacroAssembler* masm,
 //
 void ShenandoahBarrierSetAssembler::load_at(MacroAssembler* masm, DecoratorSet decorators, BasicType type,
              Register dst, Address src, Register tmp1, Register tmp_thread) {
+  tty->print_cr("ShenandoahBarrierSetAssembler::load_at called\n");
   // 1: non-reference load, no additional barrier is needed
   if (!is_reference_type(type)) {
     BarrierSetAssembler::load_at(masm, decorators, type, dst, src, tmp1, tmp_thread);
@@ -463,6 +471,7 @@ void ShenandoahBarrierSetAssembler::load_at(MacroAssembler* masm, DecoratorSet d
     if (dst == src.base() || dst == src.index()) {
       // Use tmp1 for dst if possible, as it is not used in BarrierAssembler::load_at()
       if (tmp1->is_valid() && tmp1 != src.base() && tmp1 != src.index()) {
+        // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
         dst = tmp1;
         use_tmp1_for_dst = true;
       } else {
@@ -516,6 +525,7 @@ void ShenandoahBarrierSetAssembler::load_at(MacroAssembler* masm, DecoratorSet d
 
 void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet decorators, BasicType type,
               Address dst, Register val, Register tmp1, Register tmp2) {
+  tty->print_cr("ShenandoahBarrierSetAssembler::store_at called\n");
 
   bool on_oop = type == T_OBJECT || type == T_ARRAY;
   bool in_heap = (decorators & IN_HEAP) != 0;
@@ -543,6 +553,7 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
     imasm->save_bcp();
 #endif
 
+    // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
     if (needs_pre_barrier) {
       shenandoah_write_barrier_pre(masm /*masm*/,
                                    tmp1 /* obj */,
@@ -559,6 +570,7 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
       BarrierSetAssembler::store_at(masm, decorators, type, Address(tmp1, 0), val, noreg, noreg);
     }
     NOT_LP64(imasm->restore_bcp());
+    // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
   } else {
     BarrierSetAssembler::store_at(masm, decorators, type, dst, val, tmp1, tmp2);
   }
@@ -566,6 +578,7 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
 
 void ShenandoahBarrierSetAssembler::try_resolve_jobject_in_native(MacroAssembler* masm, Register jni_env,
                                                                   Register obj, Register tmp, Label& slowpath) {
+  tty->print_cr("ShenandoahBarrierSetAssembler::try_resolve_jobject_in_native called\n");
   Label done;
   // Resolve jobject
   BarrierSetAssembler::try_resolve_jobject_in_native(masm, jni_env, obj, tmp, slowpath);
@@ -585,6 +598,7 @@ void ShenandoahBarrierSetAssembler::try_resolve_jobject_in_native(MacroAssembler
 void ShenandoahBarrierSetAssembler::cmpxchg_oop(MacroAssembler* masm,
                                                 Register res, Address addr, Register oldval, Register newval,
                                                 bool exchange, Register tmp1, Register tmp2) {
+  tty->print_cr("ShenandoahBarrierSetAssembler::cmpxchg_oop called\n");
   assert(ShenandoahCASBarrier, "Should only be used when CAS barrier is enabled");
   assert(oldval == rax, "must be in rax for implicit use in cmpxchg");
   assert_different_registers(oldval, tmp1, tmp2);
@@ -787,6 +801,7 @@ static void move_ptr(MacroAssembler* masm, VMRegPair src, VMRegPair dst) {
 void ShenandoahBarrierSetAssembler::pin_critical_native_array(MacroAssembler* masm,
                                                               VMRegPair reg,
                                                               int& pinned_slot) {
+  tty->print_cr("ShenandoahBarrierSetAssembler::pin_critical_native_array called\n");
   __ block_comment("pin_critical_native_array {");
   Register tmp_reg = rax;
 
@@ -858,6 +873,7 @@ void ShenandoahBarrierSetAssembler::pin_critical_native_array(MacroAssembler* ma
 void ShenandoahBarrierSetAssembler::unpin_critical_native_array(MacroAssembler* masm,
                                                                 VMRegPair reg,
                                                                 int& pinned_slot) {
+  tty->print_cr("ShenandoahBarrierSetAssembler::unpin_critical_native_array called\n");
   __ block_comment("unpin_critical_native_array {");
   Label is_null;
 
@@ -1184,6 +1200,7 @@ address ShenandoahBarrierSetAssembler::shenandoah_lrb() {
  *  rsi: load address
  */
 address ShenandoahBarrierSetAssembler::generate_shenandoah_lrb(StubCodeGenerator* cgen) {
+  tty->print_cr("ShenandoahBarrierSetAssembler::generate_shenandoah_lrb called\n");
   __ align(CodeEntryAlignment);
   StubCodeMark mark(cgen, "StubRoutines", "shenandoah_lrb");
   address start = __ pc();
@@ -1263,6 +1280,7 @@ address ShenandoahBarrierSetAssembler::generate_shenandoah_lrb(StubCodeGenerator
 #undef __
 
 void ShenandoahBarrierSetAssembler::barrier_stubs_init() {
+  tty->print_cr("ShenandoahBarrierSetAssembler::barrier_stubs_init called\n");
   if (ShenandoahLoadRefBarrier) {
     int stub_code_size = 4096;
     ResourceMark rm;

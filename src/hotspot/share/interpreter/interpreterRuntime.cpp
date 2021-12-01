@@ -128,6 +128,7 @@ bool InterpreterRuntime::is_breakpoint(JavaThread *thread) {
 // State accessors
 
 void InterpreterRuntime::set_bcp_and_mdp(address bcp, JavaThread *thread) {
+  // printf("InterpreterRuntime::set_bcp_and_mdp called\n");
   LastFrameAccessor last_frame(thread);
   last_frame.set_bcp(bcp);
   if (ProfileInterpreter) {
@@ -146,6 +147,7 @@ void InterpreterRuntime::set_bcp_and_mdp(address bcp, JavaThread *thread) {
 
 
 IRT_ENTRY(void, InterpreterRuntime::ldc(JavaThread* thread, bool wide))
+  // printf("InterpreterRuntime::ldc called\n");
   // access constant pool
   LastFrameAccessor last_frame(thread);
   ConstantPool* pool = last_frame.method()->constants();
@@ -334,6 +336,7 @@ void InterpreterRuntime::note_trap_inner(JavaThread* thread, int reason,
 // Assume the compiler is (or will be) interested in this event.
 // If necessary, create an MDO to hold the information, and record it.
 void InterpreterRuntime::note_trap(JavaThread* thread, int reason, TRAPS) {
+  // printf("InterpreterRuntime::note_trap called\n");
   assert(ProfileTraps, "call me only if profiling");
   LastFrameAccessor last_frame(thread);
   methodHandle trap_method(thread, last_frame.method());
@@ -676,6 +679,7 @@ void InterpreterRuntime::resolve_get_put(JavaThread* thread, Bytecodes::Code byt
                     bytecode == Bytecodes::_putstatic);
   bool is_static = (bytecode == Bytecodes::_getstatic || bytecode == Bytecodes::_putstatic);
 
+  // printf("InterpreterRuntime::resolve_get_put called\n");
   {
     JvmtiHideSingleStepping jhss(thread);
     LinkResolver::resolve_field_access(info, pool, last_frame.get_index_u2_cpcache(bytecode),
@@ -747,6 +751,7 @@ void InterpreterRuntime::resolve_get_put(JavaThread* thread, Bytecodes::Code byt
 
 //%note monitor_1
 IRT_ENTRY_NO_ASYNC(void, InterpreterRuntime::monitorenter(JavaThread* thread, BasicObjectLock* elem))
+  // printf("InterpreterRuntime::monitorenter called\n");
 #ifdef ASSERT
   thread->last_frame().interpreter_frame_verify_monitor(elem);
 #endif
@@ -772,6 +777,7 @@ IRT_END
 
 //%note monitor_1
 IRT_ENTRY_NO_ASYNC(void, InterpreterRuntime::monitorexit(JavaThread* thread, BasicObjectLock* elem))
+  // printf("InterpreterRuntime::monitorexit called\n");
 #ifdef ASSERT
   thread->last_frame().interpreter_frame_verify_monitor(elem);
 #endif
@@ -819,18 +825,22 @@ IRT_END
 // Invokes
 
 IRT_ENTRY(Bytecodes::Code, InterpreterRuntime::get_original_bytecode_at(JavaThread* thread, Method* method, address bcp))
+  // printf("InterpreterRuntime::get_original_bytecode_at called\n");
   return method->orig_bytecode_at(method->bci_from(bcp));
 IRT_END
 
 IRT_ENTRY(void, InterpreterRuntime::set_original_bytecode_at(JavaThread* thread, Method* method, address bcp, Bytecodes::Code new_code))
+  // printf("InterpreterRuntime::set_original_bytecode_at called\n");
   method->set_orig_bytecode_at(method->bci_from(bcp), new_code);
 IRT_END
 
 IRT_ENTRY(void, InterpreterRuntime::_breakpoint(JavaThread* thread, Method* method, address bcp))
+  // printf("InterpreterRuntime::_breakpoint called\n");
   JvmtiExport::post_raw_breakpoint(thread, method, bcp);
 IRT_END
 
 void InterpreterRuntime::resolve_invoke(JavaThread* thread, Bytecodes::Code bytecode) {
+  // printf("InterpreterRuntime::resolve_invoke called\n");
   Thread* THREAD = thread;
   LastFrameAccessor last_frame(thread);
   // extract receiver from the outgoing argument list if necessary
@@ -939,6 +949,7 @@ void InterpreterRuntime::resolve_invoke(JavaThread* thread, Bytecodes::Code byte
 
 // First time execution:  Resolve symbols, create a permanent MethodType object.
 void InterpreterRuntime::resolve_invokehandle(JavaThread* thread) {
+  // printf("InterpreterRuntime::resolve_invokehandle called\n");
   Thread* THREAD = thread;
   const Bytecodes::Code bytecode = Bytecodes::_invokehandle;
   LastFrameAccessor last_frame(thread);
@@ -959,6 +970,7 @@ void InterpreterRuntime::resolve_invokehandle(JavaThread* thread) {
 
 // First time execution:  Resolve symbols, create a permanent CallSite object.
 void InterpreterRuntime::resolve_invokedynamic(JavaThread* thread) {
+  // printf("InterpreterRuntime::resolve_invokedynamic called\n");
   Thread* THREAD = thread;
   LastFrameAccessor last_frame(thread);
   const Bytecodes::Code bytecode = Bytecodes::_invokedynamic;
@@ -984,6 +996,7 @@ void InterpreterRuntime::resolve_invokedynamic(JavaThread* thread) {
 // cpCache entry.  This doesn't safepoint, but the helper routines safepoint.
 // This function will check for redefinition!
 IRT_ENTRY(void, InterpreterRuntime::resolve_from_cache(JavaThread* thread, Bytecodes::Code bytecode)) {
+  // printf("InterpreterRuntime::resolve_from_cache called\n");
   switch (bytecode) {
   case Bytecodes::_getstatic:
   case Bytecodes::_putstatic:
@@ -1010,11 +1023,44 @@ IRT_ENTRY(void, InterpreterRuntime::resolve_from_cache(JavaThread* thread, Bytec
 }
 IRT_END
 
+IRT_ENTRY(void, InterpreterRuntime::print_something(JavaThread* thread))
+{
+  tty->print_raw("Barrier inserted\n");
+}
+IRT_END
+
+IRT_ENTRY(void, InterpreterRuntime::print_load_barrier(JavaThread* thread))
+{
+  tty->print_raw("Load barrier inserted\n");
+}
+IRT_END
+
+IRT_ENTRY(void, InterpreterRuntime::print_store_barrier(JavaThread* thread))
+{
+  tty->print_raw("Store barrier inserted\n");
+}
+IRT_END
+
+IRT_ENTRY(void, InterpreterRuntime::oop_increase_access_counter(JavaThread* thread, oopDesc* obj))
+{
+  // tty->print_raw("Increasing access counter\n");
+  if (obj != NULL) {
+    tty->print_raw("oop is not null\n");
+    tty->print_cr("oop ac %lu | epoch %lu\n", obj->access_counter(), obj->gc_epoch());
+    obj->set_access_counter(0);
+    obj->set_gc_epoch(0); 
+  }
+  tty->print_raw("oop is null\n");
+  // obj->add_access_counter(1);
+}
+IRT_END
+
 //------------------------------------------------------------------------------------------------------------------------
 // Miscellaneous
 
 
 nmethod* InterpreterRuntime::frequency_counter_overflow(JavaThread* thread, address branch_bcp) {
+  // printf("InterpreterRuntime::frequency_counter_overflow called\n");
   nmethod* nm = frequency_counter_overflow_inner(thread, branch_bcp);
   assert(branch_bcp != NULL || nm == NULL, "always returns null for non OSR requests");
   if (branch_bcp != NULL && nm != NULL) {
@@ -1049,6 +1095,7 @@ nmethod* InterpreterRuntime::frequency_counter_overflow(JavaThread* thread, addr
 
 IRT_ENTRY(nmethod*,
           InterpreterRuntime::frequency_counter_overflow_inner(JavaThread* thread, address branch_bcp))
+  // printf("InterpreterRuntime::frequency_counter_overflow_inner called\n");
   if (HAS_PENDING_EXCEPTION) {
     return NULL;
   }
@@ -1089,6 +1136,7 @@ IRT_ENTRY(nmethod*,
 IRT_END
 
 IRT_LEAF(jint, InterpreterRuntime::bcp_to_di(Method* method, address cur_bcp))
+  // printf("InterpreterRuntime::bcp_to_di called\n");
   assert(ProfileInterpreter, "must be profiling interpreter");
   int bci = method->bci_from(cur_bcp);
   MethodData* mdo = method->method_data();
@@ -1097,6 +1145,7 @@ IRT_LEAF(jint, InterpreterRuntime::bcp_to_di(Method* method, address cur_bcp))
 IRT_END
 
 IRT_ENTRY(void, InterpreterRuntime::profile_method(JavaThread* thread))
+  // printf("InterpreterRuntime::profile_method called\n");
   if (HAS_PENDING_EXCEPTION) {
     return;
   }
@@ -1149,6 +1198,7 @@ IRT_END
 #endif // ASSERT
 
 IRT_ENTRY(void, InterpreterRuntime::update_mdp_for_ret(JavaThread* thread, int return_bci))
+  // printf("InterpreterRuntime::update_mdp_for_ret called\n");
   assert(ProfileInterpreter, "must be profiling interpreter");
   ResourceMark rm(thread);
   HandleMark hm(thread);
@@ -1170,6 +1220,7 @@ IRT_ENTRY(void, InterpreterRuntime::update_mdp_for_ret(JavaThread* thread, int r
 IRT_END
 
 IRT_ENTRY(MethodCounters*, InterpreterRuntime::build_method_counters(JavaThread* thread, Method* m))
+  // printf("InterpreterRuntime::build_method_counters called\n");
   MethodCounters* mcs = Method::build_method_counters(m, thread);
   if (HAS_PENDING_EXCEPTION) {
     assert((PENDING_EXCEPTION->is_a(SystemDictionary::OutOfMemoryError_klass())), "we expect only an OOM error here");
@@ -1180,6 +1231,7 @@ IRT_END
 
 
 IRT_ENTRY(void, InterpreterRuntime::at_safepoint(JavaThread* thread))
+  // printf("InterpreterRuntime::at_safepoint called\n");
   // We used to need an explict preserve_arguments here for invoke bytecodes. However,
   // stack traversal automatically takes care of preserving arguments for invoke, so
   // this is no longer needed.
@@ -1200,6 +1252,7 @@ IRT_ENTRY(void, InterpreterRuntime::post_field_access(JavaThread *thread, oopDes
 ConstantPoolCacheEntry *cp_entry))
 
   // check the access_flags for the field in the klass
+  // printf("InterpreterRuntime::post_field_access called\n");
 
   InstanceKlass* ik = InstanceKlass::cast(cp_entry->f1_as_klass());
   int index = cp_entry->field_index();
@@ -1221,6 +1274,7 @@ IRT_END
 
 IRT_ENTRY(void, InterpreterRuntime::post_field_modification(JavaThread *thread,
   oopDesc* obj, ConstantPoolCacheEntry *cp_entry, jvalue *value))
+  // printf("InterpreterRuntime::post_field_modification called\n");
 
   Klass* k = cp_entry->f1_as_klass();
 
@@ -1277,6 +1331,7 @@ IRT_ENTRY(void, InterpreterRuntime::post_field_modification(JavaThread *thread,
 IRT_END
 
 IRT_ENTRY(void, InterpreterRuntime::post_method_entry(JavaThread *thread))
+  // printf("InterpreterRuntime::post_method_entry called\n");
   LastFrameAccessor last_frame(thread);
   JvmtiExport::post_method_entry(thread, last_frame.method(), last_frame.get_frame());
 IRT_END
@@ -1286,12 +1341,14 @@ IRT_END
 // before transitioning to VM, and restore it after transitioning back
 // to Java. The return oop at the top-of-stack, is not walked by the GC.
 JRT_BLOCK_ENTRY(void, InterpreterRuntime::post_method_exit(JavaThread *thread))
+  // printf("InterpreterRuntime::post_method_exit called\n");
   LastFrameAccessor last_frame(thread);
   JvmtiExport::post_method_exit(thread, last_frame.method(), last_frame.get_frame());
 IRT_END
 
 IRT_LEAF(int, InterpreterRuntime::interpreter_contains(address pc))
 {
+  // printf("InterpreterRuntime::interpreter_contains called\n");
   return (Interpreter::contains(pc) ? 1 : 0);
 }
 IRT_END
@@ -1488,6 +1545,7 @@ address                  SignatureHandlerLibrary::_buffer       = NULL;
 
 
 IRT_ENTRY(void, InterpreterRuntime::prepare_native_call(JavaThread* thread, Method* method))
+  // printf("InterpreterRuntime::prepare_native_call called\n");
   methodHandle m(thread, method);
   assert(m->is_native(), "sanity check");
   // lookup native function entry point if it doesn't exist
@@ -1532,6 +1590,7 @@ IRT_END
 // FIXME: remove DMH case after j.l.i.InvokerBytecodeGenerator code shape is updated.
 IRT_ENTRY(void, InterpreterRuntime::member_name_arg_or_null(JavaThread* thread, address member_name,
                                                             Method* method, address bcp))
+  // printf("InterpreterRuntime::member_name_arg_or_null called\n");
   Bytecodes::Code code = Bytecodes::code_at(method, bcp);
   if (code != Bytecodes::_invokestatic) {
     return;
@@ -1560,6 +1619,7 @@ IRT_END
 // The generated code still uses call_VM because that will set up the frame pointer for
 // bcp and method.
 IRT_LEAF(intptr_t, InterpreterRuntime::trace_bytecode(JavaThread* thread, intptr_t preserve_this_value, intptr_t tos, intptr_t tos2))
+  // printf("InterpreterRuntime::trace_bytecode called\n");
   LastFrameAccessor last_frame(thread);
   assert(last_frame.is_interpreted_frame(), "must be an interpreted frame");
   methodHandle mh(thread, last_frame.method());

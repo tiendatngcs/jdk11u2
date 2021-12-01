@@ -48,3 +48,14 @@ void gc_barrier_stubs_init() {
   bs_assembler->barrier_stubs_init();
 #endif
 }
+
+void BarrierSet::oop_increase_access_counter(oop p) {
+  if (!CompressedOops::is_null(p)) {
+    // ShenandoahHeap* heap = ShenandoahHeap::heap();
+    // ShenandoahHeap *const heap = ShenandoahHeap::heap();
+    // if (heap != NULL){
+    //   heap->oop_check_to_reset_access_counter(p);
+    // }
+    p->add_access_counter(1);
+  }
+}

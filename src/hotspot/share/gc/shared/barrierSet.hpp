@@ -152,6 +152,8 @@ public:
     return _barrier_set_c2;
   }
 
+  static void oop_increase_access_counter(oop p);
+
   // The AccessBarrier of a BarrierSet subclass is called by the Access API
   // (cf. oops/access.hpp) to perform decorated accesses. GC implementations
   // may override these default access operations by declaring an
@@ -296,61 +298,65 @@ public:
     template <typename T>
     static oop oop_load_in_heap(T* addr) {
       // printf("BarrierSet::oop_load_in_heap called\n");
-      // addr_increase_access_counter(addr, 1);
-      return Raw::template oop_load<oop>(addr);
+      oop obj = Raw::template oop_load<oop>(addr);
+      oop_increase_access_counter(obj);
+      return obj;
     }
 
     static oop oop_load_in_heap_at(oop base, ptrdiff_t offset) {
       // printf("BarrierSet::oop_load_in_heap_at called\n");
-      // oop_increase_access_counter_at(base, offset, 1);
-      return Raw::template oop_load_at<oop>(base, offset);
+      oop obj = Raw::template oop_load_at<oop>(base, offset);
+      oop_increase_access_counter(obj);
+      return obj;
     }
 
     template <typename T>
     static void oop_store_in_heap(T* addr, oop value) {
       // printf("BarrierSet::oop_store_in_heap called\n");
-      // addr_increase_access_counter(addr, 1);
-      // oop_increase_access_counter(value, 1);
+      oop_increase_access_counter(RawAccess<>::oop_load(addr));
+      oop_increase_access_counter(value);
       Raw::oop_store(addr, value);
     }
 
     static void oop_store_in_heap_at(oop base, ptrdiff_t offset, oop value) {
       // printf("BarrierSet::oop_store_in_heap_at called\n");
-      // oop_increase_access_counter_at(base, offset, 1);
-      // oop_increase_access_counter(value, 1);
+      oop_increase_access_counter(RawAccess<>::oop_load(AccessInternal::oop_field_addr<decorators>(base, offset)));
+      oop_increase_access_counter(value);
       Raw::oop_store_at(base, offset, value);
     }
 
     template <typename T>
     static oop oop_atomic_cmpxchg_in_heap(oop new_value, T* addr, oop compare_value) {
       // printf("BarrierSet::oop_atomic_cmpxchg_in_heap called\n");
-      // oop_increase_access_counter(new_value, 1);
-      // addr_increase_access_counter(addr, 1);
-      // oop_increase_access_counter(compare_value, 1);
-      return Raw::oop_atomic_cmpxchg(new_value, addr, compare_value);
+      oop_increase_access_counter(new_value);
+      oop obj = Raw::oop_atomic_cmpxchg(new_value, addr, compare_value);
+      oop_increase_access_counter(obj);
+      return obj;
     }
 
     static oop oop_atomic_cmpxchg_in_heap_at(oop new_value, oop base, ptrdiff_t offset, oop compare_value) {
       // printf("BarrierSet::oop_atomic_cmpxchg_in_heap_at called\n");
-      // oop_increase_access_counter(new_value, 1);
-      // oop_increase_access_counter_at(base, offset, 1);
-      // oop_increase_access_counter(compare_value, 1);
-      return Raw::oop_atomic_cmpxchg_at(new_value, base, offset, compare_value);
+      oop_increase_access_counter(new_value);
+      oop obj = Raw::oop_atomic_cmpxchg_at(new_value, base, offset, compare_value);
+      oop_increase_access_counter(obj);
+      return obj;
     }
 
     template <typename T>
     static oop oop_atomic_xchg_in_heap(oop new_value, T* addr) {
       // printf("BarrierSet::oop_atomic_xchg_in_heap called\n");
-      // oop_increase_access_counter(new_value, 1);
-      // addr_increase_access_counter(addr, 1);
-      return Raw::oop_atomic_xchg(new_value, addr);
+      oop_increase_access_counter(new_value);
+      oop obj = Raw::oop_atomic_xchg(new_value, addr);
+      oop_increase_access_counter(obj);
+      return obj;
     }
 
     static oop oop_atomic_xchg_in_heap_at(oop new_value, oop base, ptrdiff_t offset) {
       // printf("BarrierSet::oop_atomic_xchg_in_heap_at called\n");
-      // oop_increase_access_counter(new_value, 1);
-      // oop_increase_access_counter_at(base, offset, 1);
-      return Raw::oop_atomic_xchg_at(new_value, base, offset);
+      oop_increase_access_counter(new_value);
+      oop obj = Raw::oop_atomic_xchg_at(new_value, base, offset);
+      oop_increase_access_counter(obj);
+      return obj;
     }
 
     template <typename T>
@@ -364,46 +370,48 @@ public:
     template <typename T>
     static oop oop_load_not_in_heap(T* addr) {
       // printf("BarrierSet::oop_load_not_in_heap called\n");
-      // addr_increase_access_counter(addr, 1);
-      return Raw::template oop_load<oop>(addr);
+      oop obj = Raw::template oop_load<oop>(addr);
+      // oop_increase_access_counter(obj);
+      return obj;
     }
 
     template <typename T>
     static void oop_store_not_in_heap(T* addr, oop value) {
       // printf("BarrierSet::oop_store_not_in_heap called\n");
-      // addr_increase_access_counter(addr, 1);
-      // oop_increase_access_counter(value, 1);
+      // oop_increase_access_counter(RawAccess<>::oop_load(addr));
+      // oop_increase_access_counter(value);
       Raw::oop_store(addr, value);
     }
 
     template <typename T>
     static oop oop_atomic_cmpxchg_not_in_heap(oop new_value, T* addr, oop compare_value) {
       // printf("BarrierSet::oop_atomic_cmpxchg_not_in_heap called\n");
-      // oop_increase_access_counter(new_value, 1);
-      // addr_increase_access_counter(addr, 1);
-      // oop_increase_access_counter(compare_value, 1);
-      return Raw::oop_atomic_cmpxchg(new_value, addr, compare_value);
+      // oop_increase_access_counter(new_value);
+      oop obj = Raw::oop_atomic_cmpxchg(new_value, addr, compare_value);
+      // oop_increase_access_counter(obj);
+      return obj;
     }
 
     template <typename T>
     static oop oop_atomic_xchg_not_in_heap(oop new_value, T* addr) {
       // printf("BarrierSet::oop_atomic_xchg_not_in_heap called\n");
-      // oop_increase_access_counter(new_value, 1);
-      // addr_increase_access_counter(addr, 1);
-      return Raw::oop_atomic_xchg(new_value, addr);
+      // oop_increase_access_counter(new_value);
+      oop obj = Raw::oop_atomic_xchg(new_value, addr);
+      // oop_increase_access_counter(obj);
+      return obj;
     }
 
     // Clone barrier support
     static void clone_in_heap(oop src, oop dst, size_t size) {
       // printf("BarrierSet::clone_in_heap called\n");
-      // oop_increase_access_counter(src, 1);
-      // oop_increase_access_counter(dst, 1);
+      oop_increase_access_counter(src);
+      oop_increase_access_counter(dst);
       Raw::clone(src, dst, size);
     }
 
     static oop resolve(oop obj) {
       // printf("BarrierSet::resolve called\n");
-      // oop_increase_access_counter(obj, 1);
+      oop_increase_access_counter(obj);
       return Raw::resolve(obj);
     }
 

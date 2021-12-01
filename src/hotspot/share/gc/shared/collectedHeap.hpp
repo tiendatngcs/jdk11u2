@@ -125,6 +125,7 @@ class CollectedHeap : public CHeapObj<mtInternal> {
   GCCause::Cause _gc_lastcause;
   PerfStringVariable* _perf_gc_cause;
   PerfStringVariable* _perf_gc_lastcause;
+  uintptr_t _gc_epoch;
 
   // Constructor
   CollectedHeap();
@@ -421,6 +422,26 @@ class CollectedHeap : public CHeapObj<mtInternal> {
   }
 
   void increment_total_full_collections() { _total_full_collections++; }
+
+  uintptr_t gc_epoch() { return _gc_epoch; }
+
+  void set_gc_epoch(uintptr_t newval) {
+    _gc_epoch = newval;
+  } 
+
+  void increase_gc_epoch(uintptr_t increment) {
+    uintptr_t current_epoch = gc_epoch();
+    // code below prevents overflow
+    if (UINTPTR_MAX - increment > current_epoch){
+      set_gc_epoch(current_epoch + increment);
+    }
+    else {
+      printf("GC epoch reaches UINTPTR_MAX\n");
+      if (current_epoch < UINTPTR_MAX){
+        set_gc_epoch(UINTPTR_MAX);
+      }
+    }
+  }
 
   // Return the CollectorPolicy for the heap
   virtual CollectorPolicy* collector_policy() const = 0;

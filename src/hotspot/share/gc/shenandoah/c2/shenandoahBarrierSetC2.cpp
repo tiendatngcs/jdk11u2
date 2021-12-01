@@ -51,6 +51,7 @@ ShenandoahBarrierSetC2State::ShenandoahBarrierSetC2State(Arena* comp_arena)
 }
 
 int ShenandoahBarrierSetC2State::iu_barriers_count() const {
+  // printf("ShenandoahBarrierSetC2::iu_barriers_count called\n");
   return _iu_barriers->length();
 }
 
@@ -59,36 +60,43 @@ ShenandoahIUBarrierNode* ShenandoahBarrierSetC2State::iu_barrier(int idx) const 
 }
 
 void ShenandoahBarrierSetC2State::add_iu_barrier(ShenandoahIUBarrierNode * n) {
+  // printf("ShenandoahBarrierSetC2::add_iu_barrier called\n");
   assert(!_iu_barriers->contains(n), "duplicate entry in barrier list");
   _iu_barriers->append(n);
 }
 
 void ShenandoahBarrierSetC2State::remove_iu_barrier(ShenandoahIUBarrierNode * n) {
+  // printf("ShenandoahBarrierSetC2::remove_iu_barrier called\n");
   if (_iu_barriers->contains(n)) {
     _iu_barriers->remove(n);
   }
 }
 
 int ShenandoahBarrierSetC2State::load_reference_barriers_count() const {
+  // printf("ShenandoahBarrierSetC2::load_reference_barriers_count called\n");
   return _load_reference_barriers->length();
 }
 
 ShenandoahLoadReferenceBarrierNode* ShenandoahBarrierSetC2State::load_reference_barrier(int idx) const {
+  // printf("ShenandoahBarrierSetC2::load_reference_barrier called\n");
   return _load_reference_barriers->at(idx);
 }
 
 void ShenandoahBarrierSetC2State::add_load_reference_barrier(ShenandoahLoadReferenceBarrierNode * n) {
+  // printf("ShenandoahBarrierSetC2::add_load_reference_barrier called\n");
   assert(!_load_reference_barriers->contains(n), "duplicate entry in barrier list");
   _load_reference_barriers->append(n);
 }
 
 void ShenandoahBarrierSetC2State::remove_load_reference_barrier(ShenandoahLoadReferenceBarrierNode * n) {
+  // printf("ShenandoahBarrierSetC2::remove_load_reference_barrier called\n");
   if (_load_reference_barriers->contains(n)) {
     _load_reference_barriers->remove(n);
   }
 }
 
 Node* ShenandoahBarrierSetC2::shenandoah_iu_barrier(GraphKit* kit, Node* obj) const {
+  // printf("ShenandoahBarrierSetC2::shenandoah_iu_barrier called\n");
   if (ShenandoahIUBarrier) {
     return kit->gvn().transform(new ShenandoahIUBarrierNode(obj));
   }
@@ -99,6 +107,7 @@ Node* ShenandoahBarrierSetC2::shenandoah_iu_barrier(GraphKit* kit, Node* obj) co
 
 bool ShenandoahBarrierSetC2::satb_can_remove_pre_barrier(GraphKit* kit, PhaseTransform* phase, Node* adr,
                                                          BasicType bt, uint adr_idx) const {
+  // printf("ShenandoahBarrierSetC2::satb_can_remove_pre_barrier called\n");
   intptr_t offset = 0;
   Node* base = AddPNode::Ideal_base_and_offset(adr, phase, offset);
   AllocateNode* alloc = AllocateNode::Ideal_allocation(base, phase);
@@ -196,6 +205,7 @@ void ShenandoahBarrierSetC2::satb_write_barrier_pre(GraphKit* kit,
                                                     BasicType bt) const {
   // Some sanity checks
   // Note: val is unused in this routine.
+  // printf("ShenandoahBarrierSetC2::satb_write_barrier_pre called\n");
 
   if (do_load) {
     // We need to generate the load of the previous value
@@ -343,6 +353,7 @@ void ShenandoahBarrierSetC2::shenandoah_write_barrier_pre(GraphKit* kit,
                                                           const TypeOopPtr* val_type,
                                                           Node* pre_val,
                                                           BasicType bt) const {
+  // printf("ShenandoahBarrierSetC2::shenandoah_write_barrier_pre called\n");
   if (ShenandoahSATBBarrier) {
     IdealKit ideal(kit);
     kit->sync_kit(ideal);
@@ -367,6 +378,8 @@ void ShenandoahBarrierSetC2::insert_pre_barrier(GraphKit* kit, Node* base_oop, N
   // Some compile time checks.
 
   // If offset is a constant, is it java_lang_ref_Reference::_reference_offset?
+
+  // printf("ShenandoahBarrierSetC2::insert_pre_barrier called\n");
   const TypeX* otype = offset->find_intptr_t_type();
   if (otype != NULL && otype->is_con() &&
       otype->get_con() != java_lang_ref_Reference::referent_offset) {
@@ -888,6 +901,7 @@ void ShenandoahBarrierSetC2::eliminate_gc_barrier(PhaseMacroExpand* macro, Node*
 }
 
 void ShenandoahBarrierSetC2::shenandoah_eliminate_wb_pre(Node* call, PhaseIterGVN* igvn) const {
+  // printf("ShenandoahBarrierSetC2::shenandoah_eliminate_wb_pre called\n");
   assert(UseShenandoahGC && is_shenandoah_wb_pre_call(call), "");
   Node* c = call->as_Call()->proj_out(TypeFunc::Control);
   c = c->unique_ctrl_out();
@@ -909,6 +923,7 @@ void ShenandoahBarrierSetC2::shenandoah_eliminate_wb_pre(Node* call, PhaseIterGV
 }
 
 void ShenandoahBarrierSetC2::enqueue_useful_gc_barrier(Unique_Node_List &worklist, Node* node) const {
+  // printf("ShenandoahBarrierSetC2::enqueue_useful_gc_barrier called\n");
   if (node->Opcode() == Op_AddP && ShenandoahBarrierSetC2::has_only_shenandoah_wb_pre_uses(node)) {
     for (DUIterator_Fast imax, i = node->fast_outs(imax); i < imax; i++) {
       Node* use = node->fast_out(i);
@@ -918,6 +933,7 @@ void ShenandoahBarrierSetC2::enqueue_useful_gc_barrier(Unique_Node_List &worklis
 }
 
 void ShenandoahBarrierSetC2::eliminate_useless_gc_barriers(Unique_Node_List &useful) const {
+  // printf("ShenandoahBarrierSetC2::eliminate_useless_gc_barriers called\n");
   for (uint i = 0; i < useful.size(); i++) {
     Node* n = useful.at(i);
     if (n->Opcode() == Op_AddP && ShenandoahBarrierSetC2::has_only_shenandoah_wb_pre_uses(n)) {
@@ -1044,6 +1060,7 @@ bool ShenandoahBarrierSetC2::has_only_shenandoah_wb_pre_uses(Node* n) {
 }
 
 Node* ShenandoahBarrierSetC2::arraycopy_load_reference_barrier(PhaseGVN *phase, Node* v) {
+  // printf("ShenandoahBarrierSetC2::arraycopy_load_reference_barrier called\n");
   if (ShenandoahLoadRefBarrier) {
     return phase->transform(new ShenandoahLoadReferenceBarrierNode(NULL, v));
   }

@@ -184,7 +184,7 @@ private:
   size_t _histogram[20];
   size_t _size_histogram[20];
 
-  uintptr_t _gc_epoch;
+  // uintptr_t _gc_epoch;
 
   // uint32_t _neutral_to_hot_count;
   // uint32_t _neutral_to_cold_count;
@@ -244,7 +244,7 @@ public:
   void reset_histogram();
 
 
-  void increase_gc_epoch(uintptr_t increment);
+  // void increase_gc_epoch(uintptr_t increment);
 
   // void increase_neutral_to_hot_count(uint32_t increment);
   // void set_neutral_to_hot_count(uint32_t value);
@@ -258,7 +258,7 @@ public:
   void increase_hot_to_cold_count(uint32_t increment);
   void set_hot_to_cold_count(uint32_t value);
 
-  void oop_check_to_reset_access_counter(oop obj);
+  // void oop_check_to_reset_access_counter(oop obj);
 
   // size_t neutral_size() const;
   size_t cold_size()    const;
@@ -273,7 +273,7 @@ public:
   const size_t* size_histogram() const;
   // std::string histogram_in_string() const;
 
-  uintptr_t gc_epoch() const;
+  // uintptr_t gc_epoch() const;
 
   uint32_t neutral_to_hot_count()   const;
   uint32_t neutral_to_cold_count()  const;

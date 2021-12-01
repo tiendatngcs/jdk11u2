@@ -105,6 +105,12 @@ class InterpreterRuntime: AllStatic {
 #endif // CC_INTERP
 
   static void resolve_from_cache(JavaThread* thread, Bytecodes::Code bytecode);
+  static void print_something(JavaThread* thread);
+  static void print_load_barrier(JavaThread* thread);
+  static void print_store_barrier(JavaThread* thread);
+
+  static void oop_increase_access_counter(JavaThread* thread, oopDesc* obj);
+
  private:
   // Statics & fields
   static void resolve_get_put(JavaThread* thread, Bytecodes::Code bytecode);

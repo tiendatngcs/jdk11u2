@@ -218,6 +218,7 @@ address    TemplateInterpreter::_wentry_point[DispatchTable::length];
  * Returns the return entry table for the given invoke bytecode.
  */
 address* TemplateInterpreter::invoke_return_entry_table_for(Bytecodes::Code code) {
+  printf("TemplateInterpreter::invoke_return_entry_table_for called\n");
   switch (code) {
   case Bytecodes::_invokestatic:
   case Bytecodes::_invokespecial:

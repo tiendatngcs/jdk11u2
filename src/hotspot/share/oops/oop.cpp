@@ -35,6 +35,8 @@
 
 bool always_do_update_barrier = false;
 
+uintptr_t oopDesc::static_gc_epoch = 0;
+
 oopDesc::oopDesc(){
   printf("New oopdesc created\n");
   set_access_counter(0);

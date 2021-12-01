@@ -30,7 +30,7 @@
 
 void ModRefBarrierSetAssembler::arraycopy_prologue(MacroAssembler* masm, DecoratorSet decorators, BasicType type,
                                                    Register src, Register dst, Register count) {
-  printf("ModRefBarrierSetAssembler::arraycopy_prologue called\n");
+  // tty->print_cr("ModRefBarrierSetAssembler::arraycopy_prologue called\n");
   bool checkcast = (decorators & ARRAYCOPY_CHECKCAST) != 0;
   bool disjoint = (decorators & ARRAYCOPY_DISJOINT) != 0;
   bool obj_int = type == T_OBJECT LP64_ONLY(&& UseCompressedOops);
@@ -57,6 +57,7 @@ void ModRefBarrierSetAssembler::arraycopy_prologue(MacroAssembler* masm, Decorat
 
 void ModRefBarrierSetAssembler::arraycopy_epilogue(MacroAssembler* masm, DecoratorSet decorators, BasicType type,
                                                    Register src, Register dst, Register count) {
+  // tty->print_cr("ModRefBarrierSetAssembler::arraycopy_epilogue called\n");
   bool checkcast = (decorators & ARRAYCOPY_CHECKCAST) != 0;
   bool disjoint = (decorators & ARRAYCOPY_DISJOINT) != 0;
   bool obj_int = type == T_OBJECT LP64_ONLY(&& UseCompressedOops);
@@ -86,6 +87,7 @@ void ModRefBarrierSetAssembler::arraycopy_epilogue(MacroAssembler* masm, Decorat
 
 void ModRefBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet decorators, BasicType type,
                                          Address dst, Register val, Register tmp1, Register tmp2) {
+  // tty->print_cr("ModRefBarrierSetAssembler::store_at called\n");
   if (type == T_OBJECT || type == T_ARRAY) {
     oop_store_at(masm, decorators, type, dst, val, tmp1, tmp2);
   } else {
