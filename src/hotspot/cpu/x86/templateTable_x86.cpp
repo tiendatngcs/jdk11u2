@@ -165,9 +165,10 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
     bool is_array = (decorators & IS_ARRAY) != 0;
     if (dst.base() != noreg) {
       if (!is_array) {
-        __ movptr(c_rarg1, dst.base());
+        __ push(rax);
+        __ movptr(rax, dst.base());
         // __ store_check(obj.base());
-        __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), c_rarg1);
+        __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), rax);
       }
       // else {
       //   __ movptr(c_rarg0, dst.base());
