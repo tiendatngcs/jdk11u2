@@ -168,7 +168,7 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
         // __ push(rax);
         // __ movptr(rax, dst.base());
         // __ leaq(rax, dst)
-        __ movptr(rax, dst.base());
+        __ movptr(rax, dst);
 
         __ verify_oop(rax);
         __ push(rax);
