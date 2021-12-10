@@ -159,6 +159,11 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
                          DecoratorSet decorators = 0) {
   assert(val == noreg || val == rax, "parameter is just for looks");
   bool is_array = (decorators & IS_ARRAY) != 0;
+  if (val == noreg){
+    __ store_heap_oop(dst, val, rdx, rbx, decorators);
+    return;
+  } 
+    
   if (!is_array) __ movptr(c_rarg0, dst.base());
   __ store_heap_oop(dst, val, rdx, rbx, decorators);
   // printf("do_oop_store called\n");
