@@ -151,8 +151,8 @@ static Assembler::Condition j_not(TemplateTable::Condition cc) {
 static void do_oop_store(InterpreterMacroAssembler* _masm,
                          Address dst,
                          Register val,
-                         DecoratorSet decorators = 0,
-                         BarrierSet::Name barrier) {
+                         BarrierSet::Name barrier,
+                         DecoratorSet decorators = 0) {
   assert(val == noreg || val == rax, "parameter is just for looks");
   __ store_heap_oop(dst, val, rdx, rbx, decorators);
   // printf("do_oop_store called\n");
