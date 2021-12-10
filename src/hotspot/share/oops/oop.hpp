@@ -56,8 +56,8 @@ class oopDesc {
   friend class VMStructs;
   friend class JVMCIVMStructs;
  private:
-  volatile uintptr_t _access_counter;
-  volatile uintptr_t _gc_epoch;
+  uintptr_t _access_counter;
+  uintptr_t _gc_epoch;
   volatile markOop _mark;
   union _metadata {
     Klass*      _klass;
