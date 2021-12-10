@@ -44,13 +44,11 @@
 // We need a separate file to avoid circular references
 
 uintptr_t oopDesc::access_counter() const {
-  return _access_counter;
-  // return HeapAccess<MO_RELAXED>::load_at(as_oop(), access_counter_offset_in_bytes());
+  return HeapAccess<MO_RELAXED>::load_at(as_oop(), access_counter_offset_in_bytes());
 }
 
 void oopDesc::set_access_counter(uintptr_t new_value){
-  _access_counter = new_value;
-  // HeapAccess<MO_RELAXED>::store_at(as_oop(), access_counter_offset_in_bytes(), new_value);
+  HeapAccess<MO_RELAXED>::store_at(as_oop(), access_counter_offset_in_bytes(), new_value);
   // if (new_value == 0){
   //   // printf("ac is set to: %lu\n", access_counter());
   // }
@@ -71,13 +69,11 @@ void oopDesc::add_access_counter(uintptr_t increment) {
 }
 
 uintptr_t oopDesc::gc_epoch() const {
-  return _gc_epoch;
-  // return HeapAccess<MO_RELAXED>::load_at(as_oop(), gc_epoch_offset_in_bytes());
+  return HeapAccess<MO_RELAXED>::load_at(as_oop(), gc_epoch_offset_in_bytes());
 }
 
 void oopDesc::set_gc_epoch(uintptr_t new_value){
-  // HeapAccess<MO_RELAXED>::store_at(as_oop(), gc_epoch_offset_in_bytes(), new_value);
-  _gc_epoch = new_value;
+  HeapAccess<MO_RELAXED>::store_at(as_oop(), gc_epoch_offset_in_bytes(), new_value);
 }
 
 void oopDesc::add_gc_epoch(uintptr_t increment) {
