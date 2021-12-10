@@ -168,9 +168,13 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
         // __ push(rax);
         // __ movptr(rax, dst.base());
         // __ leaq(rax, dst)
-        __ movptr(rax, dst);
+        __ mov(rax, dst);
+
+        __ verify_oop(rax);
+        __ push(rax);
         // __ store_check(obj.base());
         __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), rax);
+        __ pop(rax);
       }
       // else {
       //   __ movptr(c_rarg0, dst.base());
