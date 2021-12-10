@@ -164,32 +164,35 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
     return;
   } 
     
-  if (!is_array) __ movptr(c_rarg0, dst.base());
+  // if (!is_array) __ movptr(c_rarg0, dst.base());
+  if (barrier == BarrierSet::ShenandoahBarrierSet) {
+    __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), dst.base());
+  }
   __ store_heap_oop(dst, val, rdx, rbx, decorators);
   // printf("do_oop_store called\n");
-  if (barrier == BarrierSet::ShenandoahBarrierSet) {
-    // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
-    if (val != noreg) {
-      if (!is_array) {
-        // __ push(rax);
-        // __ movptr(rax, dst.base());
-        // __ leaq(rax, dst)
-        // __ movptr(rax, dst);
+  // if (barrier == BarrierSet::ShenandoahBarrierSet) {
+  //   // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
+  //   if (val != noreg) {
+  //     if (!is_array) {
+  //       // __ push(rax);
+  //       // __ movptr(rax, dst.base());
+  //       // __ leaq(rax, dst)
+  //       // __ movptr(rax, dst);
 
-        __ verify_oop(c_rarg0);
-        // __ push(rax);
-        // __ store_check(obj.base());
-        __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), c_rarg0);
-        // __ pop(rax);
-      }
-      // else {
-      //   __ movptr(c_rarg0, dst.base());
-      //   // __ store_check(obj.base());
-      //   __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), c_rarg0);
+  //       __ verify_oop(c_rarg0);
+  //       // __ push(rax);
+  //       // __ store_check(obj.base());
+  //       __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), c_rarg0);
+  //       // __ pop(rax);
+  //     }
+  //     // else {
+  //     //   __ movptr(c_rarg0, dst.base());
+  //     //   // __ store_check(obj.base());
+  //     //   __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), c_rarg0);
 
-      // }
-    }
-  }
+  //     // }
+  //   }
+  // }
 }
 
 static void do_oop_load(InterpreterMacroAssembler* _masm,
