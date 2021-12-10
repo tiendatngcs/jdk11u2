@@ -159,7 +159,7 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
                          DecoratorSet decorators = 0) {
   assert(val == noreg || val == rax, "parameter is just for looks");
   __ store_heap_oop(dst, val, rdx, rbx, decorators);
-  printf("do_oop_store called\n");
+  // printf("do_oop_store called\n");
   if (barrier == BarrierSet::ShenandoahBarrierSet) {
     __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
   }
@@ -171,6 +171,9 @@ static void do_oop_load(InterpreterMacroAssembler* _masm,
                         DecoratorSet decorators = 0) {
   __ load_heap_oop(dst, src, rdx, rbx, decorators);
   // printf("do_oop_load called\n");
+  if (barrier == BarrierSet::ShenandoahBarrierSet) {
+    __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
+  }
 }
 
 Address TemplateTable::at_bcp(int offset) {
