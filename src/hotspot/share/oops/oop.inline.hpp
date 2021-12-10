@@ -77,7 +77,7 @@ uintptr_t oopDesc::gc_epoch() const {
 
 void oopDesc::set_gc_epoch(uintptr_t new_value){
   // HeapAccess<MO_RELAXED>::store_at(as_oop(), gc_epoch_offset_in_bytes(), new_value);
-  return _gc_epoch = new_value;
+  _gc_epoch = new_value;
 }
 
 void oopDesc::add_gc_epoch(uintptr_t increment) {
