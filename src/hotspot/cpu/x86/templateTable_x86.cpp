@@ -164,12 +164,12 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
     // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
     bool is_array = (decorators & IS_ARRAY) != 0;
     if (is_array) {
-      __ movptr(c_rarg1, obj.base());
+      __ movptr(c_rarg1, dst.base());
       // __ store_check(obj.base());
       __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), c_rarg1);
     }
     else {
-      __ movptr(c_rarg0, obj.base());
+      __ movptr(c_rarg0, dst.base());
       // __ store_check(obj.base());
       __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), c_rarg0);
 
