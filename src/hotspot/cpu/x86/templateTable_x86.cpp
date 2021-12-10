@@ -165,7 +165,7 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
   } 
     
   // if (!is_array) __ movptr(c_rarg0, dst.base());
-  if (barrier == BarrierSet::ShenandoahBarrierSet) {
+  if (barrier == BarrierSet::ShenandoahBarrierSet && !is_array) {
     __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), dst.base());
   }
   __ store_heap_oop(dst, val, rdx, rbx, decorators);
