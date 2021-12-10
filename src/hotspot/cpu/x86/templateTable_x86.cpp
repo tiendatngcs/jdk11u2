@@ -166,7 +166,9 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
     if (dst.base() != noreg) {
       if (!is_array) {
         // __ push(rax);
-        __ movptr(rax, dst.base());
+        // __ movptr(rax, dst.base());
+        // __ leaq(rax, dst)
+        __ movptr(rax, dst);
         // __ store_check(obj.base());
         __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), rax);
       }
