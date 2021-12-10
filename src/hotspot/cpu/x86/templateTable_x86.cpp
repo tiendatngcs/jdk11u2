@@ -168,6 +168,7 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
 static void do_oop_load(InterpreterMacroAssembler* _masm,
                         Address src,
                         Register dst,
+                        BarrierSet::Name barrier,
                         DecoratorSet decorators = 0) {
   __ load_heap_oop(dst, src, rdx, rbx, decorators);
   // printf("do_oop_load called\n");
@@ -844,6 +845,7 @@ void TemplateTable::aaload() {
                       UseCompressedOops ? Address::times_4 : Address::times_ptr,
                       arrayOopDesc::base_offset_in_bytes(T_OBJECT)),
               rax,
+              _bs->kind(),
               IS_ARRAY);
 }
 
@@ -2991,7 +2993,7 @@ void TemplateTable::getfield_or_static(int byte_no, bool is_static, RewriteContr
   __ cmpl(flags, atos);
   __ jcc(Assembler::notEqual, notObj);
   // atos
-  do_oop_load(_masm, field, rax);
+  do_oop_load(_masm, field, rax, _bs->kind());
   __ push(atos);
   if (!is_static && rc == may_rewrite) {
     patch_bytecode(Bytecodes::_fast_agetfield, bc, rbx);
@@ -3598,7 +3600,7 @@ void TemplateTable::fast_accessfield(TosState state) {
   // access field
   switch (bytecode()) {
   case Bytecodes::_fast_agetfield:
-    do_oop_load(_masm, field, rax);
+    do_oop_load(_masm, field, rax, _bs->kind());
     __ verify_oop(rax);
     break;
   case Bytecodes::_fast_lgetfield:
@@ -3660,7 +3662,7 @@ void TemplateTable::fast_xaccess(TosState state) {
     __ access_load_at(T_INT, IN_HEAP, rax, field, noreg, noreg);
     break;
   case atos:
-    do_oop_load(_masm, field, rax);
+    do_oop_load(_masm, field, rax, _bs->kind());
     __ verify_oop(rax);
     break;
   case ftos:
