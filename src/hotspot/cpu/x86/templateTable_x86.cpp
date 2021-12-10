@@ -164,7 +164,7 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
   // printf("do_oop_store called\n");
   if (barrier == BarrierSet::ShenandoahBarrierSet) {
     // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
-    if (dst.base() != noreg) {
+    if (val != noreg) {
       if (!is_array) {
         // __ push(rax);
         // __ movptr(rax, dst.base());
