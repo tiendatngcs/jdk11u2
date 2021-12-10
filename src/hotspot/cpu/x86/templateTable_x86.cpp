@@ -151,10 +151,14 @@ static Assembler::Condition j_not(TemplateTable::Condition cc) {
 static void do_oop_store(InterpreterMacroAssembler* _masm,
                          Address dst,
                          Register val,
-                         DecoratorSet decorators = 0) {
+                         DecoratorSet decorators = 0,
+                         BarrierSet::Name barrier) {
   assert(val == noreg || val == rax, "parameter is just for looks");
   __ store_heap_oop(dst, val, rdx, rbx, decorators);
-  printf("do_oop_store called\n");
+  // printf("do_oop_store called\n");
+  if (barrier == BarrierSet::ShenandoahBarrierSet) {
+    __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
+  }
 }
 
 static void do_oop_load(InterpreterMacroAssembler* _masm,
@@ -162,7 +166,7 @@ static void do_oop_load(InterpreterMacroAssembler* _masm,
                         Register dst,
                         DecoratorSet decorators = 0) {
   __ load_heap_oop(dst, src, rdx, rbx, decorators);
-  printf("do_oop_load called\n");
+  // printf("do_oop_load called\n");
 }
 
 Address TemplateTable::at_bcp(int offset) {
@@ -1183,7 +1187,7 @@ void TemplateTable::aastore() {
   __ movptr(rax, at_tos());
   __ movl(rcx, at_tos_p1()); // index
   // Now store using the appropriate barrier
-  do_oop_store(_masm, element_address, rax, IS_ARRAY);
+  do_oop_store(_masm, element_address, rax, _bs->kind(), IS_ARRAY);
   __ jmp(done);
 
   // Have a NULL in rax, rdx=array, ecx=index.  Store NULL at ary[idx]
@@ -1191,7 +1195,7 @@ void TemplateTable::aastore() {
   __ profile_null_seen(rbx);
 
   // Store a NULL
-  do_oop_store(_masm, element_address, noreg, IS_ARRAY);
+  do_oop_store(_masm, element_address, noreg, _bs->kind(), IS_ARRAY);
 
   // Pop stack arguments
   __ bind(done);
@@ -3242,7 +3246,7 @@ void TemplateTable::putfield_or_static(int byte_no, bool is_static, RewriteContr
     __ pop(atos);
     if (!is_static) pop_and_check_object(obj);
     // Store into the field
-    do_oop_store(_masm, field, rax);
+    do_oop_store(_masm, field, rax, _bs->kind());
     if (!is_static && rc == may_rewrite) {
       patch_bytecode(Bytecodes::_fast_aputfield, bc, rbx, true, byte_no);
     }
@@ -3490,7 +3494,7 @@ void TemplateTable::fast_storefield(TosState state) {
   // access field
   switch (bytecode()) {
   case Bytecodes::_fast_aputfield:
-    do_oop_store(_masm, field, rax);
+    do_oop_store(_masm, field, rax, _bs->kind());
     break;
   case Bytecodes::_fast_lputfield:
 #ifdef _LP64
