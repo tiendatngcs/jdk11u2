@@ -165,25 +165,25 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
   //     break;
   // }
   // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
-  // if (barrier == BarrierSet::ShenandoahBarrierSet) {
-  //   // const Register rarg_a = LP64_ONLY(c_rarg2)   NOT_LP64(rax);
-  //   // const Register rarg_b  = LP64_ONLY(c_rarg1)   NOT_LP64(rbx);
-  //   // const Register rarg_c  = LP64_ONLY(c_rarg3)   NOT_LP64(rcx);
-  //   // const Register rarg_d  = LP64_ONLY(rscratch1) NOT_LP64(rdx);
-  //   __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
-  //   if (val != noreg) {
-  //     __ movptr(rax, val);
-  //     __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::oop_increase_access_counter), rax);
-  //   }
-  //   // if (decorators == IS_ARRAY && rdx != noreg){
-  //   //   // array oop is previously stored in rdx, please check before making any change
-  //   //   __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::oop_increase_access_counter), rdx);
-  //   // }
-  //   __ movptr(rcx, dst.base());
-  //   // array element or field
-  //   __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::oop_increase_access_counter), rcx);
-  //   // call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::oop_increase_access_counter), val);
-  // }
+  if (barrier == BarrierSet::ShenandoahBarrierSet) {
+    // const Register rarg_a = LP64_ONLY(c_rarg2)   NOT_LP64(rax);
+    // const Register rarg_b  = LP64_ONLY(c_rarg1)   NOT_LP64(rbx);
+    // const Register rarg_c  = LP64_ONLY(c_rarg3)   NOT_LP64(rcx);
+    // const Register rarg_d  = LP64_ONLY(rscratch1) NOT_LP64(rdx);
+    __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
+    // if (val != noreg) {
+    //   __ movptr(rax, val);
+    //   __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::oop_increase_access_counter), rax);
+    // }
+    // // if (decorators == IS_ARRAY && rdx != noreg){
+    // //   // array oop is previously stored in rdx, please check before making any change
+    // //   __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::oop_increase_access_counter), rdx);
+    // // }
+    // __ movptr(rcx, dst.base());
+    // // array element or field
+    // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::oop_increase_access_counter), rcx);
+    // // call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::oop_increase_access_counter), val);
+  }
   __ store_heap_oop(dst, val, rdx, rbx, decorators);
 }
 
