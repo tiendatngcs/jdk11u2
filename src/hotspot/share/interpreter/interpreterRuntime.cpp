@@ -465,6 +465,7 @@ IRT_ENTRY(void, InterpreterRuntime::print_something(JavaThread* thread))
 IRT_END
 
 IRT_ENTRY(void, InterpreterRuntime::write_barrier(JavaThread* thread, oopDesc* obj))
+  bool is_oop = obj->is_oop();
   obj->add_access_counter(1);
 IRT_END
 
