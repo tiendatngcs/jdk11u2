@@ -165,7 +165,7 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
     bool is_array = (decorators & IS_ARRAY) != 0;
     if (dst.base() != noreg) {
       if (!is_array) {
-        __ push(rax);
+        // __ push(rax);
         __ movptr(rax, dst.base());
         // __ store_check(obj.base());
         __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), rax);
