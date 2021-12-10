@@ -141,7 +141,11 @@ static Assembler::Condition j_not(TemplateTable::Condition cc) {
   return Assembler::zero;
 }
 
-
+static void store_barrier(InterpreterMacroAssembler* _masm, Register obj, BarrierSet::Name barrier) {
+  if (barrier == BarrierSet::ShenandoahBarrierSet) {
+    __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
+  }
+}
 
 // Miscelaneous helper routines
 // Store an oop (or NULL) at the address described by obj.
@@ -156,9 +160,9 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
   assert(val == noreg || val == rax, "parameter is just for looks");
   __ store_heap_oop(dst, val, rdx, rbx, decorators);
   // printf("do_oop_store called\n");
-  if (barrier == BarrierSet::ShenandoahBarrierSet) {
-    __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
-  }
+  // if (barrier == BarrierSet::ShenandoahBarrierSet) {
+  //   __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
+  // }
 }
 
 static void do_oop_load(InterpreterMacroAssembler* _masm,
@@ -1160,6 +1164,8 @@ void TemplateTable::aastore() {
   Address element_address(rdx, rcx,
                           UseCompressedOops? Address::times_4 : Address::times_ptr,
                           arrayOopDesc::base_offset_in_bytes(T_OBJECT));
+
+  store_barrier(_masm, element_address.base(), _bs->kind());
 
   index_check_without_pop(rdx, rcx);     // kills rbx
   __ testptr(rax, rax);
@@ -3198,6 +3204,8 @@ void TemplateTable::putfield_or_static(int byte_no, bool is_static, RewriteContr
   __ shrl(rdx, ConstantPoolCacheEntry::is_volatile_shift);
   __ andl(rdx, 0x1);
 
+  store_barrier(_masm, obj, _bs->kind());
+
   // field addresses
   const Address field(obj, off, Address::times_1, 0*wordSize);
   NOT_LP64( const Address hi(obj, off, Address::times_1, 1*wordSize);)
@@ -3487,6 +3495,9 @@ void TemplateTable::fast_storefield(TosState state) {
 
   // Get object from stack
   pop_and_check_object(rcx);
+
+
+  store_barrier(_masm, rcx, _bs->kind());
 
   // field address
   const Address field(rcx, rbx, Address::times_1);
