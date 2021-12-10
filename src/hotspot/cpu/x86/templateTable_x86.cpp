@@ -176,7 +176,7 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
         // __ leaq(rax, dst)
         // __ movptr(rax, dst);
 
-        // __ verify_oop(rax);
+        __ verify_oop(c_rarg0);
         // __ push(rax);
         // __ store_check(obj.base());
         __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), c_rarg0);
