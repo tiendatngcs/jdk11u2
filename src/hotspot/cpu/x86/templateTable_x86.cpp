@@ -3204,7 +3204,7 @@ void TemplateTable::putfield_or_static(int byte_no, bool is_static, RewriteContr
   __ shrl(rdx, ConstantPoolCacheEntry::is_volatile_shift);
   __ andl(rdx, 0x1);
 
-  store_barrier(_masm, obj, _bs->kind());
+  // store_barrier(_masm, obj, _bs->kind());
 
   // field addresses
   const Address field(obj, off, Address::times_1, 0*wordSize);
