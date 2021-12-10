@@ -71,6 +71,7 @@ class InterpreterRuntime: AllStatic {
   static void    quicken_io_cc(JavaThread* thread);
 
   static void print_something(JavaThread* thread);
+  static void write_barrier(JavaThread* thread, oopDesc* obj);
 
   // Exceptions thrown by the interpreter
   static void    throw_AbstractMethodError(JavaThread* thread);

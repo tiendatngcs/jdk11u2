@@ -464,6 +464,10 @@ IRT_ENTRY(void, InterpreterRuntime::print_something(JavaThread* thread))
   tty->print_cr("print something");
 IRT_END
 
+IRT_ENTRY(void, InterpreterRuntime::write_barrier(JavaThread* thread, oopDesc* obj))
+  obj->add_access_counter(1);
+IRT_END
+
 // exception_handler_for_exception(...) returns the continuation address,
 // the exception oop (via TLS) and sets the bci/bcp for the continuation.
 // The exception oop is returned to make sure it is preserved over GC (it

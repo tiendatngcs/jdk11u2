@@ -161,7 +161,19 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
   __ store_heap_oop(dst, val, rdx, rbx, decorators);
   // printf("do_oop_store called\n");
   if (barrier == BarrierSet::ShenandoahBarrierSet) {
-    __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
+    // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
+    bool is_array = (decorators & IS_ARRAY) != 0;
+    if (is_array) {
+      __ movptr(c_rarg1, obj.base());
+      __ store_check(obj.base());
+      __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), c_rarg1);
+    }
+    else {
+      __ movptr(c_rarg0, obj.base());
+      __ store_check(obj.base());
+      __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), c_rarg0);
+
+    }
   }
 }
 
@@ -172,9 +184,9 @@ static void do_oop_load(InterpreterMacroAssembler* _masm,
                         DecoratorSet decorators = 0) {
   __ load_heap_oop(dst, src, rdx, rbx, decorators);
   // printf("do_oop_load called\n");
-  if (barrier == BarrierSet::ShenandoahBarrierSet) {
-    __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
-  }
+  // if (barrier == BarrierSet::ShenandoahBarrierSet) {
+  //   __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
+  // }
 }
 
 Address TemplateTable::at_bcp(int offset) {
