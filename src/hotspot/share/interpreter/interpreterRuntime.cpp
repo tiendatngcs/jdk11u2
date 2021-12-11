@@ -466,7 +466,9 @@ IRT_END
 
 IRT_ENTRY(void, InterpreterRuntime::write_barrier(JavaThread* thread, oopDesc* obj))
   bool is_oop = obj->is_oop();
-  obj->add_access_counter(1);
+  if (is_oop){
+    obj->add_access_counter(1);
+  }
 IRT_END
 
 // exception_handler_for_exception(...) returns the continuation address,
