@@ -471,6 +471,16 @@ IRT_ENTRY(void, InterpreterRuntime::write_barrier(JavaThread* thread, oopDesc* o
     obj->add_access_counter(1);
     return;
   }
+  // tty->print_cr("Is not oop");
+IRT_END
+
+IRT_ENTRY(void, InterpreterRuntime::read_barrier(JavaThread* thread, oopDesc* obj))
+  bool is_oop = oopDesc::is_oop(obj);
+  if (is_oop){
+    tty->print_cr("Is oop");
+    obj->add_access_counter(1);
+    return;
+  }
   tty->print_cr("Is not oop");
 IRT_END
 

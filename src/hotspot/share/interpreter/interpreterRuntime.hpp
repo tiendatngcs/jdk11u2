@@ -72,6 +72,7 @@ class InterpreterRuntime: AllStatic {
 
   static void print_something(JavaThread* thread);
   static void write_barrier(JavaThread* thread, oopDesc* obj);
+  static void read_barrier(JavaThread* thread, oopDesc* obj);
 
   // Exceptions thrown by the interpreter
   static void    throw_AbstractMethodError(JavaThread* thread);
