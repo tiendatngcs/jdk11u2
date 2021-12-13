@@ -200,8 +200,14 @@ static void do_oop_load(InterpreterMacroAssembler* _masm,
                         Register dst,
                         BarrierSet::Name barrier,
                         DecoratorSet decorators = 0) {
+  bool is_array = (decorators & IS_ARRAY) != 0;
+  if (barrier == BarrierSet::ShenandoahBarrierSet){
+    if (!is_array){
+      __ verify_oop(dst.base());
+      __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), src.base());
+    }
+  }
   __ load_heap_oop(dst, src, rdx, rbx, decorators);
-  printf("do_oop_load called\n");
   // if (barrier == BarrierSet::ShenandoahBarrierSet) {
   //   __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
   // }
