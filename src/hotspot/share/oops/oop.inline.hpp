@@ -44,6 +44,11 @@
 // We need a separate file to avoid circular references
 
 uintptr_t oopDesc::access_counter() const {
+  uintptr_t oop_gc_epoch = gc_epoch();
+  if (oop_gc_epoch != static_gc_epoch) {
+    set_gc_epoch(static_gc_epoch);
+    set_access_counter(0);
+  }
   return HeapAccess<MO_RELAXED>::load_at(as_oop(), access_counter_offset_in_bytes());
 }
 
