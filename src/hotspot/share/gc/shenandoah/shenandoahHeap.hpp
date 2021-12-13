@@ -258,7 +258,7 @@ public:
   void increase_hot_to_cold_count(uint32_t increment);
   void set_hot_to_cold_count(uint32_t value);
 
-  void oop_check_to_reset_access_counter(oop obj);
+  // void oop_check_to_reset_access_counter(oop obj);
 
   // size_t neutral_size() const;
   size_t cold_size()    const;

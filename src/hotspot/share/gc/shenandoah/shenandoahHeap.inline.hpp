@@ -275,7 +275,7 @@ inline oop ShenandoahHeap::evacuate_object(oop p, Thread* thread) {
 
   bool alloc_from_gclab = true;
   HeapWord* copy = NULL;
-  oop_check_to_reset_access_counter(p);
+  // oop_check_to_reset_access_counter(p);
   ShenandoahRegionAccessRate access_rate = get_access_rate_from_access_counter(p->access_counter());
 
 #ifdef ASSERT

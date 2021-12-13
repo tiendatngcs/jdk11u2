@@ -40,7 +40,7 @@ inline void ShenandoahBarrierSet::oop_increase_access_counter(oop p) {
     // ShenandoahHeap* heap = ShenandoahHeap::heap();
     ShenandoahHeap *const heap = ShenandoahHeap::heap();
     if (heap != NULL){
-      heap->oop_check_to_reset_access_counter(p);
+      // heap->oop_check_to_reset_access_counter(p);
     }
     p->add_access_counter(1);
   }
