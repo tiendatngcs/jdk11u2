@@ -203,7 +203,7 @@ static void do_oop_load(InterpreterMacroAssembler* _masm,
   bool is_array = (decorators & IS_ARRAY) != 0;
   if (barrier == BarrierSet::ShenandoahBarrierSet){
     if (!is_array){
-      __ verify_oop(dst.base());
+      __ verify_oop(src.base());
       __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), src.base());
     }
   }
