@@ -205,8 +205,8 @@ static void do_oop_load(InterpreterMacroAssembler* _masm,
   if (barrier == BarrierSet::ShenandoahBarrierSet){
     if (!is_array){
       __ push_ptr(rax);
-      __ verify_oop(rax);
-      __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), rax);
+      __ verify_oop(dst);
+      __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), dst);
       __ pop_ptr(rax);
     }
   }
