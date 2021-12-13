@@ -162,7 +162,7 @@ void ShenandoahBarrierSet::on_thread_detach(JavaThread* thread) {
 }
 
 void ShenandoahBarrierSet::clone_barrier_runtime(oop src) {
-  printf("ShenandoahBarrierSet::clone_barrier_runtime called\n");
+  // printf("ShenandoahBarrierSet::clone_barrier_runtime called\n");
   oop_increase_access_counter(src);
   if (_heap->has_forwarded_objects() || (ShenandoahIUBarrier && _heap->is_concurrent_mark_in_progress())) {
     clone_barrier(src);

@@ -30,7 +30,7 @@
 
 void ModRefBarrierSetAssembler::arraycopy_prologue(MacroAssembler* masm, DecoratorSet decorators, BasicType type,
                                                    Register src, Register dst, Register count) {
-  printf("ModRefBarrierSetAssembler::arraycopy_prologue called\n");
+  // printf("ModRefBarrierSetAssembler::arraycopy_prologue called\n");
   bool checkcast = (decorators & ARRAYCOPY_CHECKCAST) != 0;
   bool disjoint = (decorators & ARRAYCOPY_DISJOINT) != 0;
   bool obj_int = type == T_OBJECT LP64_ONLY(&& UseCompressedOops);

@@ -120,7 +120,7 @@ static void restore_machine_state(MacroAssembler* masm, bool handle_gpr, bool ha
 void ShenandoahBarrierSetAssembler::arraycopy_prologue(MacroAssembler* masm, DecoratorSet decorators, BasicType type,
                                                        Register src, Register dst, Register count) {
 
-  printf("ShenandoahBarrierSetAssembler::arraycopy_prologue called\n");
+  // printf("ShenandoahBarrierSetAssembler::arraycopy_prologue called\n");
   bool dest_uninitialized = (decorators & IS_DEST_UNINITIALIZED) != 0;
 
   if (type == T_OBJECT || type == T_ARRAY) {

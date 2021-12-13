@@ -164,12 +164,12 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
     return;
   } 
     
-  if (!is_array) __ movptr(c_rarg0, dst.base());
+  // if (!is_array) __ movptr(c_rarg0, dst.base());
   // if (barrier == BarrierSet::ShenandoahBarrierSet && !is_array) {
   //   __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), dst.base());
   // }
   __ store_heap_oop(dst, val, rdx, rbx, decorators);
-  // printf("do_oop_store called\n");
+  printf("do_oop_store called\n");
   if (barrier == BarrierSet::ShenandoahBarrierSet) {
     // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
     if (val != noreg) {
@@ -179,10 +179,10 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
         // __ leaq(rax, dst)
         // __ movptr(rax, dst);
 
-        __ verify_oop(c_rarg0);
+        __ verify_oop(dst.base());
         // __ push(rax);
         // __ store_check(obj.base());
-        __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), c_rarg0);
+        __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), dst.base());
         // __ pop(rax);
       }
       // else {
@@ -201,7 +201,7 @@ static void do_oop_load(InterpreterMacroAssembler* _masm,
                         BarrierSet::Name barrier,
                         DecoratorSet decorators = 0) {
   __ load_heap_oop(dst, src, rdx, rbx, decorators);
-  // printf("do_oop_load called\n");
+  printf("do_oop_load called\n");
   // if (barrier == BarrierSet::ShenandoahBarrierSet) {
   //   __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
   // }
@@ -811,7 +811,7 @@ void TemplateTable::index_check_without_pop(Register array, Register index) {
 }
 
 void TemplateTable::iaload() {
-  printf("iaload called\n");
+  // printf("iaload called\n");
   transition(itos, itos);
   // rax: index
   // rdx: array
@@ -823,7 +823,7 @@ void TemplateTable::iaload() {
 }
 
 void TemplateTable::laload() {
-  printf("laload called\n");
+  // printf("laload called\n");
   transition(itos, ltos);
   // rax: index
   // rdx: array
@@ -839,7 +839,7 @@ void TemplateTable::laload() {
 
 
 void TemplateTable::faload() {
-  printf("faload called\n");
+  // printf("faload called\n");
   transition(itos, ftos);
   // rax: index
   // rdx: array
@@ -852,7 +852,7 @@ void TemplateTable::faload() {
 }
 
 void TemplateTable::daload() {
-  printf("daload called\n");
+  // printf("daload called\n");
   transition(itos, dtos);
   // rax: index
   // rdx: array
@@ -865,7 +865,7 @@ void TemplateTable::daload() {
 }
 
 void TemplateTable::aaload() {
-  printf("aaload called\n");
+  // printf("aaload called\n");
   transition(itos, atos);
   // rax: index
   // rdx: array
@@ -880,7 +880,7 @@ void TemplateTable::aaload() {
 }
 
 void TemplateTable::baload() {
-  printf("baload called\n");
+  // printf("baload called\n");
   transition(itos, itos);
   // rax: index
   // rdx: array
@@ -891,7 +891,7 @@ void TemplateTable::baload() {
 }
 
 void TemplateTable::caload() {
-  printf("caload called\n");
+  // printf("caload called\n");
   transition(itos, itos);
   // rax: index
   // rdx: array
@@ -903,7 +903,7 @@ void TemplateTable::caload() {
 
 // iload followed by caload frequent pair
 void TemplateTable::fast_icaload() {
-  printf("fast_icaload called\n");
+  // printf("fast_icaload called\n");
   transition(vtos, itos);
   // load index out of locals
   locals_index(rbx);
@@ -919,7 +919,7 @@ void TemplateTable::fast_icaload() {
 
 
 void TemplateTable::saload() {
-  printf("saload called\n");
+  // printf("saload called\n");
   transition(itos, itos);
   // rax: index
   // rdx: array
@@ -930,48 +930,48 @@ void TemplateTable::saload() {
 }
 
 void TemplateTable::iload(int n) {
-  printf("iload called\n");
+  // printf("iload called\n");
   transition(vtos, itos);
   __ movl(rax, iaddress(n));
 }
 
 void TemplateTable::lload(int n) {
-  printf("lload called\n");
+  // printf("lload called\n");
   transition(vtos, ltos);
   __ movptr(rax, laddress(n));
   NOT_LP64(__ movptr(rdx, haddress(n)));
 }
 
 void TemplateTable::fload(int n) {
-  printf("fload called\n");
+  // printf("fload called\n");
   transition(vtos, ftos);
   __ load_float(faddress(n));
 }
 
 void TemplateTable::dload(int n) {
-  printf("dload called\n");
+  // printf("dload called\n");
   transition(vtos, dtos);
   __ load_double(daddress(n));
 }
 
 void TemplateTable::aload(int n) {
-  printf("aload called\n");
+  // printf("aload called\n");
   transition(vtos, atos);
   __ movptr(rax, aaddress(n));
 }
 
 void TemplateTable::aload_0() {
-  printf("aload_0 called\n");
+  // printf("aload_0 called\n");
   aload_0_internal();
 }
 
 void TemplateTable::nofast_aload_0() {
-  printf("nofast_aload_0 called\n");
+  // printf("nofast_aload_0 called\n");
   aload_0_internal(may_not_rewrite);
 }
 
 void TemplateTable::aload_0_internal(RewriteControl rc) {
-  printf("aload_0_internal called\n");
+  // printf("aload_0_internal called\n");
   transition(vtos, atos);
   // According to bytecode histograms, the pairs:
   //
@@ -1042,7 +1042,7 @@ void TemplateTable::aload_0_internal(RewriteControl rc) {
 }
 
 void TemplateTable::istore() {
-  printf("istore called\n");
+  // printf("istore called\n");
   transition(itos, vtos);
   locals_index(rbx);
   __ movl(iaddress(rbx), rax);
@@ -1050,7 +1050,7 @@ void TemplateTable::istore() {
 
 
 void TemplateTable::lstore() {
-  printf("lstore called\n");
+  // printf("lstore called\n");
   transition(ltos, vtos);
   locals_index(rbx);
   __ movptr(laddress(rbx), rax);
@@ -1058,21 +1058,21 @@ void TemplateTable::lstore() {
 }
 
 void TemplateTable::fstore() {
-  printf("fstore called\n");
+  // printf("fstore called\n");
   transition(ftos, vtos);
   locals_index(rbx);
   __ store_float(faddress(rbx));
 }
 
 void TemplateTable::dstore() {
-  printf("dstore called\n");
+  // printf("dstore called\n");
   transition(dtos, vtos);
   locals_index(rbx);
   __ store_double(daddress(rbx));
 }
 
 void TemplateTable::astore() {
-  printf("astore called\n");
+  // printf("astore called\n");
   transition(vtos, vtos);
   __ pop_ptr(rax);
   locals_index(rbx);
@@ -1080,7 +1080,7 @@ void TemplateTable::astore() {
 }
 
 void TemplateTable::wide_istore() {
-  printf("wide_istore called\n");
+  // printf("wide_istore called\n");
   transition(vtos, vtos);
   __ pop_i();
   locals_index_wide(rbx);
@@ -1088,7 +1088,7 @@ void TemplateTable::wide_istore() {
 }
 
 void TemplateTable::wide_lstore() {
-  printf("wide_lstore called\n");
+  // printf("wide_lstore called\n");
   transition(vtos, vtos);
   NOT_LP64(__ pop_l(rax, rdx));
   LP64_ONLY(__ pop_l());
@@ -1098,7 +1098,7 @@ void TemplateTable::wide_lstore() {
 }
 
 void TemplateTable::wide_fstore() {
-  printf("wide_fstore called\n");
+  // printf("wide_fstore called\n");
 #ifdef _LP64
   transition(vtos, vtos);
   __ pop_f(xmm0);
@@ -1110,7 +1110,7 @@ void TemplateTable::wide_fstore() {
 }
 
 void TemplateTable::wide_dstore() {
-  printf("wide_dstore called\n");
+  // printf("wide_dstore called\n");
 #ifdef _LP64
   transition(vtos, vtos);
   __ pop_d(xmm0);
@@ -1122,7 +1122,7 @@ void TemplateTable::wide_dstore() {
 }
 
 void TemplateTable::wide_astore() {
-  printf("wide_astore called\n");
+  // printf("wide_astore called\n");
   transition(vtos, vtos);
   __ pop_ptr(rax);
   locals_index_wide(rbx);
@@ -1130,7 +1130,7 @@ void TemplateTable::wide_astore() {
 }
 
 void TemplateTable::iastore() {
-  printf("iastore called\n");
+  // printf("iastore called\n");
   transition(itos, vtos);
   __ pop_i(rbx);
   // rax: value
@@ -1144,7 +1144,7 @@ void TemplateTable::iastore() {
 }
 
 void TemplateTable::lastore() {
-  printf("lastore called\n");
+  // printf("lastore called\n");
   transition(ltos, vtos);
   __ pop_i(rbx);
   // rax,: low(value)
@@ -1160,7 +1160,7 @@ void TemplateTable::lastore() {
 
 
 void TemplateTable::fastore() {
-  printf("fastore called\n");
+  // printf("fastore called\n");
   transition(ftos, vtos);
   __ pop_i(rbx);
   // value is in UseSSE >= 1 ? xmm0 : ST(0)
@@ -1174,7 +1174,7 @@ void TemplateTable::fastore() {
 }
 
 void TemplateTable::dastore() {
-  printf("dastore called\n");
+  // printf("dastore called\n");
   transition(dtos, vtos);
   __ pop_i(rbx);
   // value is in UseSSE >= 2 ? xmm0 : ST(0)
@@ -1188,7 +1188,7 @@ void TemplateTable::dastore() {
 }
 
 void TemplateTable::aastore() {
-  printf("aastore called\n");
+  // printf("aastore called\n");
   Label is_null, ok_is_subtype, done;
   transition(vtos, vtos);
   // stack: ..., array, index, value
@@ -1244,7 +1244,7 @@ void TemplateTable::aastore() {
 }
 
 void TemplateTable::bastore() {
-  printf("bastore called\n");
+  // printf("bastore called\n");
   transition(itos, vtos);
   __ pop_i(rbx);
   // rax: value
@@ -1268,7 +1268,7 @@ void TemplateTable::bastore() {
 }
 
 void TemplateTable::castore() {
-  printf("castore called\n");
+  // printf("castore called\n");
   transition(itos, vtos);
   __ pop_i(rbx);
   // rax: value
@@ -1283,58 +1283,58 @@ void TemplateTable::castore() {
 
 
 void TemplateTable::sastore() {
-  printf("sastore called\n");
+  // printf("sastore called\n");
   castore();
 }
 
 void TemplateTable::istore(int n) {
-  printf("istore called\n");
+  // printf("istore called\n");
   transition(itos, vtos);
   __ movl(iaddress(n), rax);
 }
 
 void TemplateTable::lstore(int n) {
-  printf("lstore called\n");
+  // printf("lstore called\n");
   transition(ltos, vtos);
   __ movptr(laddress(n), rax);
   NOT_LP64(__ movptr(haddress(n), rdx));
 }
 
 void TemplateTable::fstore(int n) {
-  printf("fstore called\n");
+  // printf("fstore called\n");
   transition(ftos, vtos);
   __ store_float(faddress(n));
 }
 
 void TemplateTable::dstore(int n) {
-  printf("dstore called\n");
+  // printf("dstore called\n");
   transition(dtos, vtos);
   __ store_double(daddress(n));
 }
 
 
 void TemplateTable::astore(int n) {
-  printf("astore called\n");
+  // printf("astore called\n");
   transition(vtos, vtos);
   __ pop_ptr(rax);
   __ movptr(aaddress(n), rax);
 }
 
 void TemplateTable::pop() {
-  printf("pop called\n");
+  // printf("pop called\n");
   transition(vtos, vtos);
   __ addptr(rsp, Interpreter::stackElementSize);
 }
 
 void TemplateTable::pop2() {
-  printf("pop2 called\n");
+  // printf("pop2 called\n");
   transition(vtos, vtos);
   __ addptr(rsp, 2 * Interpreter::stackElementSize);
 }
 
 
 void TemplateTable::dup() {
-  printf("dup called\n");
+  // printf("dup called\n");
   transition(vtos, vtos);
   __ load_ptr(0, rax);
   __ push_ptr(rax);
@@ -1342,7 +1342,7 @@ void TemplateTable::dup() {
 }
 
 void TemplateTable::dup_x1() {
-  printf("dup_x1 called\n");
+  // printf("dup_x1 called\n");
   transition(vtos, vtos);
   // stack: ..., a, b
   __ load_ptr( 0, rax);  // load b
@@ -1354,7 +1354,7 @@ void TemplateTable::dup_x1() {
 }
 
 void TemplateTable::dup_x2() {
-  printf("dup_x2 called\n");
+  // printf("dup_x2 called\n");
   transition(vtos, vtos);
   // stack: ..., a, b, c
   __ load_ptr( 0, rax);  // load c
@@ -1370,7 +1370,7 @@ void TemplateTable::dup_x2() {
 }
 
 void TemplateTable::dup2() {
-  printf("dup2 called\n");
+  // printf("dup2 called\n");
   transition(vtos, vtos);
   // stack: ..., a, b
   __ load_ptr(1, rax);  // load a
@@ -1382,7 +1382,7 @@ void TemplateTable::dup2() {
 
 
 void TemplateTable::dup2_x1() {
-  printf("dup2_x1 called\n");
+  // printf("dup2_x1 called\n");
   transition(vtos, vtos);
   // stack: ..., a, b, c
   __ load_ptr( 0, rcx);  // load c
@@ -1400,7 +1400,7 @@ void TemplateTable::dup2_x1() {
 }
 
 void TemplateTable::dup2_x2() {
-  printf("dup2_x2 called\n");
+  // printf("dup2_x2 called\n");
   transition(vtos, vtos);
   // stack: ..., a, b, c, d
   __ load_ptr( 0, rcx);  // load d
@@ -1420,7 +1420,7 @@ void TemplateTable::dup2_x2() {
 }
 
 void TemplateTable::swap() {
-  printf("swap called\n");
+  // printf("swap called\n");
   transition(vtos, vtos);
   // stack: ..., a, b
   __ load_ptr( 1, rcx);  // load a
@@ -1431,7 +1431,7 @@ void TemplateTable::swap() {
 }
 
 void TemplateTable::iop2(Operation op) {
-  printf("iop2 called\n");
+  // printf("iop2 called\n");
   transition(itos, itos);
   switch (op) {
   case add  :                    __ pop_i(rdx); __ addl (rax, rdx); break;
@@ -1448,7 +1448,7 @@ void TemplateTable::iop2(Operation op) {
 }
 
 void TemplateTable::lop2(Operation op) {
-  printf("lop2 called\n");
+  // printf("lop2 called\n");
   transition(ltos, ltos);
 #ifdef _LP64
   switch (op) {
@@ -1474,7 +1474,7 @@ void TemplateTable::lop2(Operation op) {
 }
 
 void TemplateTable::idiv() {
-  printf("idiv called\n");
+  // printf("idiv called\n");
   transition(itos, itos);
   __ movl(rcx, rax);
   __ pop_i(rax);
@@ -1486,7 +1486,7 @@ void TemplateTable::idiv() {
 }
 
 void TemplateTable::irem() {
-  printf("irem called\n");
+  // printf("irem called\n");
   transition(itos, itos);
   __ movl(rcx, rax);
   __ pop_i(rax);
@@ -1499,7 +1499,7 @@ void TemplateTable::irem() {
 }
 
 void TemplateTable::lmul() {
-  printf("lmul called\n");
+  // printf("lmul called\n");
   transition(ltos, ltos);
 #ifdef _LP64
   __ pop_l(rdx);
@@ -1514,7 +1514,7 @@ void TemplateTable::lmul() {
 }
 
 void TemplateTable::ldiv() {
-  printf("ldiv called\n");
+  // printf("ldiv called\n");
   transition(ltos, ltos);
 #ifdef _LP64
   __ mov(rcx, rax);
@@ -1542,7 +1542,7 @@ void TemplateTable::ldiv() {
 }
 
 void TemplateTable::lrem() {
-  printf("lrem called\n");
+  // printf("lrem called\n");
   transition(ltos, ltos);
 #ifdef _LP64
   __ mov(rcx, rax);
@@ -1570,7 +1570,7 @@ void TemplateTable::lrem() {
 }
 
 void TemplateTable::lshl() {
-  printf("lshl called\n");
+  // printf("lshl called\n");
   transition(itos, ltos);
   __ movl(rcx, rax);                             // get shift count
   #ifdef _LP64
@@ -1583,7 +1583,7 @@ void TemplateTable::lshl() {
 }
 
 void TemplateTable::lshr() {
-  printf("lshr called\n");
+  // printf("lshr called\n");
 #ifdef _LP64
   transition(itos, ltos);
   __ movl(rcx, rax);                             // get shift count
@@ -1598,7 +1598,7 @@ void TemplateTable::lshr() {
 }
 
 void TemplateTable::lushr() {
-  printf("lushr called\n");
+  // printf("lushr called\n");
   transition(itos, ltos);
 #ifdef _LP64
   __ movl(rcx, rax);                             // get shift count
@@ -1612,7 +1612,7 @@ void TemplateTable::lushr() {
 }
 
 void TemplateTable::fop2(Operation op) {
-  printf("fop2 called\n");
+  // printf("fop2 called\n");
   transition(ftos, ftos);
 
   if (UseSSE >= 1) {
@@ -1685,7 +1685,7 @@ void TemplateTable::fop2(Operation op) {
 }
 
 void TemplateTable::dop2(Operation op) {
-  printf("dop2 called\n");
+  // printf("dop2 called\n");
   transition(dtos, dtos);
   if (UseSSE >= 2) {
     switch (op) {
@@ -1788,13 +1788,13 @@ void TemplateTable::dop2(Operation op) {
 }
 
 void TemplateTable::ineg() {
-  printf("ineg called\n");
+  // printf("ineg called\n");
   transition(itos, itos);
   __ negl(rax);
 }
 
 void TemplateTable::lneg() {
-  printf("lneg called\n");
+  // printf("lneg called\n");
   transition(ltos, ltos);
   LP64_ONLY(__ negq(rax));
   NOT_LP64(__ lneg(rdx, rax));
@@ -1827,7 +1827,7 @@ void TemplateTable::fneg() {
 }
 
 void TemplateTable::dneg() {
-  printf("dneg called\n");
+  // printf("dneg called\n");
   transition(dtos, dtos);
   if (UseSSE >= 2) {
     static jlong *double_signflip =
@@ -1843,7 +1843,7 @@ void TemplateTable::dneg() {
 }
 
 void TemplateTable::iinc() {
-  printf("iinc called\n");
+  // printf("iinc called\n");
   transition(vtos, vtos);
   __ load_signed_byte(rdx, at_bcp(2)); // get constant
   locals_index(rbx);
