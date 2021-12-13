@@ -202,16 +202,16 @@ static void do_oop_load(InterpreterMacroAssembler* _masm,
                         DecoratorSet decorators = 0) {
   bool is_array = (decorators & IS_ARRAY) != 0;
   __ load_heap_oop(dst, src, rdx, rbx, decorators);
-  if (barrier == BarrierSet::ShenandoahBarrierSet){
-    if (!is_array){
-      // __ push_ptr(rax);
-      __ pusha();
-      __ verify_oop(dst);
-      __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::read_barrier), dst);
-      // __ pop_ptr(rax);
-      __ popa();
-    }
-  }
+  // if (barrier == BarrierSet::ShenandoahBarrierSet){
+  //   if (!is_array){
+  //     // __ push_ptr(rax);
+  //     __ pusha();
+  //     __ verify_oop(dst);
+  //     __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::read_barrier), dst);
+  //     // __ pop_ptr(rax);
+  //     __ popa();
+  //   }
+  // }
   // if (barrier == BarrierSet::ShenandoahBarrierSet) {
   //   __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
   // }
