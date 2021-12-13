@@ -49,6 +49,24 @@ uintptr_t oopDesc::access_counter() {
     set_gc_epoch(static_gc_epoch);
     set_access_counter(0);
   }
+
+
+  // uintptr_t oop_gc_epoch = gc_epoch();
+  // if (oop_gc_epoch > static_gc_epoch) {
+  //   // newly created obj
+  //   set_gc_epoch(static_gc_epoch);
+  //   set_access_counter(0);
+  // }
+  // if (oop_gc_epoch < static_gc_epoch) {
+  //   // newly created obj
+  //   set_gc_epoch(static_gc_epoch);
+  //   set_access_counter(0);
+  // } 
+  // else {
+  //   // oop_gc_epoch == static_gc_epoch
+  // }
+  
+
   return HeapAccess<MO_RELAXED>::load_at(as_oop(), access_counter_offset_in_bytes());
 }
 

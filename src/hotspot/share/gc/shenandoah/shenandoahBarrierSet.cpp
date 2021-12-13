@@ -72,7 +72,9 @@ bool ShenandoahBarrierSet::is_aligned(HeapWord* hw) {
 oop ShenandoahBarrierSet::load_reference_barrier_not_null(oop obj) {
   oop_increase_access_counter(obj);
   if (ShenandoahLoadRefBarrier && _heap->has_forwarded_objects()) {
-    return load_reference_barrier_impl(obj);
+    oop fwd = load_reference_barrier_impl(obj);
+    oop_increase_access_counter(fwd);
+    return fwd;
   } else {
     return obj;
   }
