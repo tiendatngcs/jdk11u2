@@ -43,7 +43,7 @@
 // Implementation of all inlined member functions defined in oop.hpp
 // We need a separate file to avoid circular references
 
-uintptr_t oopDesc::access_counter() const {
+uintptr_t oopDesc::access_counter() {
   uintptr_t oop_gc_epoch = gc_epoch();
   if (oop_gc_epoch != static_gc_epoch) {
     set_gc_epoch(static_gc_epoch);
