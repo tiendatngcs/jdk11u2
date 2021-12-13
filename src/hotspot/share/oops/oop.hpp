@@ -66,7 +66,7 @@ class oopDesc {
 
  public:
   oopDesc();
-  static uintprt_t static_gc_epoch;
+  static uintptr_t static_gc_epoch;
   inline uintptr_t access_counter() const;
   inline uintptr_t gc_epoch() const;
   inline markOop  mark()          const;
