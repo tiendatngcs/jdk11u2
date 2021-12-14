@@ -43,30 +43,16 @@
 // Implementation of all inlined member functions defined in oop.hpp
 // We need a separate file to avoid circular references
 
-uintptr_t oopDesc::access_counter() {
+uintptr_t oopDesc::true_access_counter() {
   uintptr_t oop_gc_epoch = gc_epoch();
   if (oop_gc_epoch != static_gc_epoch) {
     set_gc_epoch(static_gc_epoch);
     set_access_counter(0);
   }
+  return HeapAccess<MO_RELAXED>::load_at(as_oop(), access_counter_offset_in_bytes());
+}
 
-
-  // uintptr_t oop_gc_epoch = gc_epoch();
-  // if (oop_gc_epoch > static_gc_epoch) {
-  //   // newly created obj
-  //   set_gc_epoch(static_gc_epoch);
-  //   set_access_counter(0);
-  // }
-  // if (oop_gc_epoch < static_gc_epoch) {
-  //   // newly created obj
-  //   set_gc_epoch(static_gc_epoch);
-  //   set_access_counter(0);
-  // } 
-  // else {
-  //   // oop_gc_epoch == static_gc_epoch
-  // }
-  
-
+uintptr_t oopDesc::access_counter() {
   return HeapAccess<MO_RELAXED>::load_at(as_oop(), access_counter_offset_in_bytes());
 }
 
@@ -78,7 +64,7 @@ void oopDesc::set_access_counter(uintptr_t new_value){
 }
 
 void oopDesc::add_access_counter(uintptr_t increment) {
-  uintptr_t ac = access_counter();
+  uintptr_t ac = true_access_counter();
   // code below prevents overflow
   if (UINTPTR_MAX - increment > ac){
     set_access_counter(ac + increment);
