@@ -172,7 +172,7 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
   printf("do_oop_store called\n");
   if (barrier == BarrierSet::ShenandoahBarrierSet) {
     // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
-    if (!is_array || (obj.index() == noreg && obj.disp() == 0)) {
+    if (!is_array || (dst.index() == noreg && dst.disp() == 0)) {
       if (is_array) {
         __ verify_oop(dst.base());
         __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), dst.base());
@@ -180,7 +180,6 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
       else {
         __ verify_oop(dst.base());
         // __ push(rax);
-        // __ store_check(obj.base());
         __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), dst.base());
         // __ pop(rax);
       }
