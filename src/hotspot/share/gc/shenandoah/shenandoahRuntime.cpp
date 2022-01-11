@@ -42,9 +42,9 @@ void ShenandoahRuntime::arraycopy_barrier_narrow_oop_entry(narrowOop* src, narro
 
 // Shenandoah pre write barrier slowpath
 JRT_LEAF(void, ShenandoahRuntime::write_ref_field_pre_entry(oopDesc* orig, JavaThread *thread))
-  tty->print_raw("ShenandoahRuntime::write_ref_field_pre_entry\n");
-  orig->add_access_counter(1);
-  tty->print_cr("orgi oop: ac %lu | epoch %lu", orig->access_counter(), orig->gc_epoch());
+  // tty->print_raw("ShenandoahRuntime::write_ref_field_pre_entry\n");
+  orig->increase_access_counter(1);
+  // tty->print_cr("orgi oop: ac %lu | epoch %lu", orig->access_counter(), orig->gc_epoch());
   assert(orig != NULL, "should be optimized out");
   shenandoah_assert_correct(NULL, orig);
   // store the original value that was in the field reference
@@ -53,31 +53,31 @@ JRT_LEAF(void, ShenandoahRuntime::write_ref_field_pre_entry(oopDesc* orig, JavaT
 JRT_END
 
 JRT_LEAF(oopDesc*, ShenandoahRuntime::load_reference_barrier(oopDesc* src, oop* load_addr))
-  tty->print_raw("ShenandoahRuntime::load_reference_barrier\n");
-  src->add_access_counter(1);
-  tty->print_cr("src oop: ac %lu | epoch %lu", src->access_counter(), src->gc_epoch());
+  // tty->print_raw("ShenandoahRuntime::load_reference_barrier\n");
+  src->increase_access_counter(1);
+  // tty->print_cr("src oop: ac %lu | epoch %lu", src->access_counter(), src->gc_epoch());
   oop load = *load_addr;
-  load->add_access_counter(1);
-  tty->print_cr("load oop: ac %lu | epoch %lu", load->access_counter(), load->gc_epoch());
+  load->increase_access_counter(1);
+  // tty->print_cr("load oop: ac %lu | epoch %lu", load->access_counter(), load->gc_epoch());
   return ShenandoahBarrierSet::barrier_set()->load_reference_barrier_mutator(src, load_addr);
 JRT_END
 
 JRT_LEAF(oopDesc*, ShenandoahRuntime::load_reference_barrier_narrow(oopDesc* src, narrowOop* load_addr))
-  tty->print_raw("ShenandoahRuntime::load_reference_barrier_narrow\n");
-  src->add_access_counter(1);
-  tty->print_cr("src oop: ac %lu | epoch %lu", src->access_counter(), src->gc_epoch());
+  // tty->print_raw("ShenandoahRuntime::load_reference_barrier_narrow\n");
+  src->increase_access_counter(1);
+  // tty->print_cr("src oop: ac %lu | epoch %lu", src->access_counter(), src->gc_epoch());
   oop load = CompressedOops::decode(*load_addr);
-  load->add_access_counter(1);
-  tty->print_cr("load oop: ac %lu | epoch %lu", load->access_counter(), load->gc_epoch());
+  load->increase_access_counter(1);
+  // tty->print_cr("load oop: ac %lu | epoch %lu", load->access_counter(), load->gc_epoch());
   return ShenandoahBarrierSet::barrier_set()->load_reference_barrier_mutator(src, load_addr);
 JRT_END
 
 // Shenandoah clone barrier: makes sure that references point to to-space
 // in cloned objects.
 JRT_LEAF(void, ShenandoahRuntime::shenandoah_clone_barrier(oopDesc* src))
-  tty->print_raw("ShenandoahRuntime::shenandoah_clone_barrier\n");
+  // tty->print_raw("ShenandoahRuntime::shenandoah_clone_barrier\n");
   oop s = oop(src);
-  s->add_access_counter(1);
+  s->increase_access_counter(1);
   tty->print_cr("s oop: ac %lu | epoch %lu", s->access_counter(), s->gc_epoch());
   shenandoah_assert_correct(NULL, s);
   ShenandoahBarrierSet::barrier_set()->clone_barrier(s);

@@ -1041,19 +1041,48 @@ IRT_ENTRY(void, InterpreterRuntime::print_store_barrier(JavaThread* thread))
 }
 IRT_END
 
-IRT_ENTRY(void, InterpreterRuntime::oop_increase_access_counter(JavaThread* thread, oopDesc* obj))
+IRT_ENTRY(void, InterpreterRuntime::write_barrier(JavaThread* thread, oopDesc* obj))
 {
   // tty->print_raw("Increasing access counter\n");
-  if (obj != NULL) {
-    tty->print_raw("oop is not null\n");
-    tty->print_cr("oop ac %lu | epoch %lu\n", obj->access_counter(), obj->gc_epoch());
-    obj->set_access_counter(0);
-    obj->set_gc_epoch(0); 
+  bool is_oop = oopDesc::is_oop(obj);
+  if (is_oop) {
+    // tty->print_raw("is oop\n");
+    // tty->print_cr("oop ac %lu | epoch %lu\n", obj->access_counter(), obj->gc_epoch());
+    obj->increase_access_counter(1);
+    return;
   }
-  tty->print_raw("oop is null\n");
-  // obj->add_access_counter(1);
+  // tty->print_cr("wb: is not oop");
 }
 IRT_END
+
+IRT_ENTRY(void, InterpreterRuntime::read_barrier(JavaThread* thread, oopDesc* obj))
+{
+  // tty->print_raw("Interpreter read barrier\n");
+  bool is_oop = oopDesc::is_oop(obj);
+  if (is_oop) {
+    // tty->print_cr("rb: is oop");
+    // tty->print_cr("oop ac %lu | epoch %lu\n", obj->access_counter(), obj->gc_epoch());
+    obj->increase_access_counter(1);
+    return;
+  }
+  // tty->print_cr("rb: is not oop");
+}
+IRT_END
+
+
+// IRT_LEAF(void, InterpreterRuntime::read_barrier(oopDesc* obj))
+// {
+//   // tty->print_raw("Interpreter read barrier\n");
+//   bool is_oop = oopDesc::is_oop(obj);
+//   if (is_oop) {
+//     // tty->print_cr("rb: is oop");
+//     // tty->print_cr("oop ac %lu | epoch %lu\n", obj->access_counter(), obj->gc_epoch());
+//     obj->increase_access_counter(1);
+//     return;
+//   }
+//   tty->print_cr("rb: is not oop");
+// }
+// IRT_END
 
 //------------------------------------------------------------------------------------------------------------------------
 // Miscellaneous

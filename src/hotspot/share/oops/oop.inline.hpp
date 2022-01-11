@@ -45,50 +45,26 @@
 // We need a separate file to avoid circular references
 
 void oopDesc::set_access_counter(uintptr_t new_value){
-  // tty->print_raw("setting access counter\n");
-  // HeapAccess<MO_RELAXED>::store_at(as_oop(), access_counter_offset_in_bytes(), new_value);
   _access_counter = new_value;
-  // if (new_value == 0){
-  //   // printf("ac is set to: %lu\n", access_counter());
-  // }
 }
 
 uintptr_t oopDesc::access_counter() {
+  // Do not check gc_epoch to reset access counter.
+  return _access_counter;
+}
+
+uintptr_t oopDesc::true_access_counter() {
+  // Check if gc_epoch is up-to-date, if not, reset access counter to 0;
   uintptr_t oop_gc_epoch = gc_epoch();
   if (oop_gc_epoch != static_gc_epoch) {
     set_gc_epoch(static_gc_epoch);
     set_access_counter(0);
   }
-  return HeapAccess<MO_RELAXED>::load_at(as_oop(), access_counter_offset_in_bytes());
+  return _access_counter;
 }
 
-void oopDesc::add_access_counter(uintptr_t increment) {
-  // tty->print_raw("Adding access counter\n");
-  // uintptr_t ac = access_counter();
-  // set_access_counter(0);
-  // uintptr_t oop_gc_epoch = gc_epoch();
-  // set_gc_epoch(0);
-
-  // uintptr_t oop_gc_epoch = gc_epoch();
-  // if (oop_gc_epoch != static_gc_epoch) {
-  //   set_gc_epoch(static_gc_epoch);
-  //   set_access_counter(increment);
-  // }
-  // else {
-  //   uintptr_t ac = access_counter();
-  //   // code below prevents overflow
-  //   if (UINTPTR_MAX - increment > ac){
-  //     set_access_counter(ac + increment);
-  //   }
-  //   else {
-  //     printf("Access Counter reaches UINTPTR_MAX\n");
-  //     if (ac < UINTPTR_MAX){
-  //       set_access_counter(UINTPTR_MAX);
-  //     }
-  //   }
-  // }
-
-  uintptr_t ac = access_counter();
+void oopDesc::increase_access_counter(uintptr_t increment) {
+  uintptr_t ac = true_access_counter();
   // code below prevents overflow
   if (UINTPTR_MAX - increment > ac){
     set_access_counter(ac + increment);
@@ -102,7 +78,7 @@ void oopDesc::add_access_counter(uintptr_t increment) {
 }
 
 uintptr_t oopDesc::gc_epoch() const {
-  return HeapAccess<MO_RELAXED>::load_at(as_oop(), gc_epoch_offset_in_bytes());
+  return _gc_epoch;
 }
 
 void oopDesc::set_gc_epoch(uintptr_t new_value){
@@ -124,11 +100,6 @@ void oopDesc::add_gc_epoch(uintptr_t increment) {
     }
   }
 }
-
-// uintptr_t oopDesc::static_gc_epoch() {
-//   // return HeapAccess<MO_RELAXED>::load_at(as_oop(), gc_epoch_offset_in_bytes());
-//   return static_gc_epoch;
-// }
 
 void oopDesc::set_static_gc_epoch(uintptr_t new_value){
   // HeapAccess<MO_RELAXED>::store_at(as_oop(), gc_epoch_offset_in_bytes(), new_value);

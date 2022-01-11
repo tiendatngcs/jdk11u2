@@ -82,16 +82,16 @@ oop ShenandoahBarrierSet::load_reference_barrier(oop obj) {
   if (obj != NULL) {
     // ShenandoahHeap *const heap = ShenandoahHeap::heap();
     // heap->oop_check_to_reset_access_counter(obj);
-    // obj->add_access_counter(1);
+    // obj->increase_access_counter(1);
     return load_reference_barrier_not_null(obj);
   } else {
     return obj;
   }
 }
 
-// void ShenandoahBarrierSet::oop_add_access_counter(oop obj, uintptr_t increment) {
+// void ShenandoahBarrierSet::oop_increase_access_counter(oop obj, uintptr_t increment) {
 //   _heap->oop_check_to_reset_access_counter(obj);
-//   obj->add_access_counter(increment);
+//   obj->increase_access_counter(increment);
 // }
 
 bool ShenandoahBarrierSet::need_load_reference_barrier(DecoratorSet decorators, BasicType type) {

@@ -60,7 +60,7 @@ void ModRefBarrierSet::write_ref_array(HeapWord* start, size_t count) {
 //     // if (heap != NULL){
 //     //   heap->oop_check_to_reset_access_counter(p);
 //     // }
-//     p->add_access_counter(1);
+//     p->increase_access_counter(1);
 //   }
 // }
 

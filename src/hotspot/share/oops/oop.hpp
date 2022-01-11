@@ -68,6 +68,7 @@ class oopDesc {
   oopDesc();
   static uintptr_t static_gc_epoch;
   inline uintptr_t access_counter();
+  inline uintptr_t true_access_counter();
   inline uintptr_t gc_epoch() const;
   // static inline uintptr_t static_gc_epoch();
   inline markOop  mark()          const;
@@ -75,7 +76,7 @@ class oopDesc {
   inline markOop* mark_addr_raw() const;
 
   inline void set_access_counter(uintptr_t new_value);
-  inline void add_access_counter(uintptr_t increment);
+  inline void increase_access_counter(uintptr_t increment);
 
   inline void set_gc_epoch(uintptr_t new_value);
   inline void add_gc_epoch(uintptr_t increment);

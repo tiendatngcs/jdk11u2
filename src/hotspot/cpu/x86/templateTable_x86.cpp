@@ -153,38 +153,35 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
                          Register val,
                          BarrierSet::Name barrier,
                          DecoratorSet decorators = 0) {
-  // printf("TemplateTable::do_oop_store called\n");
   assert(val == noreg || val == rax, "parameter is just for looks");
-  // switch(barrier) {
-  //   // case BarrierSet::CardTableBarrierSet:
-  //   // case BarrierSet::ModRef: 
-  //   case BarrierSet::ShenandoahBarrierSet:
-  //     __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
-  //     break;
-  //   default:
-  //     break;
-  // }
-  // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
-  // if (barrier == BarrierSet::ShenandoahBarrierSet) {
-  //   // const Register rarg_a = LP64_ONLY(c_rarg2)   NOT_LP64(rax);
-  //   // const Register rarg_b  = LP64_ONLY(c_rarg1)   NOT_LP64(rbx);
-  //   // const Register rarg_c  = LP64_ONLY(c_rarg3)   NOT_LP64(rcx);
-  //   // const Register rarg_d  = LP64_ONLY(rscratch1) NOT_LP64(rdx);
-  //   __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
-  //   if (val != noreg) {
-  //     __ movptr(rax, val);
-  //     __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::oop_increase_access_counter), rax);
-  //   }
-  //   // if (decorators == IS_ARRAY && rdx != noreg){
-  //   //   // array oop is previously stored in rdx, please check before making any change
-  //   //   __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::oop_increase_access_counter), rdx);
-  //   // }
-  //   __ movptr(rcx, dst.base());
-  //   // array element or field
-  //   __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::oop_increase_access_counter), rcx);
-  //   // call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::oop_increase_access_counter), val);
+  bool is_array = (decorators & IS_ARRAY) != 0;
+  if (val == noreg){
+    __ store_heap_oop(dst, val, rdx, rbx, decorators);
+    return;
+  } 
+    
+  // if (!is_array) __ movptr(c_rarg0, dst.base());
+  // if (barrier == BarrierSet::ShenandoahBarrierSet && !is_array) {
+  //   __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), dst.base());
   // }
   __ store_heap_oop(dst, val, rdx, rbx, decorators);
+  printf("do_oop_store called\n");
+  if (barrier == BarrierSet::ShenandoahBarrierSet) {
+    // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
+    if (!is_array || (dst.index() == noreg && dst.disp() == 0)) {
+      if (is_array) {
+        __ verify_oop(dst.base());
+        __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), dst.base());
+      }
+      else {
+        __ verify_oop(dst.base());
+        // __ push(rax);
+        __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), dst.base());
+        // __ pop(rax);
+      }
+        
+    }
+  }
 }
 
 static void do_oop_load(InterpreterMacroAssembler* _masm,
@@ -193,25 +190,27 @@ static void do_oop_load(InterpreterMacroAssembler* _masm,
                         BarrierSet::Name barrier,
                         DecoratorSet decorators = 0) {
   // printf("TemplateTable::do_oop_load called\n");
+  bool is_array = (decorators & IS_ARRAY) != 0;
   __ load_heap_oop(dst, src, rdx, rbx, decorators);
-  // if (barrier == BarrierSet::ShenandoahBarrierSet) {
-  //   __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_load_barrier));
-  //   // const Register rarg_a = LP64_ONLY(c_rarg2)   NOT_LP64(rax);
-  //   // const Register rarg_b  = LP64_ONLY(c_rarg1)   NOT_LP64(rbx);
-  //   // const Register rarg_c  = LP64_ONLY(c_rarg3)   NOT_LP64(rcx);
-  //   // const Register rarg_d  = LP64_ONLY(rscratch1) NOT_LP64(rdx);
-  //   if (dst != noreg) {
-  //     __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::oop_increase_access_counter), dst);
-  //   }
-  //   if (decorators == IS_ARRAY){
-  //     // array oop is previously stored in rdx, please check before making any change
-  //     __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::oop_increase_access_counter), rdx);
-  //   }
-  //   // __ movptr(rcx, dst.base());
-  //   // array element or field
-  //   __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::oop_increase_access_counter), src.base());
-  //   // call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::oop_increase_access_counter), val);
-  // }
+  if (barrier == BarrierSet::ShenandoahBarrierSet){
+    if (!is_array){
+
+      __ push_ptr(rax);
+      // __ pusha();
+      __ verify_oop(dst);
+      __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::read_barrier), dst);
+      __ pop_ptr(rax);
+      // __ popa();
+    }
+    else {
+      __ push_ptr(rax);
+      // __ pusha();
+      __ verify_oop(dst);
+      __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::read_barrier), dst);
+      __ pop_ptr(rax);
+      // __ popa();
+    }
+  }
 }
 
 Address TemplateTable::at_bcp(int offset) {

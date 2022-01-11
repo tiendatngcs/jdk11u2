@@ -59,7 +59,7 @@ void BarrierSetAssembler::load_at(MacroAssembler* masm, DecoratorSet decorators,
         __ movptr(dst, src);
       }
       // barrier here for dist 
-      // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
+      // __ call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::read_barrier), dst);
     } else {
       assert(in_native, "why else?");
       __ movptr(dst, src);

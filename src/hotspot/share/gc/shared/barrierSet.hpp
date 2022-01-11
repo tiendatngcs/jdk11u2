@@ -173,7 +173,7 @@ public:
   public:
     // static void oop_increase_access_counter(oop obj, uintptr_t increment) {
     //   if (obj != NULL) {
-    //     obj->add_access_counter(increment);
+    //     obj->increase_access_counter(increment);
     //   }
     // }
 
