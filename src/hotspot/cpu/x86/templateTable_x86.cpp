@@ -165,23 +165,23 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
   //   __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), dst.base());
   // }
   __ store_heap_oop(dst, val, rdx, rbx, decorators);
-  printf("do_oop_store called\n");
-  if (barrier == BarrierSet::ShenandoahBarrierSet) {
-    // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
-    if (!is_array || (dst.index() == noreg && dst.disp() == 0)) {
-      if (is_array) {
-        __ verify_oop(dst.base());
-        __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), dst.base());
-      }
-      else {
-        __ verify_oop(dst.base());
-        // __ push(rax);
-        __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), dst.base());
-        // __ pop(rax);
-      }
+
+  // if (barrier == BarrierSet::ShenandoahBarrierSet) {
+  //   // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
+  //   if (!is_array || (dst.index() == noreg && dst.disp() == 0)) {
+  //     if (is_array) {
+  //       __ verify_oop(dst.base());
+  //       __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), dst.base());
+  //     }
+  //     else {
+  //       __ verify_oop(dst.base());
+  //       // __ push(rax);
+  //       __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), dst.base());
+  //       // __ pop(rax);
+  //     }
         
-    }
-  }
+  //   }
+  // }
 }
 
 static void do_oop_load(InterpreterMacroAssembler* _masm,
@@ -192,25 +192,25 @@ static void do_oop_load(InterpreterMacroAssembler* _masm,
   // printf("TemplateTable::do_oop_load called\n");
   bool is_array = (decorators & IS_ARRAY) != 0;
   __ load_heap_oop(dst, src, rdx, rbx, decorators);
-  if (barrier == BarrierSet::ShenandoahBarrierSet){
-    if (!is_array){
+  // if (barrier == BarrierSet::ShenandoahBarrierSet){
+  //   if (!is_array){
 
-      __ push_ptr(rax);
-      // __ pusha();
-      __ verify_oop(dst);
-      __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::read_barrier), dst);
-      __ pop_ptr(rax);
-      // __ popa();
-    }
-    else {
-      __ push_ptr(rax);
-      // __ pusha();
-      __ verify_oop(dst);
-      __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::read_barrier), dst);
-      __ pop_ptr(rax);
-      // __ popa();
-    }
-  }
+  //     __ push_ptr(rax);
+  //     // __ pusha();
+  //     __ verify_oop(dst);
+  //     __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::read_barrier), dst);
+  //     __ pop_ptr(rax);
+  //     // __ popa();
+  //   }
+  //   else {
+  //     __ push_ptr(rax);
+  //     // __ pusha();
+  //     __ verify_oop(dst);
+  //     __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::read_barrier), dst);
+  //     __ pop_ptr(rax);
+  //     // __ popa();
+  //   }
+  // }
 }
 
 Address TemplateTable::at_bcp(int offset) {
