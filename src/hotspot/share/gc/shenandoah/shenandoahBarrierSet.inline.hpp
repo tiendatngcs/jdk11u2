@@ -328,16 +328,18 @@ void ShenandoahBarrierSet::arraycopy_work(T* src, size_t count) {
     T o = RawAccess<>::oop_load(elem_ptr);
     if (!CompressedOops::is_null(o)) {
       oop obj = CompressedOops::decode_not_null(o);
+      oop_increase_access_counter(obj);
       if (HAS_FWD && cset->is_in(obj)) {
         oop fwd = resolve_forwarded_not_null(obj);
         if (EVAC && obj == fwd) {
           fwd = _heap->evacuate_object(obj, thread);
         }
         assert(obj != fwd || _heap->cancelled_gc(), "must be forwarded");
+        oop_increase_access_counter(fwd);
         oop witness = ShenandoahHeap::cas_oop(fwd, elem_ptr, o);
         obj = fwd;
       }
-      oop_increase_access_counter(obj);
+      // oop_increase_access_counter(obj);
       if (ENQUEUE && !ctx->is_marked(obj)) {
         queue.enqueue_known_active(obj);
       }
@@ -346,7 +348,34 @@ void ShenandoahBarrierSet::arraycopy_work(T* src, size_t count) {
 }
 
 template <class T>
+void ShenandoahBarrierSet::arraycopy_work_barrier(T* src, T* dst, size_t count) {
+  // Thread* thread = Thread::current();
+  // ShenandoahSATBMarkQueue& queue = ShenandoahThreadLocalData::satb_mark_queue(thread);
+  // ShenandoahMarkingContext* ctx = _heap->marking_context();
+  // const ShenandoahCollectionSet* const cset = _heap->collection_set();
+  T* end;
+  end = src + count;
+  for (T* elem_ptr = src; elem_ptr < end; elem_ptr++) {
+    T o = RawAccess<>::oop_load(elem_ptr);
+    if (!CompressedOops::is_null(o)) {
+      oop obj = CompressedOops::decode_not_null(o);
+      oop_increase_access_counter(obj);
+    }
+  }
+  
+  end = dst + count;
+  for (T* elem_ptr = dst; elem_ptr < end; elem_ptr++) {
+    T o = RawAccess<>::oop_load(elem_ptr);
+    if (!CompressedOops::is_null(o)) {
+      oop obj = CompressedOops::decode_not_null(o);
+      oop_increase_access_counter(obj);
+    }
+  }
+}
+
+template <class T>
 void ShenandoahBarrierSet::arraycopy_barrier(T* src, T* dst, size_t count) {
+  arraycopy_work_barrier(src, dst, count);
   if (count == 0) {
     return;
   }

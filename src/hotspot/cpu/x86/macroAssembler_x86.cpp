@@ -5482,6 +5482,9 @@ void MacroAssembler::access_store_at(BasicType type, DecoratorSet decorators, Ad
 void MacroAssembler::load_heap_oop(Register dst, Address src, Register tmp1,
                                    Register thread_tmp, DecoratorSet decorators) {
   access_load_at(T_OBJECT, IN_HEAP | decorators, dst, src, tmp1, thread_tmp);
+  // call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
+    // call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_as_raw));
+    // call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_not_as_raw));
 }
 
 // Doesn't do verfication, generates fixed size code

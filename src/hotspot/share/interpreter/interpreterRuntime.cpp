@@ -1037,21 +1037,35 @@ IRT_END
 
 IRT_ENTRY(void, InterpreterRuntime::print_store_barrier(JavaThread* thread))
 {
-  tty->print_raw("Store barrier inserted\n");
+  tty->print_cr("Store barrier inserted");
+}
+IRT_END
+
+IRT_LEAF(void, InterpreterRuntime::print_as_raw())
+{
+  tty->print_cr("As raw");
+}
+IRT_END
+
+IRT_LEAF(void, InterpreterRuntime::print_not_as_raw())
+{
+  tty->print_cr("Not as raw");
 }
 IRT_END
 
 IRT_ENTRY(void, InterpreterRuntime::write_barrier(JavaThread* thread, oopDesc* obj))
 {
   // tty->print_raw("Increasing access counter\n");
+  assert(obj != 0, "Null oop");
   bool is_oop = oopDesc::is_oop(obj);
   if (is_oop) {
-    // tty->print_raw("is oop\n");
+    // tty->print_raw("wb: is oop\n");
     // tty->print_cr("oop ac %lu | epoch %lu\n", obj->access_counter(), obj->gc_epoch());
     obj->increase_access_counter(1);
     return;
   }
-  // tty->print_cr("wb: is not oop");
+  tty->print_cr("wb: is not oop");
+  // obj->increase_access_counter(1);
 }
 IRT_END
 
@@ -1065,7 +1079,7 @@ IRT_ENTRY(void, InterpreterRuntime::read_barrier(JavaThread* thread, oopDesc* ob
     obj->increase_access_counter(1);
     return;
   }
-  // tty->print_cr("rb: is not oop");
+  tty->print_cr("rb: is not oop");
 }
 IRT_END
 

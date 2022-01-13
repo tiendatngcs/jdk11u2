@@ -181,8 +181,8 @@ private:
   size_t _hot_region_count;
   size_t _cold_region_count;
 
-  size_t _histogram[20];
-  size_t _size_histogram[20];
+  size_t _histogram[30];
+  size_t _size_histogram[30];
 
   // uintptr_t _gc_epoch;
 

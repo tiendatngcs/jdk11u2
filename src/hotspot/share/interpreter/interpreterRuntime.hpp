@@ -108,6 +108,8 @@ class InterpreterRuntime: AllStatic {
   static void print_something(JavaThread* thread);
   static void print_load_barrier(JavaThread* thread);
   static void print_store_barrier(JavaThread* thread);
+  static void print_as_raw();
+  static void print_not_as_raw();
 
   static void write_barrier(JavaThread* thread, oopDesc* obj);
   static void read_barrier(JavaThread* thread, oopDesc* obj);

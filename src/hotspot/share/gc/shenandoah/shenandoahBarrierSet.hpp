@@ -110,6 +110,10 @@ private:
   template <class T, bool HAS_FWD, bool EVAC, bool ENQUEUE>
   inline void arraycopy_work(T* src, size_t count);
 
+  template <class T>
+  inline void arraycopy_work_barrier(T* src, T* dst, size_t count);
+
+
   oop load_reference_barrier_impl(oop obj);
 
   inline bool need_bulk_update(HeapWord* dst);

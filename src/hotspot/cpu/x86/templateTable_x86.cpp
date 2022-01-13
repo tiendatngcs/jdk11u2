@@ -155,10 +155,13 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
                          DecoratorSet decorators = 0) {
   assert(val == noreg || val == rax, "parameter is just for looks");
   bool is_array = (decorators & IS_ARRAY) != 0;
+
   if (val == noreg){
     __ store_heap_oop(dst, val, rdx, rbx, decorators);
     return;
   } 
+
+  // this point onward, val is rax
     
   // if (!is_array) __ movptr(c_rarg0, dst.base());
   // if (barrier == BarrierSet::ShenandoahBarrierSet && !is_array) {
@@ -166,22 +169,42 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
   // }
   __ store_heap_oop(dst, val, rdx, rbx, decorators);
 
-  // if (barrier == BarrierSet::ShenandoahBarrierSet) {
-  //   // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
-  //   if (!is_array || (dst.index() == noreg && dst.disp() == 0)) {
-  //     if (is_array) {
-  //       __ verify_oop(dst.base());
-  //       __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), dst.base());
-  //     }
-  //     else {
-  //       __ verify_oop(dst.base());
-  //       // __ push(rax);
-  //       __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), dst.base());
-  //       // __ pop(rax);
-  //     }
-        
-  //   }
-  // }
+  Label oop_is_null;
+  // __ cmpptr(dst.base(), 0);
+  // __ jcc(Assembler::equal, oop_is_null);
+
+  if (barrier == BarrierSet::ShenandoahBarrierSet) {
+    // flatten object address if needed
+    // if (dst.index() == noreg && dst.disp() == 0) {
+    //   if (dst.base() != r8) {
+    //     __ movq(r8, dst.base());
+    //   }
+    // } else {
+    //   __ leaq(r8, dst);
+    // }
+
+    // __ cmpptr(r8, 0);
+    // __ jcc(Assembler::equal, oop_is_null);
+    // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), r8);
+
+
+    if (!is_array || (dst.index() == noreg && dst.disp() == 0)) {
+      __ cmpptr(dst.base(), 0);
+      __ jcc(Assembler::equal, oop_is_null);
+      __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), dst.base());
+    } else { // is_array
+      // dst.base(), which is rdx, could have been altered. Therefore, arrayoop is saved to r9 in aastore
+      __ cmpptr(r9, 0);
+      __ jcc(Assembler::equal, oop_is_null);
+      __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), r9);
+      
+      __ lea(r9, dst);
+      __ cmpptr(r9, 0);
+      __ jcc(Assembler::equal, oop_is_null);
+      __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), r9);
+    }
+  }
+  __ bind(oop_is_null);
 }
 
 static void do_oop_load(InterpreterMacroAssembler* _masm,
@@ -191,26 +214,53 @@ static void do_oop_load(InterpreterMacroAssembler* _masm,
                         DecoratorSet decorators = 0) {
   // printf("TemplateTable::do_oop_load called\n");
   bool is_array = (decorators & IS_ARRAY) != 0;
-  __ load_heap_oop(dst, src, rdx, rbx, decorators);
   // if (barrier == BarrierSet::ShenandoahBarrierSet){
-  //   if (!is_array){
-
-  //     __ push_ptr(rax);
-  //     // __ pusha();
-  //     __ verify_oop(dst);
-  //     __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::read_barrier), dst);
-  //     __ pop_ptr(rax);
-  //     // __ popa();
-  //   }
-  //   else {
-  //     __ push_ptr(rax);
-  //     // __ pusha();
-  //     __ verify_oop(dst);
-  //     __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::read_barrier), dst);
-  //     __ pop_ptr(rax);
-  //     // __ popa();
-  //   }
+  //   Label oop_is_null;
+  //   __ cmpptr(r9, 0);
+  //   __ jcc(Assembler::equal, oop_is_null);
+  //   // __ push_ptr(rax);
+  //   __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::read_barrier), r9);
+  //   // __ pop_ptr(rax);
+  //   __ bind(oop_is_null);
   // }
+  __ load_heap_oop(dst, src, rdx, rbx, decorators);
+  if (barrier == BarrierSet::ShenandoahBarrierSet){
+    Label oop_is_null;
+    __ cmpptr(dst, 0);
+    __ jcc(Assembler::equal, oop_is_null);
+    __ push_ptr(rax);
+    // __ pusha();
+    assert(dst == rax, "is dst = rax?");
+    __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::read_barrier), dst);
+    __ pop_ptr(rax);
+
+    // __ cmpptr(r9, 0);
+    // __ jcc(Assembler::equal, oop_is_null);
+    // __ push_ptr(rax);
+    // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::read_barrier), r9);
+    // __ pop_ptr(rax);
+    // if (!is_array){
+    //   __ cmpptr(dst, 0);
+    //   __ jcc(Assembler::equal, oop_is_null);
+    //   __ push_ptr(rax);
+    //   // __ pusha();
+    //   assert(dst == rax, "is dst = rax?");
+    //   __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::read_barrier), dst);
+    //   __ pop_ptr(rax);
+    //   // __ popa();
+    // }
+    // else {
+    //   __ cmpptr(dst, 0);
+    //   __ jcc(Assembler::equal, oop_is_null);
+    //   __ push_ptr(rax);
+    //   // __ pusha();
+    //   assert(dst == rax, "is dst = rax?");
+    //   __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::read_barrier), dst);
+    //   __ pop_ptr(rax);
+    //   // __ popa();
+    // }
+    __ bind(oop_is_null);
+  }
 }
 
 Address TemplateTable::at_bcp(int offset) {
@@ -882,6 +932,10 @@ void TemplateTable::aaload() {
   // rax: index
   // rdx: array
   index_check(rdx, rax); // kills rbx
+  // // Dat mod
+  // // assuming that r9 will not be altered
+  // __ movptr(r9, rdx);
+  // // Dat mod ends
   do_oop_load(_masm,
               Address(rdx, rax,
                       UseCompressedOops ? Address::times_4 : Address::times_ptr,
@@ -1220,6 +1274,10 @@ void TemplateTable::aastore() {
   __ testptr(rax, rax);
   __ jcc(Assembler::zero, is_null);
 
+  // Dat mod
+  __ movptr(r9, rdx);
+  // Dat mod ends
+
   // Move subklass into rbx
   __ load_klass(rbx, rax);
   // Move superklass into rax
@@ -1242,8 +1300,8 @@ void TemplateTable::aastore() {
   __ movptr(rax, at_tos());
   __ movl(rcx, at_tos_p1()); // index
   // Now store using the appropriate barrier
-  // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
   do_oop_store(_masm, element_address, rax, _bs->kind(), IS_ARRAY);
+  // call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
   __ jmp(done);
 
   // Have a NULL in rax, rdx=array, ecx=index.  Store NULL at ary[idx]
@@ -3003,6 +3061,11 @@ void TemplateTable::getfield_or_static(int byte_no, bool is_static, RewriteContr
 
   if (!is_static) pop_and_check_object(obj);
 
+  // // Dat mod
+  // // assuming that r9 will not be altered
+  // __ movptr(r9, obj);
+  // // Dat mod ends
+
   const Address field(obj, off, Address::times_1, 0*wordSize);
 
   Label Done, notByte, notBool, notInt, notShort, notChar, notLong, notFloat, notObj, notDouble;
@@ -3266,6 +3329,10 @@ void TemplateTable::putfield_or_static(int byte_no, bool is_static, RewriteContr
   __ shrl(rdx, ConstantPoolCacheEntry::is_volatile_shift);
   __ andl(rdx, 0x1);
 
+
+  // Dat mod
+  __ movptr(r9, obj);
+  // Dat mod ends
   // field addresses
   const Address field(obj, off, Address::times_1, 0*wordSize);
   NOT_LP64( const Address hi(obj, off, Address::times_1, 1*wordSize);)
@@ -3314,8 +3381,8 @@ void TemplateTable::putfield_or_static(int byte_no, bool is_static, RewriteContr
     __ pop(atos);
     if (!is_static) pop_and_check_object(obj);
     // Store into the field
-    // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
     do_oop_store(_masm, field, rax, _bs->kind());
+    // call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
     if (!is_static && rc == may_rewrite) {
       patch_bytecode(Bytecodes::_fast_aputfield, bc, rbx, true, byte_no);
     }
@@ -3557,14 +3624,18 @@ void TemplateTable::fast_storefield(TosState state) {
   // Get object from stack
   pop_and_check_object(rcx);
 
+  // Dat mod
+  __ movptr(r9, rcx);
+  // Dat mod ends
+
   // field address
   const Address field(rcx, rbx, Address::times_1);
 
   // access field
   switch (bytecode()) {
   case Bytecodes::_fast_aputfield:
-    // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
     do_oop_store(_masm, field, rax, _bs->kind());
+    // call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
     break;
   case Bytecodes::_fast_lputfield:
 #ifdef _LP64
@@ -3649,6 +3720,12 @@ void TemplateTable::fast_accessfield(TosState state) {
   // rax: object
   __ verify_oop(rax);
   __ null_check(rax);
+
+  // // Dat mod
+  // // assuming that r9 will not be altered
+  // __ movptr(r9, rax);
+  // // Dat mod ends
+
   Address field(rax, rbx, Address::times_1);
 
   // access field
@@ -3710,6 +3787,12 @@ void TemplateTable::fast_xaccess(TosState state) {
   // next instruction)
   __ increment(rbcp);
   __ null_check(rax);
+
+  // // Dat mod
+  // // assuming that r9 will not be altered
+  // __ movptr(r9, rax);
+  // // Dat mod ends
+
   const Address field = Address(rax, rbx, Address::times_1, 0*wordSize);
   switch (state) {
   case itos:

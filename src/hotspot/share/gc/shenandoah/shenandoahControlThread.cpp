@@ -446,12 +446,12 @@ void ShenandoahControlThread::service_concurrent_normal_cycle(GCCause::Cause cau
   // int arr_size = sizeof(heap->histogram()) / sizeof(heap->histogram()[0]);
   // log_info(gc)("Array size: %d", arr_size);
   log_info(gc)("Obj count ac histogram");
-  for (int i = 0; i < 20; i++){
+  for (int i = 0; i < 30; i++){
     log_info(gc)("\t%d: %lu", i, heap->histogram()[i]);
   }
 
   log_info(gc)("Obj size ac histogram");
-  for (int i = 0; i < 20; i++){
+  for (int i = 0; i < 30; i++){
     log_info(gc)("\t%d: %lu", i, heap->size_histogram()[i]);
   }
   heap->refresh_hot_cold_stats();
