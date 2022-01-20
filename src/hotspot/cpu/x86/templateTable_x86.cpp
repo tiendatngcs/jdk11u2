@@ -198,10 +198,10 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
       __ jcc(Assembler::equal, oop_is_null);
       __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), r9);
       
-      __ lea(r9, dst);
-      __ cmpptr(r9, 0);
-      __ jcc(Assembler::equal, oop_is_null);
-      __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), r9);
+      // __ lea(r9, dst);
+      // __ cmpptr(r9, 0);
+      // __ jcc(Assembler::equal, oop_is_null);
+      // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), r9);
     }
   }
   __ bind(oop_is_null);
