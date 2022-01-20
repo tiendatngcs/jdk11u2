@@ -18,3 +18,4 @@ NashornProfile.txt
 
 gce_test/*.log*
 make/*.log*
+java_progs/*.log*
