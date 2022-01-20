@@ -406,15 +406,16 @@ oop MemAllocator::finish(HeapWord* mem) const {
   // object zeroing are visible before setting the klass non-NULL, for
   // concurrent collectors.
   oopDesc::release_set_klass(mem, _klass);
-  oop return_oop = oop(mem);
-  return_oop->set_access_counter(0);
-  return_oop->set_gc_epoch(0);
-  return return_oop;
+
+  return oop(mem);
 }
 
 oop ObjAllocator::initialize(HeapWord* mem) const {
   mem_clear(mem);
-  return finish(mem);
+  oop obj = finish(mem);
+  obj->set_access_counter(0);
+  obj->set_gc_epoch(0);
+  return obj;
 }
 
 MemRegion ObjArrayAllocator::obj_memory_range(oop obj) const {
