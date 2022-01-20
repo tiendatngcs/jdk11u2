@@ -48,6 +48,10 @@ void oopDesc::set_access_counter(uintptr_t new_value){
   _access_counter = new_value;
 }
 
+void oopDesc::set_access_counter(HeapWord* mem, uintptr_t new_value){ 
+  *(uintptr_t*)(((char*)mem) + access_counter_offset_in_bytes()) = new_value;
+}
+
 uintptr_t oopDesc::access_counter() {
   // Do not check gc_epoch to reset access counter.
   return _access_counter;
@@ -85,6 +89,10 @@ void oopDesc::set_gc_epoch(uintptr_t new_value){
   // tty->print_raw("setting gc_epoch\n");
   // HeapAccess<MO_RELAXED>::store_at(as_oop(), gc_epoch_offset_in_bytes(), new_value);
   _gc_epoch = new_value;
+}
+
+void oopDesc::set_gc_epoch(HeapWord* mem, uintptr_t new_value){ 
+  *(uintptr_t*)(((char*)mem) + gc_epoch_offset_in_bytes()) = new_value;
 }
 
 void oopDesc::add_gc_epoch(uintptr_t increment) {
