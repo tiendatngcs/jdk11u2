@@ -666,6 +666,13 @@ jint Klass::jvmti_class_status() const {
 
 // Printing
 
+// void Klass::print_name_on(outputStream* st) const {
+//   ResourceMark rm;
+//   // print title
+//   st->print("%s", internal_name());
+//   st->cr();
+// }
+
 void Klass::print_on(outputStream* st) const {
   ResourceMark rm;
   // print title

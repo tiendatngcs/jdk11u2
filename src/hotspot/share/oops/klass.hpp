@@ -698,6 +698,8 @@ protected:
   virtual jint jvmti_class_status() const;
 
   // Printing
+
+  // virtual void print_name_on(outputStream* st) const;
   virtual void print_on(outputStream* st) const;
 
   virtual void oop_print_value_on(oop obj, outputStream* st);
