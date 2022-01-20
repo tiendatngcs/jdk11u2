@@ -954,7 +954,7 @@ void ShenandoahHeap::update_histogram(oop obj) {
     _size_histogram[0] += obj->size();
     return;
   }
-  if (oopDesc::static_gc_epoch > 0 && obj->gc_epoch() > oopDesc::static_gc_epoch){
+  if (obj->gc_epoch() > oopDesc::static_gc_epoch || (obj->access_counter() == 0 && obj->gc_epoch() == 0)){
     printf("untouched oop | ac %lu | gc_epoch %lu | size %d | klass %s\n", ac, obj->gc_epoch(), obj->size(), obj->klass()->external_name());
   }
   int idx = static_cast<int>(log2(ac)) + 1;

@@ -310,6 +310,7 @@ inline oop ShenandoahHeap::evacuate_object(oop p, Thread* thread) {
   // Try to install the new forwarding pointer.
   oop copy_val = oop(copy);
   // copy_val->set_access_counter(0);
+  printf("p: ac %lu gc_epoch region %d | copy_val: ac %lu gc_epoch region %lu", p->access_counter(), p->gc_epoch(), heap_region_index_containing(p), copy_val->access_counter(), copy_val->gc_epoch(), heap_region_index_containing(copy_val));
   oop result = ShenandoahForwarding::try_update_forwardee(p, copy_val);
   // increase_hotness_size(copy_val->size(), access_rate);
   if (result == copy_val) {
@@ -339,6 +340,8 @@ inline oop ShenandoahHeap::evacuate_object(oop p, Thread* thread) {
     shenandoah_assert_correct(NULL, result);
     increase_hotness_size(result);
     update_histogram(result);
+
+    printf("result: ac %lu gc_epoch region %d\n", result->access_counter(), result->gc_epoch(), heap_region_index_containing(result));
     return result;
   }
 }
