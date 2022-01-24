@@ -1043,13 +1043,13 @@ IRT_END
 
 IRT_LEAF(void, InterpreterRuntime::print_as_raw())
 {
-  tty->print_cr("As raw");
+  tty->print_cr("As raw--------------------------------------------------------------------");
 }
 IRT_END
 
 IRT_LEAF(void, InterpreterRuntime::print_not_as_raw())
 {
-  tty->print_cr("Not as raw");
+  tty->print_cr("Not as raw-----------------------------------------------------------------");
 }
 IRT_END
 
