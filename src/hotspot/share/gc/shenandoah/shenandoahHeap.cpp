@@ -954,7 +954,7 @@ void ShenandoahHeap::update_histogram(oop obj) {
     _size_histogram[0] += obj->size();
     return;
   }
-  if (obj->gc_epoch() > oopDesc::static_gc_epoch || (obj->access_counter() == 0 && obj->gc_epoch() == 0)){
+  if ((obj->access_counter() == 0 && obj->gc_epoch() == 0)){
     ResourceMark rm;
     tty->print_cr("untouched oop | ac %lu | gc_epoch %lu | size %d", ac, obj->gc_epoch(), obj->size());
     tty->print_cr("%s", obj->klass()->internal_name());
