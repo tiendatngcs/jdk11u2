@@ -456,10 +456,10 @@ void ShenandoahControlThread::service_concurrent_normal_cycle(GCCause::Cause cau
   }
 
   log_info(gc)("Valid/invalid oop stats\n"
-                "valid_count: %d\n"
-                "valid_size: %d\n"
-                "invalid_count: %d\n"
-                "invalid_size: %d\n", heap->oop_stats(true, true), heap->oop_stats(true, false), heap->oop_stats(false, true), heap->oop_stats(false, false));
+                "valid_count: %lu\n"
+                "valid_size: %lu\n"
+                "invalid_count: %lu\n"
+                "invalid_size: %lu\n", heap->oop_stats(true, true), heap->oop_stats(true, false), heap->oop_stats(false, true), heap->oop_stats(false, false));
 
   heap->refresh_hot_cold_stats();
   heap->reset_histogram();
