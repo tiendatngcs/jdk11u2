@@ -454,8 +454,16 @@ void ShenandoahControlThread::service_concurrent_normal_cycle(GCCause::Cause cau
   for (int i = 0; i < 30; i++){
     log_info(gc)("\t%d: %lu", i, heap->size_histogram()[i]);
   }
+
+  log_info(gc)("Valid/invalid oop stats\n"
+                "valid_count: %d\n"
+                "valid_size: %d\n"
+                "invalid_count: %d\n"
+                "invalid_size: %d\n", heap->oop_stats(true, true), heap->oop_stats(true, false), heap->oop_stats(false, true), heap->oop_stats(false, false));
+
   heap->refresh_hot_cold_stats();
   heap->reset_histogram();
+
   heap->heuristics()->record_success_concurrent();
   heap->shenandoah_policy()->record_success_concurrent();
   // heap->increase_gc_epoch(1);
