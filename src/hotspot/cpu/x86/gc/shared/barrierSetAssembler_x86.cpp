@@ -146,9 +146,11 @@ void BarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet decorators
       assert(val != noreg, "not supported");
       __ movptr(dst, val);
     }
+    __ print_state();
+    __ print_CPU_state();
     // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
     __ pusha();
-    __ call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_as_raw), dst.base());
+    // __ call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_as_raw), dst.base());
     __ popa();
     break;
   }
