@@ -271,7 +271,7 @@ static void array_barrier(InterpreterMacroAssembler* _masm,
   assert(is_array, "must be arrayoop");
   if (barrier == BarrierSet::ShenandoahBarrierSet){
     Label oop_is_null;
-    __ cmpptr(array_oop), 0);
+    __ cmpptr(arrayoop), 0);
     __ jcc(Assembler::equal, oop_is_null);
     __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_load_barrier));
     __ bind(oop_is_null);
