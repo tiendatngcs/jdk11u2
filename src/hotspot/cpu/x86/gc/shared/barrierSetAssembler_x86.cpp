@@ -146,25 +146,6 @@ void BarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet decorators
       assert(val != noreg, "not supported");
       __ movptr(dst, val);
     }
-    __ pusha();                      // push registers
-    // if (count == c_rarg0) {
-    //   if (addr == c_rarg1) {
-    //     // exactly backwards!!
-    //     __ xchgptr(c_rarg1, c_rarg0);
-    //   } else {
-    //     __ movptr(c_rarg1, count);
-    //     __ movptr(c_rarg0, addr);
-    //   }
-    // } else {
-    //   __ movptr(c_rarg0, addr);
-    //   __ movptr(c_rarg1, count);
-    // }
-    if (UseCompressedOops) {
-      __ call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_narrow_oop_entry), 0);
-    } else {
-      __ call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_oop_entry), 0);
-    }
-    __ popa();
     break;
   }
   case T_BOOLEAN:
