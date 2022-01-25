@@ -1299,12 +1299,12 @@ void TemplateTable::aastore() {
   __ movptr(rax, at_tos());    // value
   __ movl(rcx, at_tos_p1()); // index
   __ movptr(rdx, at_tos_p2()); // array
-  
+
   // Dat mod
   __ movptr(r9, rdx);
   // Dat mod ends
 
-  array_store_barrier(_masm, rdx, _bs->kind(), IS_ARRAY);
+  // array_store_barrier(_masm, rdx, _bs->kind(), IS_ARRAY);
 
   Address element_address(rdx, rcx,
                           UseCompressedOops? Address::times_4 : Address::times_ptr,
