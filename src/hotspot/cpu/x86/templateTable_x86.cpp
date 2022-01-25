@@ -964,11 +964,11 @@ void TemplateTable::aaload() {
   // rax: index
   // rdx: array
   index_check(rdx, rax); // kills rbx
-  array_load_barrier(_masm, rdx, _bs->kind(), IS_ARRAY);
   // // Dat mod
   // // assuming that r9 will not be altered
-  // __ movptr(r9, rdx);
+  __ movptr(r9, rdx);
   // // Dat mod ends
+  array_load_barrier(_masm, r9, _bs->kind(), IS_ARRAY);
   do_oop_load(_masm,
               Address(rdx, rax,
                       UseCompressedOops ? Address::times_4 : Address::times_ptr,
