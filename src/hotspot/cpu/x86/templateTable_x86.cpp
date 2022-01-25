@@ -967,9 +967,9 @@ void TemplateTable::aaload() {
   // // assuming that r9 will not be altered
   __ movptr(r9, rdx);
   // // Dat mod ends
-  __ pusha();
-  array_load_barrier(_masm, r9, _bs->kind(), IS_ARRAY);
-  __ popa();
+  // __ pusha();
+  array_load_barrier(_masm, rdx, _bs->kind(), IS_ARRAY);
+  // __ popa();
   do_oop_load(_masm,
               Address(rdx, rax,
                       UseCompressedOops ? Address::times_4 : Address::times_ptr,
@@ -1303,9 +1303,9 @@ void TemplateTable::aastore() {
   // Dat mod
   __ movptr(r9, rdx);
   // Dat mod ends
-  __ pusha();
-  array_store_barrier(_masm, r9, _bs->kind(), IS_ARRAY);
-  __ popa();
+  // __ pusha();
+  array_store_barrier(_masm, rdx, _bs->kind(), IS_ARRAY);
+  // __ popa();
 
   Address element_address(rdx, rcx,
                           UseCompressedOops? Address::times_4 : Address::times_ptr,
