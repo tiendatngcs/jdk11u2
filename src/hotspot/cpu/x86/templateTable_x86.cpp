@@ -166,15 +166,17 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
       __ lea(rdx, dst);
     }
 
-    __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), rdx);
+    // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), rdx);
 
     // Register new_val = val;
     // if (UseCompressedOops) {
     //   new_val = rbx;
     //   __ movptr(new_val, val);
     // }
-
+    __ pusha();
     __ store_heap_oop(Address(rdx, 0), val, rdx, rbx, decorators);
+    __ popa();
+    __ store_oop_barrier(rdx);
     // __ store_oop_barrier(rdx);
 
   } else {
