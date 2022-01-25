@@ -157,12 +157,12 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
   bool is_array = (decorators & IS_ARRAY) != 0;
 
   if (barrier == BarrierSet::ShenandoahBarrierSet) {
-    if (obj.index() == noreg && obj.disp() == 0) {
-      if (obj.base() != rdx) {
-        __ movq(rdx, obj.base());
+    if (dst.index() == noreg && dst.disp() == 0) {
+      if (dst.base() != rdx) {
+        __ movq(rdx, dst.base());
       }
     } else {
-      __ leaq(rdx, obj);
+      __ leaq(rdx, dst);
     }
 
     __ store_oop_barrier(rdx);
