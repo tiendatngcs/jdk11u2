@@ -147,7 +147,7 @@ void BarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet decorators
       __ movptr(dst, val);
     }
     // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
-    __ call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
+    __ call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_as_raw));
     break;
   }
   case T_BOOLEAN:
