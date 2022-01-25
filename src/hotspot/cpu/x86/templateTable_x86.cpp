@@ -263,6 +263,21 @@ static void do_oop_load(InterpreterMacroAssembler* _masm,
   }
 }
 
+static void array_barrier(InterpreterMacroAssembler* _masm,
+                          Register arrayoop,
+                          BarrierSet::Name barrier,
+                          DecoratorSet decorators = 0) {
+  bool is_array = (decorators & IS_ARRAY) != 0;
+  assert(is_array, "must be arrayoop");
+  if (barrier == BarrierSet::ShenandoahBarrierSet){
+    Label oop_is_null;
+    __ cmpptr(array_oop), 0);
+    __ jcc(Assembler::equal, oop_is_null);
+    __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_load_barrier));
+    __ bind(oop_is_null);
+  }
+}
+
 Address TemplateTable::at_bcp(int offset) {
   assert(_desc->uses_bcp(), "inconsistent uses_bcp information");
   return Address(rbcp, offset);
@@ -932,6 +947,7 @@ void TemplateTable::aaload() {
   // rax: index
   // rdx: array
   index_check(rdx, rax); // kills rbx
+  array_barrier(_masm, rdx, _bs->kind(), IS_ARRAY);
   // // Dat mod
   // // assuming that r9 will not be altered
   // __ movptr(r9, rdx);
@@ -1265,6 +1281,8 @@ void TemplateTable::aastore() {
   __ movptr(rax, at_tos());    // value
   __ movl(rcx, at_tos_p1()); // index
   __ movptr(rdx, at_tos_p2()); // array
+
+  array_barrier(_masm, rdx, _bs->kind(), IS_ARRAY);
 
   Address element_address(rdx, rcx,
                           UseCompressedOops? Address::times_4 : Address::times_ptr,
