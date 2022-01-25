@@ -968,7 +968,7 @@ void TemplateTable::aaload() {
   __ movptr(r9, rdx);
   // // Dat mod ends
   // __ pusha();
-  array_load_barrier(_masm, rdx, _bs->kind(), IS_ARRAY);
+  // array_load_barrier(_masm, rdx, _bs->kind(), IS_ARRAY);
   // __ popa();
   do_oop_load(_masm,
               Address(rdx, rax,
@@ -1304,7 +1304,7 @@ void TemplateTable::aastore() {
   __ movptr(r9, rdx);
   // Dat mod ends
   // __ pusha();
-  array_store_barrier(_masm, rdx, _bs->kind(), IS_ARRAY);
+  // array_store_barrier(_masm, rdx, _bs->kind(), IS_ARRAY);
   // __ popa();
 
   Address element_address(rdx, rcx,
