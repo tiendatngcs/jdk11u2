@@ -202,7 +202,7 @@ public:
     template <typename T>
     static T load_in_heap(T* addr) {
       // printf("BarrierSet::load_in_heap called\n");
-      addr_increase_access_counter(addr, 1);
+      // addr_increase_access_counter(addr, 1);
       return Raw::template load<T>(addr);
     }
 
@@ -287,6 +287,8 @@ public:
                                   arrayOop dst_obj, size_t dst_offset_in_bytes, T* dst_raw,
                                   size_t length) {
       // printf("BarrierSet::arraycopy_in_heap called\n");
+      oop_increase_access_counter(src_obj);
+      oop_increase_access_counter(dst_obj);
       Raw::arraycopy(src_obj, src_offset_in_bytes, src_raw,
                      dst_obj, dst_offset_in_bytes, dst_raw,
                      length);
