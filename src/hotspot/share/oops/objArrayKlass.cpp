@@ -259,7 +259,6 @@ void ObjArrayKlass::copy_array(arrayOop s, int src_pos, arrayOop d,
 
   s->increase_access_counter(1);
   d->increase_access_counter(1);
-  printf("Copying array -----------------------------------\n");
 
   if (!d->is_objArray()) {
     ResourceMark rm(THREAD);
