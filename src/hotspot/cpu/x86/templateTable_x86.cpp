@@ -273,6 +273,7 @@ static void array_store_barrier(InterpreterMacroAssembler* _masm,
     Label oop_is_null;
     __ cmpptr(arrayoop, 0);
     __ jcc(Assembler::equal, oop_is_null);
+    assert(arrayoop==rdx, "arrayoop must be rdx ?");
     __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
     __ bind(oop_is_null);
   }
@@ -966,9 +967,9 @@ void TemplateTable::aaload() {
   index_check(rdx, rax); // kills rbx
   // // Dat mod
   // // assuming that r9 will not be altered
-  __ movptr(r9, rdx);
+  // __ movptr(r9, rdx);
   // // Dat mod ends
-  array_load_barrier(_masm, r9, _bs->kind(), IS_ARRAY);
+  // array_load_barrier(_masm, r9, _bs->kind(), IS_ARRAY);
   do_oop_load(_masm,
               Address(rdx, rax,
                       UseCompressedOops ? Address::times_4 : Address::times_ptr,
@@ -1298,6 +1299,10 @@ void TemplateTable::aastore() {
   __ movptr(rax, at_tos());    // value
   __ movl(rcx, at_tos_p1()); // index
   __ movptr(rdx, at_tos_p2()); // array
+  
+  // Dat mod
+  __ movptr(r9, rdx);
+  // Dat mod ends
 
   array_store_barrier(_masm, rdx, _bs->kind(), IS_ARRAY);
 
@@ -1309,9 +1314,6 @@ void TemplateTable::aastore() {
   __ testptr(rax, rax);
   __ jcc(Assembler::zero, is_null);
 
-  // Dat mod
-  __ movptr(r9, rdx);
-  // Dat mod ends
 
   // Move subklass into rbx
   __ load_klass(rbx, rax);
