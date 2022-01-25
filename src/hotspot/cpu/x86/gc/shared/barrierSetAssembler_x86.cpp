@@ -148,7 +148,7 @@ void BarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet decorators
     }
     // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
     __ pusha();
-    __ call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_as_raw));
+    __ call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_as_raw), dst.base());
     __ popa();
     break;
   }

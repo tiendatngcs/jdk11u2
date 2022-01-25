@@ -1041,9 +1041,18 @@ IRT_ENTRY(void, InterpreterRuntime::print_store_barrier(JavaThread* thread))
 }
 IRT_END
 
-IRT_LEAF(void, InterpreterRuntime::print_as_raw())
+IRT_LEAF(void, InterpreterRuntime::print_as_raw(oopDesc* obj))
 {
   tty->print_cr("As raw--------------------------------------------------------------------");
+  // assert(obj != 0, "Null oop");
+  bool is_oop = oopDesc::is_oop(obj);
+  if (is_oop) {
+    // tty->print_raw("wb: is oop\n");
+    // tty->print_cr("oop ac %lu | epoch %lu\n", obj->access_counter(), obj->gc_epoch());
+    obj->increase_access_counter(1);
+    return;
+  }
+  tty->print_cr("wb: is not oop");
 }
 IRT_END
 
