@@ -288,9 +288,9 @@ static void array_load_barrier(InterpreterMacroAssembler* _masm,
     Label oop_is_null;
     __ cmpptr(arrayoop, 0);
     __ jcc(Assembler::equal, oop_is_null);
-    __ push(rax);
+    __ pusha();
     __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_load_barrier));
-    __ pop(rax);
+    __ popa();
     __ bind(oop_is_null);
   }
 }
