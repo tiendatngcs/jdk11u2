@@ -5540,7 +5540,7 @@ void MacroAssembler::store_oop_barrier(Register oop) {
   //   movptr(c_rarg0, addr);
   //   movptr(c_rarg1, count);
   // }
-  movptr(c_rarg0, oop)
+  movptr(c_rarg0, oop);
   if (UseCompressedOops) {
     call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_narrow_oop_entry), 1);
   } else {
