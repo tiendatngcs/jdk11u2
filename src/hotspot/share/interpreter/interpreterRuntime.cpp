@@ -1062,6 +1062,14 @@ IRT_LEAF(void, InterpreterRuntime::print_not_as_raw())
 }
 IRT_END
 
+void InterpreterRuntime::print_oop_entry() {
+  tty->print_cr("Oop entry -----------------------------------------------------------------");
+}
+
+void InterpreterRuntime::print_narrow_oop_entry() {
+  tty->print_cr("Narrow oop entry -----------------------------------------------------------------");
+}
+
 IRT_ENTRY(void, InterpreterRuntime::write_barrier(JavaThread* thread, oopDesc* obj))
 {
   // tty->print_raw("Increasing access counter\n");
