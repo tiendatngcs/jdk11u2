@@ -239,8 +239,9 @@ void ShenandoahBarrierSetAssembler::satb_write_barrier_pre(MacroAssembler* masm,
     __ load_heap_oop(pre_val, Address(obj, 0), noreg, noreg, AS_RAW);
 
     //Dat mod
-    __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), obj);
-    
+    // change this to call vm leaf?
+    // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), obj);
+
   }
 
   // Is the previous value null?
