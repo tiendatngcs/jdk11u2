@@ -192,7 +192,7 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
   __ store_heap_oop(dst, val, rdx, rbx, decorators);
   if (val == noreg) return;
 
-  Label oop_is_null, assertion;
+  Label oop_is_null, assertion, done;
   // __ cmpptr(dst.base(), 0);
   // __ jcc(Assembler::equal, oop_is_null);
 
@@ -213,8 +213,11 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
 
     if (!is_array || (dst.index() == noreg && dst.disp() == 0)) {
       __ cmpptr(r9, dst.base());
-      __ jcc(Assembler::notEqual, assertion);
+      __ jcc(Assembler::equal, assertion);
+      assert(false, "Assertion failed");
+      __ jmp(done);
 
+      __ bind(assertion);
       __ cmpptr(r9, 0);
       __ jcc(Assembler::equal, oop_is_null);
       __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), r9);
@@ -230,11 +233,11 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
       // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), r9);
     }
   }
-  if (false){
-    __ bind(assertion);
-    assert(false, "Assertion failed");
-  }
+
   __ bind(oop_is_null);
+
+  __ bind(done);
+
 }
 
 static void do_oop_load(InterpreterMacroAssembler* _masm,
