@@ -27,6 +27,7 @@
 
 #include "asm/macroAssembler.hpp"
 #include "gc/shared/modRefBarrierSetAssembler.hpp"
+#include "interpreter/interpreterRuntime.hpp"
 
 class CardTableBarrierSetAssembler: public ModRefBarrierSetAssembler {
 protected:
