@@ -188,11 +188,11 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
 
 
 
-
+  // __ movptr(r8, dst);
   __ store_heap_oop(dst, val, rdx, rbx, decorators);
   if (val == noreg) return;
 
-  Label oop_is_null;
+  Label oop_is_null, assertion;
   // __ cmpptr(dst.base(), 0);
   // __ jcc(Assembler::equal, oop_is_null);
 
@@ -212,10 +212,12 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
 
 
     if (!is_array || (dst.index() == noreg && dst.disp() == 0)) {
-      assert(r9 == dst.base(), "dst.base is no more obj");
-      __ cmpptr(dst.base(), 0);
+      __ cmpptr(r9, dst.base());
+      __ jcc(Assembler::notEqual, assertion);
+
+      __ cmpptr(r9, 0);
       __ jcc(Assembler::equal, oop_is_null);
-      __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), dst.base());
+      __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), r9);
     } else { // is_array
       // dst.base(), which is rdx, could have been altered. Therefore, arrayoop is saved to r9 in aastore
       __ cmpptr(r9, 0);
@@ -227,6 +229,10 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
       // __ jcc(Assembler::equal, oop_is_null);
       // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), r9);
     }
+  }
+  if (false){
+    __ bind(assertion);
+    assert(false, "Assertion failed");
   }
   __ bind(oop_is_null);
 }
