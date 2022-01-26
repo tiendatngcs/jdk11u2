@@ -67,21 +67,22 @@ uintptr_t oopDesc::true_access_counter() {
   return _access_counter;
 }
 
-void oopDesc::increase_access_counter(uintptr_t increment) {
-  if (_gc_epoch != static_gc_epoch) {
-    _gc_epoch = static_gc_epoch;
-    _access_counter = 0;
-  }
-  // code below prevents overflow
-  if (UINTPTR_MAX - increment > _access_counter){
-    _access_counter += increment;
-  }
-  else {
-    printf("Access Counter reaches UINTPTR_MAX\n");
-    if (_access_counter < UINTPTR_MAX){
-      _access_counter = UINTPTR_MAX;
-    }
-  }
+void oopDesc::increase_access_counter() {
+  // if (_gc_epoch != static_gc_epoch) {
+  //   _gc_epoch = static_gc_epoch;
+  //   _access_counter = 0;
+  // }
+  // // code below prevents overflow
+  // if (UINTPTR_MAX - increment > _access_counter){
+  //   _access_counter += increment;
+  // }
+  // else {
+  //   printf("Access Counter reaches UINTPTR_MAX\n");
+  //   if (_access_counter < UINTPTR_MAX){
+  //     _access_counter = UINTPTR_MAX;
+  //   }
+  // }
+  _gc_epoch += 1;
 }
 
 uintptr_t oopDesc::gc_epoch() const {

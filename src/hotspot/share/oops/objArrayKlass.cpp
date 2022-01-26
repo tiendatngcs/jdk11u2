@@ -257,8 +257,8 @@ void ObjArrayKlass::copy_array(arrayOop s, int src_pos, arrayOop d,
                                int dst_pos, int length, TRAPS) {
   assert(s->is_objArray(), "must be obj array");
 
-  s->increase_access_counter(1);
-  d->increase_access_counter(1);
+  s->increase_access_counter();
+  d->increase_access_counter();
 
   if (!d->is_objArray()) {
     ResourceMark rm(THREAD);

@@ -44,7 +44,7 @@ private:
     T o = RawAccess<>::oop_load(p);
     if (!CompressedOops::is_null(o)) {
       oop obj = CompressedOops::decode_not_null(o);
-      obj->increase_access_counter(1);
+      obj->increase_access_counter();
       if (HAS_FWD && _cset->is_in(obj)) {
         oop fwd = _bs->resolve_forwarded_not_null(obj);
         if (EVAC && obj == fwd) {
@@ -53,7 +53,7 @@ private:
         assert(obj != fwd || _heap->cancelled_gc(), "must be forwarded");
         ShenandoahHeap::cas_oop(fwd, p, o);
         obj = fwd;
-        obj->increase_access_counter(1);
+        obj->increase_access_counter();
       }
       if (ENQUEUE) {
         _bs->enqueue(obj);
