@@ -55,6 +55,9 @@ private:
                                     bool tosca_live,
                                     bool expand_call);
 
+  void shenandoah_write_barrier_post(MacroAssembler* masm,
+                                    Register obj);
+
   void load_reference_barrier_not_null(MacroAssembler* masm, Register dst, Address src);
 
   void iu_barrier_impl(MacroAssembler* masm, Register dst, Register tmp);
