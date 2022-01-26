@@ -32,6 +32,10 @@
 
 void ShenandoahRuntime::arraycopy_barrier_oop_entry(oop* src, oop* dst, size_t length) {
   ShenandoahBarrierSet *bs = ShenandoahBarrierSet::barrier_set();
+  oop s = *src;
+  s->increase_access_counter(1);
+  s = *dst;
+  s->increase_access_counter(1);
   bs->arraycopy_barrier(src, dst, length);
 }
 

@@ -67,6 +67,8 @@ inline oop ShenandoahBarrierSet::load_reference_barrier_mutator(oop obj, T* load
   assert(ShenandoahLoadRefBarrier, "should be enabled");
   shenandoah_assert_in_cset(load_addr, obj);
 
+  obj->increase_access_counter(1);
+
   oop fwd = resolve_forwarded_not_null_mutator(obj);
   if (obj == fwd) {
     // Dat mod ends
@@ -82,7 +84,7 @@ inline oop ShenandoahBarrierSet::load_reference_barrier_mutator(oop obj, T* load
     ShenandoahHeap::cas_oop(fwd, load_addr, obj);
   }
   // Dat mod
-  // oop_increase_access_counter(fwd);
+  fwd->increase_access_counter(1);
 
   return fwd;
 }

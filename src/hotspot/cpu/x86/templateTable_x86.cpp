@@ -219,9 +219,9 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
 
       // __ bind(assertion);
       // r9 = obj containing this field
-      __ cmpptr(r9, 0);
+      __ cmpptr(dst.base(), 0);
       __ jcc(Assembler::equal, oop_is_null);
-      __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), r9);
+      __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), dst.base());
       
     } else { // is_array
       // dst.base(), which is rdx, could have been altered. Therefore, arrayoop is saved to r9 in aastore
