@@ -240,6 +240,13 @@ void ShenandoahBarrierSetAssembler::satb_write_barrier_pre(MacroAssembler* masm,
 
     //Dat mod
     // change this to call vm leaf?
+
+    if (c_rarg0 != obj) {
+      __ mov(c_rarg0, obj);
+    }
+    __ pusha();
+    __ MacroAssembler::call_VM_leaf_base(CAST_FROM_FN_PTR(address, ShenandoahRuntime::write_barrier_helper), 1);
+    __ popa();
     // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), obj);
 
   }
