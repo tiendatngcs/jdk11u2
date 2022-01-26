@@ -298,39 +298,39 @@ static void do_oop_load(InterpreterMacroAssembler* _masm,
   // }
 }
 
-static void array_store_barrier(InterpreterMacroAssembler* _masm,
-                          Register arrayoop,
-                          BarrierSet::Name barrier,
-                          DecoratorSet decorators = 0) {
-  bool is_array = (decorators & IS_ARRAY) != 0;
-  assert(is_array, "must be arrayoop");
-  if (barrier == BarrierSet::ShenandoahBarrierSet){
-    Label oop_is_null;
-    __ cmpptr(arrayoop, 0);
-    __ jcc(Assembler::equal, oop_is_null);
-    __ pusha();
-    __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
-    __ popa();
-    __ bind(oop_is_null);
-  }
-}
+// static void array_store_barrier(InterpreterMacroAssembler* _masm,
+//                           Register arrayoop,
+//                           BarrierSet::Name barrier,
+//                           DecoratorSet decorators = 0) {
+//   bool is_array = (decorators & IS_ARRAY) != 0;
+//   assert(is_array, "must be arrayoop");
+//   if (barrier == BarrierSet::ShenandoahBarrierSet){
+//     Label oop_is_null;
+//     __ cmpptr(arrayoop, 0);
+//     __ jcc(Assembler::equal, oop_is_null);
+//     __ pusha();
+//     __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
+//     __ popa();
+//     __ bind(oop_is_null);
+//   }
+// }
 
-static void array_load_barrier(InterpreterMacroAssembler* _masm,
-                          Register arrayoop,
-                          BarrierSet::Name barrier,
-                          DecoratorSet decorators = 0) {
-  bool is_array = (decorators & IS_ARRAY) != 0;
-  assert(is_array, "must be arrayoop");
-  if (barrier == BarrierSet::ShenandoahBarrierSet){
-    Label oop_is_null;
-    __ cmpptr(arrayoop, 0);
-    __ jcc(Assembler::equal, oop_is_null);
-    __ pusha();
-    __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_load_barrier));
-    __ popa();
-    __ bind(oop_is_null);
-  }
-}
+// static void array_load_barrier(InterpreterMacroAssembler* _masm,
+//                           Register arrayoop,
+//                           BarrierSet::Name barrier,
+//                           DecoratorSet decorators = 0) {
+//   bool is_array = (decorators & IS_ARRAY) != 0;
+//   assert(is_array, "must be arrayoop");
+//   if (barrier == BarrierSet::ShenandoahBarrierSet){
+//     Label oop_is_null;
+//     __ cmpptr(arrayoop, 0);
+//     __ jcc(Assembler::equal, oop_is_null);
+//     __ pusha();
+//     __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_load_barrier));
+//     __ popa();
+//     __ bind(oop_is_null);
+//   }
+// }
 
 Address TemplateTable::at_bcp(int offset) {
   assert(_desc->uses_bcp(), "inconsistent uses_bcp information");
@@ -1003,7 +1003,7 @@ void TemplateTable::aaload() {
   index_check(rdx, rax); // kills rbx
   // // Dat mod
   // // assuming that r9 will not be altered
-  __ movptr(r9, rdx);
+  // __ movptr(r9, rdx);
   // // Dat mod ends
   // __ pusha();
   // array_load_barrier(_masm, rdx, _bs->kind(), IS_ARRAY);
@@ -1339,7 +1339,7 @@ void TemplateTable::aastore() {
   __ movptr(rdx, at_tos_p2()); // array
 
   // Dat mod
-  __ movptr(r9, rdx);
+  // __ movptr(r9, rdx);
   // Dat mod ends
   // __ pusha();
   // array_store_barrier(_masm, rdx, _bs->kind(), IS_ARRAY);
@@ -3415,7 +3415,7 @@ void TemplateTable::putfield_or_static(int byte_no, bool is_static, RewriteContr
 
 
   // Dat mod
-  __ movptr(r9, obj);
+  // __ movptr(r9, obj);
   // Dat mod ends
   // field addresses
   const Address field(obj, off, Address::times_1, 0*wordSize);
@@ -3709,7 +3709,7 @@ void TemplateTable::fast_storefield(TosState state) {
   pop_and_check_object(rcx);
 
   // Dat mod
-  __ movptr(r9, rcx);
+  // __ movptr(r9, rcx);
   // Dat mod ends
 
   // field address
