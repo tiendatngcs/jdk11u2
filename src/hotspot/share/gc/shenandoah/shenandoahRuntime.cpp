@@ -56,15 +56,16 @@ JRT_LEAF(void, ShenandoahRuntime::write_ref_field_pre_entry(oopDesc* orig, JavaT
   ShenandoahThreadLocalData::satb_mark_queue(thread).enqueue_known_active(orig);
 JRT_END
 
-JRT_LEAF(void, ShenandoahRuntime::write_barrier_helper(oopDesc* obj)) 
-  bool is_oop = oopDesc::is_oop(obj);
-  if (is_oop) {
-    // tty->print_raw("wb: is oop\n");
-    // tty->print_cr("oop ac %lu | epoch %lu\n", obj->access_counter(), obj->gc_epoch());
-    obj->increase_access_counter(1);
-    return;
-  }
-  tty->print_cr("SRT_wb: is not oop");
+JRT_LEAF(void, ShenandoahRuntime::write_barrier_helper(oopDesc* obj))
+  tty->print_cr("SRT_wb: obj ptr ? %p", obj);
+  // bool is_oop = oopDesc::is_oop(obj);
+  // if (is_oop) {
+  //   // tty->print_raw("wb: is oop\n");
+  //   // tty->print_cr("oop ac %lu | epoch %lu\n", obj->access_counter(), obj->gc_epoch());
+  //   obj->increase_access_counter(1);
+  //   return;
+  // }
+  // tty->print_cr("SRT_wb: is not oop");
 JRT_END
 
 JRT_LEAF(oopDesc*, ShenandoahRuntime::load_reference_barrier(oopDesc* src, oop* load_addr))
