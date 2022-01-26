@@ -1380,7 +1380,7 @@ void TemplateTable::aastore() {
   do_oop_store(_masm, element_address, rax, _bs->kind(), IS_ARRAY);
   // call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
   // oop barrier
-  __ store_oop_barrier(r9);
+  // __ store_oop_barrier(r9);
   __ jmp(done);
 
   // Have a NULL in rax, rdx=array, ecx=index.  Store NULL at ary[idx]
@@ -1394,7 +1394,7 @@ void TemplateTable::aastore() {
   // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
   do_oop_store(_masm, element_address, noreg, _bs->kind(), IS_ARRAY);
   // oop barrier
-  __ store_oop_barrier(r9);
+  // __ store_oop_barrier(r9);
 
   // Pop stack arguments
   __ bind(done);
