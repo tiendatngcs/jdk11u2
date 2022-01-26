@@ -156,78 +156,79 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
   assert(val == noreg || val == rax, "parameter is just for looks");
   bool is_array = (decorators & IS_ARRAY) != 0;
 
-  if (barrier == BarrierSet::ShenandoahBarrierSet) {
-
-    if (dst.index() == noreg && dst.disp() == 0) {
-      if (dst.base() != rdx) {
-        __ movptr(rdx, dst.base());
-      }
-    } else {
-      __ lea(rdx, dst);
-    }
-
-    __ store_oop_barrier(rdx);
-
-    // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), rdx);
-
-    // Register new_val = val;
-    // if (UseCompressedOops) {
-    //   new_val = rbx;
-    //   __ movptr(new_val, val);
-    // }
-    // __ pusha();
-    __ store_heap_oop(Address(rdx, 0), val, rdx, rbx, decorators);
-    // __ popa();
-    // __ store_oop_barrier(rdx);
-
-  } else {
-    __ store_heap_oop(dst, val, rdx, rbx, decorators);
-  }
-
-
-
-
-
-
-  // __ store_heap_oop(dst, val, rdx, rbx, decorators);
-  // if (val == noreg) return;
-
-  // Label oop_is_null;
-  // // __ cmpptr(dst.base(), 0);
-  // // __ jcc(Assembler::equal, oop_is_null);
-
   // if (barrier == BarrierSet::ShenandoahBarrierSet) {
-  //   // flatten object address if needed
-  //   // if (dst.index() == noreg && dst.disp() == 0) {
-  //   //   if (dst.base() != r8) {
-  //   //     __ movq(r8, dst.base());
-  //   //   }
-  //   // } else {
-  //   //   __ leaq(r8, dst);
-  //   // }
 
-  //   // __ cmpptr(r8, 0);
-  //   // __ jcc(Assembler::equal, oop_is_null);
-  //   // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), r8);
-
-
-  //   if (!is_array || (dst.index() == noreg && dst.disp() == 0)) {
-  //     __ cmpptr(dst.base(), 0);
-  //     __ jcc(Assembler::equal, oop_is_null);
-  //     __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), dst.base());
-  //   } else { // is_array
-  //     // dst.base(), which is rdx, could have been altered. Therefore, arrayoop is saved to r9 in aastore
-  //     __ cmpptr(r9, 0);
-  //     __ jcc(Assembler::equal, oop_is_null);
-  //     __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), r9);
-      
-  //     // __ lea(r9, dst);
-  //     // __ cmpptr(r9, 0);
-  //     // __ jcc(Assembler::equal, oop_is_null);
-  //     // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), r9);
+  //   if (dst.index() == noreg && dst.disp() == 0) {
+  //     if (dst.base() != rdx) {
+  //       __ movptr(rdx, dst.base());
+  //     }
+  //   } else {
+  //     __ lea(rdx, dst);
   //   }
+
+  //   __ store_oop_barrier(rdx);
+
+  //   // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), rdx);
+
+  //   // Register new_val = val;
+  //   // if (UseCompressedOops) {
+  //   //   new_val = rbx;
+  //   //   __ movptr(new_val, val);
+  //   // }
+  //   // __ pusha();
+  //   __ store_heap_oop(Address(rdx, 0), val, rdx, rbx, decorators);
+  //   // __ popa();
+  //   // __ store_oop_barrier(rdx);
+
+  // } else {
+  //   __ store_heap_oop(dst, val, rdx, rbx, decorators);
   // }
-  // __ bind(oop_is_null);
+
+
+
+
+
+
+  __ store_heap_oop(dst, val, rdx, rbx, decorators);
+  if (val == noreg) return;
+
+  Label oop_is_null;
+  // __ cmpptr(dst.base(), 0);
+  // __ jcc(Assembler::equal, oop_is_null);
+
+  if (barrier == BarrierSet::ShenandoahBarrierSet) {
+    // flatten object address if needed
+    // if (dst.index() == noreg && dst.disp() == 0) {
+    //   if (dst.base() != r8) {
+    //     __ movq(r8, dst.base());
+    //   }
+    // } else {
+    //   __ leaq(r8, dst);
+    // }
+
+    // __ cmpptr(r8, 0);
+    // __ jcc(Assembler::equal, oop_is_null);
+    // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), r8);
+
+
+    if (!is_array || (dst.index() == noreg && dst.disp() == 0)) {
+      assert(r9 == dst.base(), "dst.base is no more obj");
+      __ cmpptr(dst.base(), 0);
+      __ jcc(Assembler::equal, oop_is_null);
+      __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), dst.base());
+    } else { // is_array
+      // dst.base(), which is rdx, could have been altered. Therefore, arrayoop is saved to r9 in aastore
+      __ cmpptr(r9, 0);
+      __ jcc(Assembler::equal, oop_is_null);
+      __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), r9);
+      
+      // __ lea(r9, dst);
+      // __ cmpptr(r9, 0);
+      // __ jcc(Assembler::equal, oop_is_null);
+      // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), r9);
+    }
+  }
+  __ bind(oop_is_null);
 }
 
 static void do_oop_load(InterpreterMacroAssembler* _masm,
@@ -1360,8 +1361,6 @@ void TemplateTable::aastore() {
   // Come here on success
   __ bind(ok_is_subtype);
 
-  // oop barrier
-  // __ store_oop_barrier(r9);
 
   // Get the value we will store
   __ movptr(rax, at_tos());
@@ -1369,6 +1368,8 @@ void TemplateTable::aastore() {
   // Now store using the appropriate barrier
   do_oop_store(_masm, element_address, rax, _bs->kind(), IS_ARRAY);
   // call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
+  // oop barrier
+  __ store_oop_barrier(r9);
   __ jmp(done);
 
   // Have a NULL in rax, rdx=array, ecx=index.  Store NULL at ary[idx]
@@ -1381,6 +1382,8 @@ void TemplateTable::aastore() {
   // Store a NULL
   // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
   do_oop_store(_masm, element_address, noreg, _bs->kind(), IS_ARRAY);
+  // oop barrier
+  __ store_oop_barrier(r9);
 
   // Pop stack arguments
   __ bind(done);
