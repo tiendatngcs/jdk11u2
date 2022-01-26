@@ -188,7 +188,7 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
 
 
 
-  // __ movptr(r8, dst);
+  __ movptr(r8, dst);
   __ store_heap_oop(dst, val, rdx, rbx, decorators);
   if (val == noreg) return;
 
@@ -212,15 +212,17 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
 
 
     if (!is_array || (dst.index() == noreg && dst.disp() == 0)) {
-      __ cmpptr(r9, dst.base());
-      __ jcc(Assembler::equal, assertion);
-      assert(false, "Assertion failed");
-      __ jmp(done);
+      // __ cmpptr(r9, dst.base());
+      // __ jcc(Assembler::equal, assertion);
+      // assert(false, "Assertion failed");
+      // __ jmp(done);
 
-      __ bind(assertion);
+      // __ bind(assertion);
+      // r9 = obj containing this field
       __ cmpptr(r9, 0);
       __ jcc(Assembler::equal, oop_is_null);
       __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), r9);
+      
     } else { // is_array
       // dst.base(), which is rdx, could have been altered. Therefore, arrayoop is saved to r9 in aastore
       __ cmpptr(r9, 0);
