@@ -663,7 +663,7 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
       __ popa();
 
       __ pusha();
-      __ increase_access_counter(tmp1 /*obj*/, rcx /*tmp1*/, rdx /*tmp2*/);
+      __ increase_access_counter(tmp1 /*obj*/, r8 /*tmp1*/, r9 /*tmp2*/);
       __ popa();
 
       __ pusha();
