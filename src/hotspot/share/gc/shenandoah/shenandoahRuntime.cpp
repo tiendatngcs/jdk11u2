@@ -57,26 +57,25 @@ JRT_LEAF(void, ShenandoahRuntime::write_ref_field_pre_entry(oopDesc* orig, JavaT
 JRT_END
 
 JRT_LEAF(void, ShenandoahRuntime::write_barrier_helper(oopDesc* obj))
-  tty->print_cr("SRT_wb: obj ptr ? %p", obj);
-  obj->increase_access_counter();
+  // tty->print_cr("SRT_wb: obj ptr ? %p", obj);
   bool is_oop = oopDesc::is_oop(obj);
-  // if (is_oop) {
-  //   // tty->print_raw("wb: is oop\n");
-  //   // tty->print_cr("oop ac %lu | epoch %lu\n", obj->access_counter(), obj->gc_epoch());
-  //   obj->increase_access_counter();
-  //   return;
-  // }
-  // tty->print_cr("SRT_wb: is not oop");
+  if (is_oop) {
+    // tty->print_raw("wb: is oop\n");
+    // tty->print_cr("oop ac %lu | epoch %lu\n", obj->access_counter(), obj->gc_epoch());
+    obj->increase_access_counter();
+    return;
+  }
+  tty->print_cr("SRT_wb: is not oop");
 JRT_END
 
-// JRT_LEAF(void, ShenandoahRuntime::print_oop(oopDesc* obj))
-//   tty->print_cr("oop @ %p | ac = %lu | gc_epoch = %lu", obj, obj->access_counter(), obj->gc_epoch());
+JRT_LEAF(void, ShenandoahRuntime::print_oop(oopDesc* obj))
+  tty->print_cr("oop @ %p | ac = %lu | gc_epoch = %lu", obj, obj->access_counter(), obj->gc_epoch());
+JRT_END
+
+// JRT_LEAF(void, ShenandoahRuntime::print_oop(oopDesc* obj1, oopDesc* obj2))
+//   tty->print_cr("oop1 @ %p | ac = %lu | gc_epoch = %lu |||"
+//                 "oop2 @ %p | ac = %lu | gc_epoch = %lu\n", obj1, obj1->access_counter(), obj1->gc_epoch(), obj2, obj2->access_counter(), obj2->gc_epoch());
 // JRT_END
-
-JRT_LEAF(void, ShenandoahRuntime::print_oop(oopDesc* obj1, oopDesc* obj2))
-  tty->print_cr("oop1 @ %p | ac = %lu | gc_epoch = %lu |||"
-                "oop2 @ %p | ac = %lu | gc_epoch = %lu\n", obj1, obj1->access_counter(), obj1->gc_epoch(), obj2, obj2->access_counter(), obj2->gc_epoch());
-JRT_END
 
 JRT_LEAF(oopDesc*, ShenandoahRuntime::load_reference_barrier(oopDesc* src, oop* load_addr))
   // tty->print_raw("ShenandoahRuntime::load_reference_barrier\n");
