@@ -656,7 +656,7 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
       // store what is in obj to stack
       __ push(tmp1);
       // obj is the address to the actual oop load oop to the same register
-      movptr(tmp1, Address(tmp1, 0));
+      __ movptr(tmp1, Address(tmp1, 0));
 
       __ pusha();
       __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), tmp1);
