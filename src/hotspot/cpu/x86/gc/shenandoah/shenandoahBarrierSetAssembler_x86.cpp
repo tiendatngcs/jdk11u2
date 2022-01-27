@@ -366,9 +366,9 @@ void ShenandoahBarrierSetAssembler::shenandoah_write_barrier_post(MacroAssembler
   // void store_sized_value(Address dst, Register src, size_t size_in_bytes, Register src2 = noreg);
   // __ store_sized_value(Address(obj, oopDesc::access_counter_offset_in_bytes()), r9, sizeof(uintptr_t));
 
-  __ movptr(r9, obj);
+  __ movptr(r8, obj);
   __ pusha();
-  __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::write_barrier_helper), r9);
+  __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::write_barrier_helper), r8);
   __ popa();
   
   // __ pop(r9);
@@ -634,7 +634,7 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
     NOT_LP64(imasm->restore_bcp());
     // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
     // if as_normal?
-    if (as_normal) {
+    if (as_normal && val != noreg) {
       shenandoah_write_barrier_post(masm, tmp1);
     }
   } else {
