@@ -79,6 +79,14 @@ JRT_END
 //                 "oop2 @ %p | ac = %lu | gc_epoch = %lu\n", obj1, obj1->access_counter(), obj1->gc_epoch(), obj2, obj2->access_counter(), obj2->gc_epoch());
 // JRT_END
 
+JRT_LEAF(void, ShenandoahRuntime::print_address(void* address))
+  tty->print_cr("address %p", address);
+JRT_END
+
+JRT_LEAF(void, ShenandoahRuntime::print_new_line())
+  tty->print_cr("\n");
+JRT_END
+
 JRT_LEAF(oopDesc*, ShenandoahRuntime::load_reference_barrier(oopDesc* src, oop* load_addr))
   // tty->print_raw("ShenandoahRuntime::load_reference_barrier\n");
   src->increase_access_counter();

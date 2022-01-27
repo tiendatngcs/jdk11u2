@@ -340,11 +340,14 @@ void ShenandoahBarrierSetAssembler::shenandoah_write_barrier_post(MacroAssembler
   __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), obj);
   assert_different_registers(obj, r9);
   __ lea(r9, Address(obj, oopDesc::access_counter_offset_in_bytes()));
+  __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_address), r9);
   __ increment(r9);
+  __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_address), r9);
   
   // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::write_barrier_helper), r9);
   // __ pop(r9);
   __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), obj);
+  __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_new_line));
 }
 
 void ShenandoahBarrierSetAssembler::load_reference_barrier_not_null(MacroAssembler* masm, Register dst, Address src) {
