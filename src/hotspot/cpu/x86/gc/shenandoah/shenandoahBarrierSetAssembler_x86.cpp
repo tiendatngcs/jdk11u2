@@ -347,10 +347,10 @@ void ShenandoahBarrierSetAssembler::shenandoah_write_barrier_post(MacroAssembler
   __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), obj);
   __ popa();
 
-  assert_different_registers(obj, r9);
+  assert_different_registers(obj, rax);
 
   // load ac value to r9
-  __ load_sized_value(r9, Address(obj, oopDesc::access_counter_offset_in_bytes()), sizeof(intptr_t), false);
+  __ load_sized_value(rax, Address(obj, oopDesc::access_counter_offset_in_bytes()), sizeof(intptr_t), false);
 
 
   __ pusha();
@@ -358,7 +358,7 @@ void ShenandoahBarrierSetAssembler::shenandoah_write_barrier_post(MacroAssembler
   __ popa();
 
   // increment the ac value
-  __ increment(r9);
+  __ increment(rax);
 
   __ pusha();
   __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), obj);
@@ -368,7 +368,7 @@ void ShenandoahBarrierSetAssembler::shenandoah_write_barrier_post(MacroAssembler
 
 
   // void store_sized_value(Address dst, Register src, size_t size_in_bytes, Register src2 = noreg);
-  __ store_sized_value(Address(obj, oopDesc::access_counter_offset_in_bytes()), r9, sizeof(intptr_t));
+  __ store_sized_value(Address(obj, oopDesc::access_counter_offset_in_bytes()), rax, sizeof(intptr_t));
 
   // __ movptr(r8, obj);
   // __ pusha();

@@ -149,11 +149,11 @@ void CardTableBarrierSetAssembler::oop_store_at(MacroAssembler* masm, DecoratorS
     // flatten object address if needed
     if (!precise || (dst.index() == noreg && dst.disp() == 0)) {
       store_check(masm, dst.base(), dst);
-      __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), dst.base());
+      // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), dst.base());
     } else {
       __ lea(tmp1, dst);
       store_check(masm, tmp1, dst);
-      __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), tmp1);
+      // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), tmp1);
     }
   }
 }
