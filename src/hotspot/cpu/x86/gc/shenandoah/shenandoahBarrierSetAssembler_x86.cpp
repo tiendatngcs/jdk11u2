@@ -345,18 +345,18 @@ void ShenandoahBarrierSetAssembler::shenandoah_write_barrier_post(MacroAssembler
 
   assert_different_registers(obj, r9);
 
-  // load address of ac to r9??
-  __ movptr(r9, Address(obj, oopDesc::access_counter_offset_in_bytes()));
+  // load ac value to r9
+  __ load_sized_value(r9, Address(obj, oopDesc::access_counter_offset_in_bytes()), sizeof(uintptr_t), false);
   __ pusha();
   __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_address), r9);
   __ popa();
-
-  // What is being incremented?
+  // increment the ac value
   __ increment(r9);
-
   __ pusha();
   __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_address), r9);
   __ popa();
+  __ store_sized_value(r9, Address(obj, oopDesc::access_counter_offset_in_bytes()), sizeof(uintptr_t), false);
+
   
   // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::write_barrier_helper), r9);
   // __ pop(r9);
