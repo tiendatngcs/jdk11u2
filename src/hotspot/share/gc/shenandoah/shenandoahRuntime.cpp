@@ -73,7 +73,7 @@ JRT_LEAF(void, ShenandoahRuntime::print_oop(oopDesc* obj))
   tty->print_cr("oop @ %p | ac = %lu | gc_epoch = %lu", obj, obj->access_counter(), obj->gc_epoch());
 JRT_END
 
-JRT_LEAF(void, ShenandoahRuntime::print_oop(oopDesc* obj1, , oopDesc* obj2))
+JRT_LEAF(void, ShenandoahRuntime::print_oop(oopDesc* obj1, oopDesc* obj2))
   tty->print_cr("oop1 @ %p | ac = %lu | gc_epoch = %lu |||"
                 "oop2 @ %p | ac = %lu | gc_epoch = %lu\n", obj1, obj1->access_counter(), obj1->gc_epoch(), obj2, obj2->access_counter(), obj2->gc_epoch());
 JRT_END
