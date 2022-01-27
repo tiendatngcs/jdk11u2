@@ -347,7 +347,7 @@ void ShenandoahBarrierSetAssembler::shenandoah_write_barrier_post(MacroAssembler
   assert_different_registers(obj, r9);
 
   // load address of ac to r9??
-  __ mov(r9, Address(obj, oopDesc::access_counter_offset_in_bytes()));
+  __ lea(r9, Address(obj, oopDesc::access_counter_offset_in_bytes()));
   __ pusha();
   __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_address), r9);
   __ popa();
