@@ -343,10 +343,10 @@ void ShenandoahBarrierSetAssembler::shenandoah_write_barrier_post(MacroAssembler
   __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), obj);
   __ popa();
 
-  assert_different_registers(obj, r9);
+  // assert_different_registers(obj, r9);
 
   // load ac value to r9
-  __ load_sized_value(r9, Address(obj, oopDesc::access_counter_offset_in_bytes()), sizeof(uintptr_t), false);
+  // __ load_sized_value(r9, Address(obj, oopDesc::access_counter_offset_in_bytes()), sizeof(uintptr_t), false);
 
 
   __ pusha();
@@ -354,7 +354,7 @@ void ShenandoahBarrierSetAssembler::shenandoah_write_barrier_post(MacroAssembler
   __ popa();
 
   // increment the ac value
-  __ increment(r9);
+  // __ increment(r9);
 
   __ pusha();
   __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), obj);
@@ -366,9 +366,9 @@ void ShenandoahBarrierSetAssembler::shenandoah_write_barrier_post(MacroAssembler
   // void store_sized_value(Address dst, Register src, size_t size_in_bytes, Register src2 = noreg);
   // __ store_sized_value(Address(obj, oopDesc::access_counter_offset_in_bytes()), r9, sizeof(uintptr_t));
 
-  __ movptr(r8, obj);
+  // __ movptr(r8, obj);
   __ pusha();
-  __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::write_barrier_helper), r8);
+  __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::write_barrier_helper), obj);
   __ popa();
   
   // __ pop(r9);
@@ -625,14 +625,15 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
                                    val != noreg /* tosca_live */,
                                    false /* expand_call */);
     }
-    if (as_normal && val != noreg) {
-      shenandoah_write_barrier_post(masm, tmp1);
-    }
+    __ movptr(r9, tmp1);
     if (val == noreg) {
       BarrierSetAssembler::store_at(masm, decorators, type, Address(tmp1, 0), val, noreg, noreg);
     } else {
       iu_barrier(masm, val, tmp3);
       BarrierSetAssembler::store_at(masm, decorators, type, Address(tmp1, 0), val, noreg, noreg);
+    }
+    if (as_normal && val != noreg) {
+      shenandoah_write_barrier_post(masm, r9);
     }
     NOT_LP64(imasm->restore_bcp());
     // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
