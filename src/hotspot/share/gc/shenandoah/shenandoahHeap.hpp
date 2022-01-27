@@ -376,7 +376,7 @@ public:
   char gc_state() const;
   static address gc_state_addr();
 
-  static ShenandoahRegionAccessRate get_access_rate_from_access_counter(uintptr_t ac);
+  static ShenandoahRegionAccessRate get_access_rate_from_access_counter(intptr_t ac);
 
   void set_concurrent_mark_in_progress(bool in_progress);
   void set_evacuation_in_progress(bool in_progress);
