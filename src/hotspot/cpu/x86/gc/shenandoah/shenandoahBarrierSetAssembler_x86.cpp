@@ -347,6 +347,8 @@ void ShenandoahBarrierSetAssembler::shenandoah_write_barrier_post(MacroAssembler
   __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), obj);
   __ popa();
 
+  __ push(rax);
+
   assert_different_registers(obj, rax);
 
   // load ac value to r9
@@ -375,7 +377,7 @@ void ShenandoahBarrierSetAssembler::shenandoah_write_barrier_post(MacroAssembler
   // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::write_barrier_helper), obj);
   // __ popa();
   
-  // __ pop(r9);
+  __ pop(rax);
 
   __ pusha();
   __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), obj);
