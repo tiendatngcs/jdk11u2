@@ -339,9 +339,9 @@ void ShenandoahBarrierSetAssembler::satb_write_barrier_pre(MacroAssembler* masm,
 void ShenandoahBarrierSetAssembler::shenandoah_write_barrier_post(MacroAssembler* masm, Register obj) {
   
   // call vm change obj register so push and pop before and after
-  __ pusha();
-  __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), obj);
-  __ popa();
+  // __ pusha();
+  // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), obj);
+  // __ popa();
 
   assert_different_registers(obj, r9);
 
@@ -357,14 +357,14 @@ void ShenandoahBarrierSetAssembler::shenandoah_write_barrier_post(MacroAssembler
   
   // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::write_barrier_helper), r9);
   // __ pop(r9);
-  __ pusha();
-  __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), obj);
-  __ popa();
+  // __ pusha();
+  // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), obj);
+  // __ popa();
 
 
-  __ pusha();
-  __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_new_line));
-  __ popa();
+  // __ pusha();
+  // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_new_line));
+  // __ popa();
 }
 
 void ShenandoahBarrierSetAssembler::load_reference_barrier_not_null(MacroAssembler* masm, Register dst, Address src) {
