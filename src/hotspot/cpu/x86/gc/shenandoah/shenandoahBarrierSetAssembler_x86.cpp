@@ -647,15 +647,16 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
     } else {
       iu_barrier(masm, val, tmp3);
 
-      __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), val);
+      // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), val);
       __ push(r8);
       __ push(r9);
       __ increase_access_counter(val /*obj*/, r8 /*tmp1*/, r9 /*tmp2*/);
       __ pop(r9);
       __ pop(r8);
-      __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), val);
+      // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), val);
       BarrierSetAssembler::store_at(masm, decorators, type, Address(tmp1, 0), val, noreg, noreg);
     }
+    __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), val);
     // if (as_normal && val != noreg) {
     //   __ pusha();
     //   shenandoah_write_barrier_post(masm, tmp1);
