@@ -638,7 +638,9 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
       BarrierSetAssembler::store_at(masm, decorators, type, Address(tmp1, 0), val, noreg, noreg);
     }
     if (as_normal && val != noreg) {
+      __ pusha();
       shenandoah_write_barrier_post(masm, tmp1);
+      __ popa();
     }
     NOT_LP64(imasm->restore_bcp());
     // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
