@@ -653,11 +653,21 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
     //   shenandoah_write_barrier_post(masm, tmp1);
     //   __ popa();
     // }
+
+    __ pusha();
+    __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), tmp1);
+    __ popa();
+
     __ push(r8);
     __ push(r9);
     __ increase_access_counter(tmp1 /*obj*/, r8 /*tmp1*/, r9 /*tmp2*/);
     __ pop(r9);
     __ pop(r8);
+
+
+    __ pusha();
+    __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), tmp1);
+    __ popa();
 
     NOT_LP64(imasm->restore_bcp());
     // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));

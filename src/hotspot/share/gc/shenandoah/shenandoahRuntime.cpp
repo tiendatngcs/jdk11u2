@@ -71,6 +71,7 @@ JRT_LEAF(void, ShenandoahRuntime::write_barrier_helper(oopDesc* obj))
 JRT_END
 
 JRT_LEAF(void, ShenandoahRuntime::print_oop(oopDesc* obj))
+  
   tty->print_cr("oop @ %p | ac = %lu | gc_epoch = %lu", obj, obj->access_counter(), obj->gc_epoch());
 JRT_END
 

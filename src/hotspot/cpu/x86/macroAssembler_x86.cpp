@@ -5571,7 +5571,9 @@ void MacroAssembler::increase_access_counter(Register oop, Register tmp1, Regist
   // increment ac by 1
   increment(tmp2);
   movptr(Address(oop, oopDesc::access_counter_offset_in_bytes()), tmp2);
-
+  if (UseCompressedOops) {
+    encode_heap_oop(oop);
+  }
 }
 
 #ifdef _LP64
