@@ -5551,7 +5551,11 @@ void MacroAssembler::store_oop_barrier(Register oop) {
 
 void MacroAssembler::increase_access_counter(Register obj, Register tmp1, Register tmp2) {
   assert_different_registers(obj, tmp1, tmp2);
-  Label no_reset_values;
+  Label no_reset_values, done;
+
+  //is obj null?
+  cmpptr(obj, 0);
+  jcc(Assembler::equal, done);
 
   // obj now should have the oop, decide if we need to decompressed
   if (UseCompressedOops) {
@@ -5577,6 +5581,7 @@ void MacroAssembler::increase_access_counter(Register obj, Register tmp1, Regist
   if (UseCompressedOops) {
     encode_heap_oop(obj);
   }
+  bind(done);
 }
 
 #ifdef _LP64
