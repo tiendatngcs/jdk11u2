@@ -364,11 +364,15 @@ void ShenandoahBarrierSetAssembler::shenandoah_write_barrier_post(MacroAssembler
 
 
   // void store_sized_value(Address dst, Register src, size_t size_in_bytes, Register src2 = noreg);
-  __ store_sized_value(Address(obj, oopDesc::access_counter_offset_in_bytes()), r9, sizeof(uintptr_t));
+  // __ store_sized_value(Address(obj, oopDesc::access_counter_offset_in_bytes()), r9, sizeof(uintptr_t));
 
+  __ movptr(r9, obj);
+  __ pusha();
+  __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::write_barrier_helper), r9);
+  __ popa();
   
-  // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::write_barrier_helper), r9);
   // __ pop(r9);
+
   __ pusha();
   __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), obj);
   __ popa();
