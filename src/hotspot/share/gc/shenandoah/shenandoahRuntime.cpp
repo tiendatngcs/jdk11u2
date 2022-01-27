@@ -60,12 +60,12 @@ JRT_LEAF(void, ShenandoahRuntime::write_barrier_helper(oopDesc* obj))
   // tty->print_cr("SRT_wb: obj ptr ? %p", obj);
   bool is_oop = oopDesc::is_oop(obj);
   if (is_oop) {
-    // tty->print_raw("wb: is oop\n");
+    tty->print_cr("SRT_wb: %p is oop", obj);
     // tty->print_cr("oop ac %lu | epoch %lu\n", obj->access_counter(), obj->gc_epoch());
     obj->increase_access_counter();
     return;
   }
-  tty->print_cr("SRT_wb: is not oop");
+  tty->print_cr("SRT_wb: %p is not oop", obj);
 JRT_END
 
 JRT_LEAF(void, ShenandoahRuntime::print_oop(oopDesc* obj))
