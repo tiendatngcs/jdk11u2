@@ -651,7 +651,7 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
       // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), val);
       BarrierSetAssembler::store_at(masm, decorators, type, Address(tmp1, 0), val, noreg, noreg);
       __ pusha();
-      __ increase_access_counter(val /*obj*/, rax /*tmp1*/, rdx /*tmp2*/);
+      __ increase_access_counter(val /*obj*/, rcx /*tmp1*/, rdx /*tmp2*/);
       __ popa();
     }
     __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), val);
