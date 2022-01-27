@@ -2521,7 +2521,7 @@ address ShenandoahHeap::gc_state_addr() {
   return (address) ShenandoahHeap::heap()->_gc_state.addr_of();
 }
 
-ShenandoahRegionAccessRate ShenandoahHeap::get_access_rate_from_access_counter(uintptr_t ac) {
+ShenandoahRegionAccessRate ShenandoahHeap::get_access_rate_from_access_counter(intptr_t ac) {
   if (ac < ShenandoahHotnessThreshold) {
     return COLD;
   }
