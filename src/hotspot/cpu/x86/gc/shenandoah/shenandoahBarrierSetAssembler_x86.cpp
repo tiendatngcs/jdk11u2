@@ -339,17 +339,28 @@ void ShenandoahBarrierSetAssembler::satb_write_barrier_pre(MacroAssembler* masm,
 void ShenandoahBarrierSetAssembler::shenandoah_write_barrier_post(MacroAssembler* masm, Register obj) {
   
   // call vm change obj register so push and pop before and after
-  // __ pusha();
-  // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), obj);
-  // __ popa();
+  __ pusha();
+  __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), obj);
+  __ popa();
 
   assert_different_registers(obj, r9);
 
   // load ac value to r9
   __ load_sized_value(r9, Address(obj, oopDesc::access_counter_offset_in_bytes()), sizeof(uintptr_t), false);
+
+
+  __ pusha();
+  __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), obj);
+  __ popa();
+
   // increment the ac value
-  // __ increment(r9);
-  __ movptr(r9, 0);
+  __ increment(r9);
+
+  __ pusha();
+  __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), obj);
+  __ popa();
+
+  // __ movptr(r9, 0);
 
 
   // void store_sized_value(Address dst, Register src, size_t size_in_bytes, Register src2 = noreg);
