@@ -44,22 +44,22 @@
 // Implementation of all inlined member functions defined in oop.hpp
 // We need a separate file to avoid circular references
 
-void oopDesc::set_access_counter(uintptr_t new_value){
+void oopDesc::set_access_counter(intptr_t new_value){
   _access_counter = new_value;
 }
 
-void oopDesc::set_access_counter(HeapWord* mem, uintptr_t new_value){ 
-  *(uintptr_t*)(((char*)mem) + access_counter_offset_in_bytes()) = new_value;
+void oopDesc::set_access_counter(HeapWord* mem, intptr_t new_value){ 
+  *(intptr_t*)(((char*)mem) + access_counter_offset_in_bytes()) = new_value;
 }
 
-uintptr_t oopDesc::access_counter() {
+intptr_t oopDesc::access_counter() {
   // Do not check gc_epoch to reset access counter.
   return _access_counter;
 }
 
-uintptr_t oopDesc::true_access_counter() {
+intptr_t oopDesc::true_access_counter() {
   // Check if gc_epoch is up-to-date, if not, reset access counter to 0;
-  uintptr_t oop_gc_epoch = gc_epoch();
+  intptr_t oop_gc_epoch = gc_epoch();
   if (oop_gc_epoch != static_gc_epoch) {
     set_gc_epoch(static_gc_epoch);
     set_access_counter(0);
@@ -73,52 +73,52 @@ void oopDesc::increase_access_counter() {
     _access_counter = 0;
   }
   // code below prevents overflow
-  if (UINTPTR_MAX - 1 > _access_counter){
+  if (INT_MAX - 1 > _access_counter){
     _access_counter += 1;
   }
   else {
-    printf("Access Counter reaches UINTPTR_MAX\n");
-    if (_access_counter < UINTPTR_MAX){
-      _access_counter = UINTPTR_MAX;
+    printf("Access Counter reaches INT_MAX\n");
+    if (_access_counter < INT_MAX){
+      _access_counter = INT_MAX;
     }
   }
   // _gc_epoch += 1;
 }
 
-uintptr_t oopDesc::gc_epoch() const {
+intptr_t oopDesc::gc_epoch() const {
   return _gc_epoch;
 }
 
-void oopDesc::set_gc_epoch(uintptr_t new_value){
+void oopDesc::set_gc_epoch(intptr_t new_value){
   // tty->print_raw("setting gc_epoch\n");
   // HeapAccess<MO_RELAXED>::store_at(as_oop(), gc_epoch_offset_in_bytes(), new_value);
   _gc_epoch = new_value;
 }
 
-void oopDesc::set_gc_epoch(HeapWord* mem, uintptr_t new_value){ 
-  *(uintptr_t*)(((char*)mem) + gc_epoch_offset_in_bytes()) = new_value;
+void oopDesc::set_gc_epoch(HeapWord* mem, intptr_t new_value){ 
+  *(intptr_t*)(((char*)mem) + gc_epoch_offset_in_bytes()) = new_value;
 }
 
-void oopDesc::add_gc_epoch(uintptr_t increment) {
-  uintptr_t epoch = gc_epoch();
+void oopDesc::add_gc_epoch(intptr_t increment) {
+  intptr_t epoch = gc_epoch();
   // code below prevents overflow
-  if (UINTPTR_MAX - increment > epoch){
+  if (INT_MAX - increment > epoch){
     set_gc_epoch(epoch + increment);
   }
   else {
-    printf("GC epoch reaches UINTPTR_MAX\n");
-    if (epoch < UINTPTR_MAX){
-      set_gc_epoch(UINTPTR_MAX);
+    printf("GC epoch reaches INT_MAX\n");
+    if (epoch < INT_MAX){
+      set_gc_epoch(INT_MAX);
     }
   }
 }
 
-void oopDesc::set_static_gc_epoch(uintptr_t new_value){
+void oopDesc::set_static_gc_epoch(intptr_t new_value){
   // HeapAccess<MO_RELAXED>::store_at(as_oop(), gc_epoch_offset_in_bytes(), new_value);
   static_gc_epoch = new_value;
 }
 
-void oopDesc::add_static_gc_epoch(uintptr_t increment) {
+void oopDesc::add_static_gc_epoch(intptr_t increment) {
   // uintptr_t static_epoch = static_gc_epoch();
   // code below prevents overflow
   if (UINTPTR_MAX - increment > static_gc_epoch){

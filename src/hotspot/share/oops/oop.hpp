@@ -56,8 +56,8 @@ class oopDesc {
   friend class VMStructs;
   friend class JVMCIVMStructs;
  private:
-  volatile uintptr_t _access_counter;
-  volatile uintptr_t _gc_epoch;
+  intptr_t _access_counter;
+  intptr_t _gc_epoch;
   volatile markOop _mark;
   union _metadata {
     Klass*      _klass;
@@ -65,25 +65,25 @@ class oopDesc {
   } _metadata;
 
  public:
-  static uintptr_t static_gc_epoch;
-  inline uintptr_t access_counter();
-  inline uintptr_t true_access_counter();
-  inline uintptr_t gc_epoch() const;
+  static intptr_t static_gc_epoch;
+  inline intptr_t access_counter();
+  inline intptr_t true_access_counter();
+  inline intptr_t gc_epoch() const;
   // static inline uintptr_t static_gc_epoch();
   inline markOop  mark()          const;
   inline markOop  mark_raw()      const;
   inline markOop* mark_addr_raw() const;
 
-  inline void set_access_counter(uintptr_t new_value);
-  static inline void set_access_counter(HeapWord* mem, uintptr_t new_value);
+  inline void set_access_counter(intptr_t new_value);
+  static inline void set_access_counter(HeapWord* mem, intptr_t new_value);
   inline void increase_access_counter();
 
-  inline void set_gc_epoch(uintptr_t new_value);
-  static inline void set_gc_epoch(HeapWord* mem, uintptr_t new_value);
-  inline void add_gc_epoch(uintptr_t increment);
+  inline void set_gc_epoch(intptr_t new_value);
+  static inline void set_gc_epoch(HeapWord* mem, intptr_t new_value);
+  inline void add_gc_epoch(intptr_t increment);
 
-  static inline void set_static_gc_epoch(uintptr_t new_value);
-  static inline void add_static_gc_epoch(uintptr_t increment);
+  static inline void set_static_gc_epoch(intptr_t new_value);
+  static inline void add_static_gc_epoch(intptr_t increment);
 
 
   inline void set_mark(volatile markOop m);
