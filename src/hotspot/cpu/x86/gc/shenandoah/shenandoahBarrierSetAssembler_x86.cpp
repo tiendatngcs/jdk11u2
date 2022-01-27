@@ -654,9 +654,17 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
     //   __ popa();
     // }
 
+    if (UseCompressedOops) {
+      __ decode_heap_oop(tmp1);
+    }
+
     __ pusha();
     __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), tmp1);
     __ popa();
+
+    if (UseCompressedOops) {
+      __ encode_heap_oop(tmp1);
+    }
 
     __ push(r8);
     __ push(r9);
@@ -665,9 +673,17 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
     __ pop(r8);
 
 
+    if (UseCompressedOops) {
+      __ decode_heap_oop(tmp1);
+    }
     __ pusha();
     __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), tmp1);
     __ popa();
+
+
+    if (UseCompressedOops) {
+      __ encode_heap_oop(tmp1);
+    }
 
     NOT_LP64(imasm->restore_bcp());
     // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));

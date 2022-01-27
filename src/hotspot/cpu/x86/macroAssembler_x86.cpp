@@ -5549,30 +5549,30 @@ void MacroAssembler::store_oop_barrier(Register oop) {
   popa();
 }
 
-void MacroAssembler::increase_access_counter(Register oop, Register tmp1, Register tmp2) {
-  assert_different_registers(oop, tmp1, tmp2);
+void MacroAssembler::increase_access_counter(Register obj, Register tmp1, Register tmp2) {
+  assert_different_registers(obj, tmp1, tmp2);
   Label no_reset_values;
   if (UseCompressedOops) {
-    decode_heap_oop(oop);
+    decode_heap_oop(obj);
   }
-  // load oop gc_epoch to tmp1
-  movptr(tmp1, Address(oop, oopDesc::gc_epoch_offset_in_bytes()));
-  // load oop ac to tmp2
-  movptr(tmp2, Address(oop, oopDesc::access_counter_offset_in_bytes()));
+  // load obj gc_epoch to tmp1
+  movptr(tmp1, Address(obj, oopDesc::gc_epoch_offset_in_bytes()));
+  // load obj ac to tmp2
+  movptr(tmp2, Address(obj, oopDesc::access_counter_offset_in_bytes()));
 
   // cmp tmp1 to static_gc_epoch if equal jmp to no_reset_values, 
   cmpptr(tmp1, oopDesc::static_gc_epoch);
   jcc(Assembler::equal, no_reset_values);
   // Reset ac to 0 and gc_epoch to current gc_epoch to 0
-  movptr(Address(oop, oopDesc::access_counter_offset_in_bytes()), 0);
-  movptr(Address(oop, oopDesc::gc_epoch_offset_in_bytes()), oopDesc::static_gc_epoch);
+  movptr(Address(obj, oopDesc::access_counter_offset_in_bytes()), 0);
+  movptr(Address(obj, oopDesc::gc_epoch_offset_in_bytes()), oopDesc::static_gc_epoch);
 
   bind(no_reset_values);
   // increment ac by 1
   increment(tmp2);
-  movptr(Address(oop, oopDesc::access_counter_offset_in_bytes()), tmp2);
+  movptr(Address(obj, oopDesc::access_counter_offset_in_bytes()), tmp2);
   if (UseCompressedOops) {
-    encode_heap_oop(oop);
+    encode_heap_oop(obj);
   }
 }
 
