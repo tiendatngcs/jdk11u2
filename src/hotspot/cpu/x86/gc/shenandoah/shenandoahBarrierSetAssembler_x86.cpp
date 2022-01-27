@@ -625,6 +625,9 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
                                    val != noreg /* tosca_live */,
                                    false /* expand_call */);
     }
+    if (as_normal && val != noreg) {
+      shenandoah_write_barrier_post(masm, tmp1);
+    }
     if (val == noreg) {
       BarrierSetAssembler::store_at(masm, decorators, type, Address(tmp1, 0), val, noreg, noreg);
     } else {
@@ -634,9 +637,6 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
     NOT_LP64(imasm->restore_bcp());
     // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
     // if as_normal?
-    if (as_normal && val != noreg) {
-      shenandoah_write_barrier_post(masm, tmp1);
-    }
   } else {
     BarrierSetAssembler::store_at(masm, decorators, type, dst, val, tmp1, tmp2);
   }
