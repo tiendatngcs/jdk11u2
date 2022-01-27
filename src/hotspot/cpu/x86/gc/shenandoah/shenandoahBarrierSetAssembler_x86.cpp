@@ -646,6 +646,14 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
       BarrierSetAssembler::store_at(masm, decorators, type, Address(tmp1, 0), val, noreg, noreg);
     } else {
       iu_barrier(masm, val, tmp3);
+
+      __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), val);
+      __ push(r8);
+      __ push(r9);
+      __ increase_access_counter(val /*obj*/, r8 /*tmp1*/, r9 /*tmp2*/);
+      __ pop(r9);
+      __ pop(r8);
+      __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), val);
       BarrierSetAssembler::store_at(masm, decorators, type, Address(tmp1, 0), val, noreg, noreg);
     }
     // if (as_normal && val != noreg) {
@@ -654,36 +662,34 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
     //   __ popa();
     // }
 
-    if (UseCompressedOops) {
-      __ decode_heap_oop(tmp1);
-    }
+    // if (UseCompressedOops) {
+    //   __ decode_heap_oop(tmp1);
+    // }
+    // __ pusha();
+    // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), tmp1);
+    // __ popa();
+    // if (UseCompressedOops) {
+    //   __ encode_heap_oop(tmp1);
+    // }
 
-    __ pusha();
-    __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), tmp1);
-    __ popa();
-
-    if (UseCompressedOops) {
-      __ encode_heap_oop(tmp1);
-    }
-
-    __ push(r8);
-    __ push(r9);
-    __ increase_access_counter(tmp1 /*obj*/, r8 /*tmp1*/, r9 /*tmp2*/);
-    __ pop(r9);
-    __ pop(r8);
+    // __ push(r8);
+    // __ push(r9);
+    // __ increase_access_counter(tmp1 /*obj*/, r8 /*tmp1*/, r9 /*tmp2*/);
+    // __ pop(r9);
+    // __ pop(r8);
 
 
-    if (UseCompressedOops) {
-      __ decode_heap_oop(tmp1);
-    }
-    __ pusha();
-    __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), tmp1);
-    __ popa();
+    // if (UseCompressedOops) {
+    //   __ decode_heap_oop(tmp1);
+    // }
+    // __ pusha();
+    // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), tmp1);
+    // __ popa();
 
 
-    if (UseCompressedOops) {
-      __ encode_heap_oop(tmp1);
-    }
+    // if (UseCompressedOops) {
+    //   __ encode_heap_oop(tmp1);
+    // }
 
     NOT_LP64(imasm->restore_bcp());
     // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));

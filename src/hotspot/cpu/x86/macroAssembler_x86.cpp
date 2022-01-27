@@ -5563,8 +5563,8 @@ void MacroAssembler::increase_access_counter(Register obj, Register tmp1, Regist
   // cmp tmp1 to static_gc_epoch if equal jmp to no_reset_values, 
   cmpptr(tmp1, oopDesc::static_gc_epoch);
   jcc(Assembler::equal, no_reset_values);
-  // Reset ac to 0 and gc_epoch to current gc_epoch to 0
-  movptr(Address(obj, oopDesc::access_counter_offset_in_bytes()), 0);
+  // Reset ac to 0 and gc_epoch to current gc_epoch
+  movptr(Address(obj, oopDesc::access_counter_offset_in_bytes()), (intptr_t)0);
   movptr(Address(obj, oopDesc::gc_epoch_offset_in_bytes()), oopDesc::static_gc_epoch);
 
   bind(no_reset_values);
