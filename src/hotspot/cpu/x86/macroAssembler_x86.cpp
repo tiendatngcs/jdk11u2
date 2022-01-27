@@ -5556,9 +5556,9 @@ void MacroAssembler::increase_access_counter(Register oop, Register tmp1, Regist
     decode_heap_oop(oop);
   }
   // load oop gc_epoch to tmp1
-  movptr(tmp1, Address(obj, oopDesc::gc_epoch_offset_in_bytes());
+  movptr(tmp1, Address(oop, oopDesc::gc_epoch_offset_in_bytes());
   // load oop ac to tmp2
-  movptr(tmp2, Address(obj, oopDesc::access_counter_offset_in_bytes());
+  movptr(tmp2, Address(oop, oopDesc::access_counter_offset_in_bytes());
 
   // cmp tmp1 to static_gc_epoch if equal jmp to no_reset_values, 
   cmpptr(tmp1, oopDesc::static_gc_epoch);
