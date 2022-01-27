@@ -348,7 +348,8 @@ void ShenandoahBarrierSetAssembler::shenandoah_write_barrier_post(MacroAssembler
   // load ac value to r9
   __ load_sized_value(r9, Address(obj, oopDesc::access_counter_offset_in_bytes()), sizeof(uintptr_t), false);
   // increment the ac value
-  __ increment(r9);
+  // __ increment(r9);
+  __ movptr(r9, 0);
 
 
   // void store_sized_value(Address dst, Register src, size_t size_in_bytes, Register src2 = noreg);
