@@ -370,7 +370,9 @@ void ShenandoahBarrierSetAssembler::shenandoah_write_barrier_post(MacroAssembler
 
 
   // void store_sized_value(Address dst, Register src, size_t size_in_bytes, Register src2 = noreg);
-  __ store_sized_value(Address(obj, oopDesc::access_counter_offset_in_bytes()), rax, sizeof(intptr_t));
+  // __ store_sized_value(Address(obj, oopDesc::access_counter_offset_in_bytes()), rax, sizeof(intptr_t));
+
+  __ movl(Address(obj, oopDesc::access_counter_offset_in_bytes()), rax);
 
   // __ movptr(r8, obj);
   // __ pusha();
