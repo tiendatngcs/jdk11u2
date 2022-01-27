@@ -5552,9 +5552,9 @@ void MacroAssembler::store_oop_barrier(Register oop) {
 void MacroAssembler::increase_access_counter(Register obj, Register tmp1, Register tmp2) {
   assert_different_registers(obj, tmp1, tmp2);
   Label no_reset_values;
-  if (UseCompressedOops) {
-    decode_heap_oop(obj);
-  }
+  // if (UseCompressedOops) {
+  //   decode_heap_oop(obj);
+  // }
   // load obj gc_epoch to tmp1
   movptr(tmp1, Address(obj, oopDesc::gc_epoch_offset_in_bytes()));
   // load obj ac to tmp2
@@ -5571,9 +5571,9 @@ void MacroAssembler::increase_access_counter(Register obj, Register tmp1, Regist
   // increment ac by 1
   increment(tmp2);
   movptr(Address(obj, oopDesc::access_counter_offset_in_bytes()), tmp2);
-  if (UseCompressedOops) {
-    encode_heap_oop(obj);
-  }
+  // if (UseCompressedOops) {
+  //   encode_heap_oop(obj);
+  // }
 }
 
 #ifdef _LP64
