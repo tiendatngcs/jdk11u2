@@ -5556,12 +5556,12 @@ void MacroAssembler::increase_access_counter(Register oop, Register tmp1, Regist
     decode_heap_oop(oop);
   }
   // load oop gc_epoch to tmp1
-  __ movptr(tmp1, Address(obj, oopDesc::gc_epoch_offset_in_bytes());
+  movptr(tmp1, Address(obj, oopDesc::gc_epoch_offset_in_bytes());
   // load oop ac to tmp2
-  __ movptr(tmp2, Address(obj, oopDesc::access_counter_offset_in_bytes());
+  movptr(tmp2, Address(obj, oopDesc::access_counter_offset_in_bytes());
 
   // cmp tmp1 to static_gc_epoch if equal jmp to no_reset_values, 
-  cmp(tmp1, oopDesc::static_gc_epoch);
+  cmpptr(tmp1, oopDesc::static_gc_epoch);
   jcc(Assembler::equal, no_reset_values);
   // Reset ac to 0 and gc_epoch to current gc_epoch to 0
   movptr(Address(oop, oopDesc::access_counter_offset_in_bytes()), 0);
