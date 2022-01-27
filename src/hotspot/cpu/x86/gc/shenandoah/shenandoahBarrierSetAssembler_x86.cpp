@@ -649,11 +649,33 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
 
       // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), val);
       // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), val);
-      __ pusha();
-      __ increase_access_counter(val /*obj*/, rcx /*tmp1*/, rdx /*tmp2*/);
-      __ popa();
       BarrierSetAssembler::store_at(masm, decorators, type, Address(tmp1, 0), val, noreg, noreg);
     }
+
+    if (as_normal){
+      // store what is in obj to stack
+      __ push(tmp1);
+      // obj is the address to the actual oop load oop to the same register
+      movptr(tmp1, Address(tmp1, 0));
+
+      __ pusha();
+      __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), tmp1);
+      __ popa();
+
+      __ pusha();
+      __ increase_access_counter(tmp1 /*obj*/, rcx /*tmp1*/, rdx /*tmp2*/);
+      __ popa();
+
+      __ pusha();
+      __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), tmp1);
+      __ popa();
+      
+      // restore value in tmp1
+      __ pop(tmp1);
+
+    }
+
+
     // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), val);
     // if (as_normal && val != noreg) {
     //   __ pusha();
@@ -664,9 +686,6 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
     // if (UseCompressedOops) {
     //   __ decode_heap_oop(tmp1);
     // }
-    // __ pusha();
-    // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), tmp1);
-    // __ popa();
     // if (UseCompressedOops) {
     //   __ encode_heap_oop(tmp1);
     // }
