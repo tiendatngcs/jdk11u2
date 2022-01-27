@@ -39,6 +39,7 @@ public:
   static void write_ref_field_pre_entry(oopDesc* orig, JavaThread* thread);
 
   static void write_barrier_helper(oopDesc* obj);
+  static void print_oop(oopDesc* obj);
 
   static oopDesc* load_reference_barrier(oopDesc* src, oop* load_addr);
   static oopDesc* load_reference_barrier_narrow(oopDesc* src, narrowOop* load_addr);

@@ -69,6 +69,10 @@ JRT_LEAF(void, ShenandoahRuntime::write_barrier_helper(oopDesc* obj))
   // tty->print_cr("SRT_wb: is not oop");
 JRT_END
 
+JRT_LEAF(void, ShenandoahRuntime::print_oop(oopDesc* obj))
+  tty->print_cr("oop @ %p | ac = %lu | gc_epoch = %lu", obj, obj->access_counter(), obj->gc_epoch());
+JRT_END
+
 JRT_LEAF(oopDesc*, ShenandoahRuntime::load_reference_barrier(oopDesc* src, oop* load_addr))
   // tty->print_raw("ShenandoahRuntime::load_reference_barrier\n");
   src->increase_access_counter();
