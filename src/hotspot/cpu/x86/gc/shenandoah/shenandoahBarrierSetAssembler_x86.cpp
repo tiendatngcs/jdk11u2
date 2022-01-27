@@ -347,12 +347,13 @@ void ShenandoahBarrierSetAssembler::shenandoah_write_barrier_post(MacroAssembler
   __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), obj);
   __ popa();
 
-  __ push(rax);
+  __ push(r8);
 
-  assert_different_registers(obj, rax);
+  assert_different_registers(obj, r8);
 
   // load ac value to r9
-  __ load_sized_value(rax, Address(obj, oopDesc::access_counter_offset_in_bytes()), sizeof(intptr_t), false);
+  // __ load_sized_value(r8, Address(obj, oopDesc::access_counter_offset_in_bytes()), sizeof(intptr_t), false);
+  __ movptr(r8, Address(obj, oopDesc::access_counter_offset_in_bytes());
 
 
   __ pusha();
@@ -360,7 +361,7 @@ void ShenandoahBarrierSetAssembler::shenandoah_write_barrier_post(MacroAssembler
   __ popa();
 
   // increment the ac value
-  __ increment(rax);
+  __ increment(r8);
 
   __ pusha();
   __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), obj);
@@ -372,14 +373,20 @@ void ShenandoahBarrierSetAssembler::shenandoah_write_barrier_post(MacroAssembler
   // void store_sized_value(Address dst, Register src, size_t size_in_bytes, Register src2 = noreg);
   // __ store_sized_value(Address(obj, oopDesc::access_counter_offset_in_bytes()), rax, sizeof(intptr_t));
 
-  __ movl(Address(obj, oopDesc::access_counter_offset_in_bytes()), rax);
+  // write back to access counter field
+  if (UseCompressedOops) {
+    __ movl(Address(obj, oopDesc::access_counter_offset_in_bytes()), r8);
+
+  } else {
+    __ movptr(Address(obj, oopDesc::access_counter_offset_in_bytes()), r8);
+  }
 
   // __ movptr(r8, obj);
   // __ pusha();
   // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::write_barrier_helper), obj);
   // __ popa();
   
-  __ pop(rax);
+  __ pop(r8);
 
   __ pusha();
   __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), obj);
@@ -641,11 +648,17 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
       iu_barrier(masm, val, tmp3);
       BarrierSetAssembler::store_at(masm, decorators, type, Address(tmp1, 0), val, noreg, noreg);
     }
-    if (as_normal && val != noreg) {
-      __ pusha();
-      shenandoah_write_barrier_post(masm, tmp1);
-      __ popa();
-    }
+    // if (as_normal && val != noreg) {
+    //   __ pusha();
+    //   shenandoah_write_barrier_post(masm, tmp1);
+    //   __ popa();
+    // }
+    __ push(r8);
+    __ push(r9);
+    __ increase_access_counter(tmp1 /*obj*/, r8 /*tmp1*/, r9 /*tmp2*/);
+    __ pop(r9);
+    __ pop(r8);
+
     NOT_LP64(imasm->restore_bcp());
     // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
     // if as_normal?

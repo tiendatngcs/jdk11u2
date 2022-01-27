@@ -333,6 +333,8 @@ class MacroAssembler: public Assembler {
   void load_oop_barrier(Register oop);
   void store_oop_barrier(Register oop);
 
+  void increase_access_counter(Register oop, Register tmp1, Register tmp2);
+
   // Used for storing NULL. All other oop constants should be
   // stored using routines that take a jobject.
   void store_heap_oop_null(Address dst);
