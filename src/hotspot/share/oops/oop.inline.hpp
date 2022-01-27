@@ -121,13 +121,13 @@ void oopDesc::set_static_gc_epoch(intptr_t new_value){
 void oopDesc::add_static_gc_epoch(intptr_t increment) {
   // uintptr_t static_epoch = static_gc_epoch();
   // code below prevents overflow
-  if (UINTPTR_MAX - increment > static_gc_epoch){
+  if (INT_MAX - increment > static_gc_epoch){
     set_static_gc_epoch(static_gc_epoch + increment);
   }
   else {
-    printf("Static GC epoch reaches UINTPTR_MAX\n");
-    if (static_gc_epoch < UINTPTR_MAX){
-      set_static_gc_epoch(UINTPTR_MAX);
+    printf("Static GC epoch reaches INT_MAX\n");
+    if (static_gc_epoch < INT_MAX){
+      set_static_gc_epoch(INT_MAX);
     }
   }
 }
