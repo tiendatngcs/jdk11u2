@@ -404,10 +404,6 @@ void ShenandoahBarrierSetAssembler::oop_increase_access_counter(MacroAssembler* 
   assert_different_registers(obj, temp1, temp2, temp3);
   save_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
   Label oop_is_null, no_reset_values;
-  // store what is in obj to stack
-  // __ push(r10);
-  // obj is the address to the actual oop load oop to the same register
-  __ load_heap_oop(obj, Address(obj, 0), noreg, noreg, AS_RAW);
   __ cmpptr(obj, 0);
   __ jcc(Assembler::equal, oop_is_null);
 
@@ -636,7 +632,9 @@ void ShenandoahBarrierSetAssembler::load_at(MacroAssembler* masm, DecoratorSet d
 
       dst = result_dst;
     }
+    save_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
     oop_increase_access_counter(masm, dst, r8, r9, r10);
+    restore_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
   } else {
     BarrierSetAssembler::load_at(masm, decorators, type, dst, src, tmp1, tmp_thread);
   }
@@ -716,8 +714,12 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
     }
 
     if (as_normal){
-
+      save_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
+      // obj is the address to the actual oop load oop to the same register
+      __ load_heap_oop(tmp1, Address(tmp1, 0), noreg, noreg, AS_RAW);
       oop_increase_access_counter(masm, tmp1, r8, r9, r10);
+      restore_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
+
       // save_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
       // Label oop_is_null, no_reset_values;
       // // store what is in obj to stack
