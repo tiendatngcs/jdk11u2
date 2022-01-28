@@ -436,7 +436,7 @@ void ShenandoahBarrierSetAssembler::oop_increase_access_counter(MacroAssembler* 
   // Reset ac to 0 and gc_epoch to current gc_epoch
   __ movptr(Address(obj, oopDesc::gc_epoch_offset_in_bytes()), temp3);
 
-  __ movptr(temp3, (intptr_t)0);
+  __ movptr(temp3, (intptr_t)0); // illegal use but works for this situation
   __ pusha();
   __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_address), temp3);
   __ popa();
@@ -595,7 +595,6 @@ void ShenandoahBarrierSetAssembler::load_reference_barrier(MacroAssembler* masm,
 //
 void ShenandoahBarrierSetAssembler::load_at(MacroAssembler* masm, DecoratorSet decorators, BasicType type,
              Register dst, Address src, Register tmp1, Register tmp_thread) {
-  tty->print_cr("ShenandoahBarrierSetAssembler::load_at called\n");
   // 1: non-reference load, no additional barrier is needed
   if (!is_reference_type(type)) {
     BarrierSetAssembler::load_at(masm, decorators, type, dst, src, tmp1, tmp_thread);
@@ -637,8 +636,7 @@ void ShenandoahBarrierSetAssembler::load_at(MacroAssembler* masm, DecoratorSet d
 
       dst = result_dst;
     }
-    // // read barrier
-    // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::read_barrier), dst);
+    oop_increase_access_counter(masm, dst, r8, r9, r10);
   } else {
     BarrierSetAssembler::load_at(masm, decorators, type, dst, src, tmp1, tmp_thread);
   }
