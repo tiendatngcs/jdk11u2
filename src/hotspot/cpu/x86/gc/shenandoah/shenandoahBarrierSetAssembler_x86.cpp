@@ -654,7 +654,7 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
 
     if (as_normal){
       save_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
-      Label oop_is_null;
+      Label oop_is_null, no_reset_values;
       // store what is in obj to stack
       // __ push(r10);
       // obj is the address to the actual oop load oop to the same register
@@ -663,13 +663,39 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
       __ cmpptr(r10, 0);
       __ jcc(Assembler::equal, oop_is_null);
 
+
+
+      if (UseCompressedOops) {
+        __ decode_heap_oop(r10);
+      }
+
+      // load obj gc_epoch to r9
+      __ movptr(r9, Address(r10, oopDesc::gc_epoch_offset_in_bytes()));
+      // load obj ac to r8
+      __ movptr(r8, Address(r10, oopDesc::access_counter_offset_in_bytes()));
+
+      // cmp tmp1 to static_gc_epoch if equal jmp to no_reset_values, 
+      __ cmpptr(r9, oopDesc::static_gc_epoch);
+      __ jcc(Assembler::equal, no_reset_values);
+      // Reset ac to 0 and gc_epoch to current gc_epoch
+      __ movptr(Address(r10, oopDesc::access_counter_offset_in_bytes()), (intptr_t)0);
+      __ movptr(Address(r10, oopDesc::gc_epoch_offset_in_bytes()), oopDesc::static_gc_epoch);
+
+      __ bind(no_reset_values);
+      // increment ac by 1
+      __ increment(r8);
+      __ movptr(Address(r10, oopDesc::access_counter_offset_in_bytes()), r8);
+      if (UseCompressedOops) {
+        __ encode_heap_oop(r10);
+      }
+
       // __ pusha();
       // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), r10);
       // __ popa();
 
       // __ push(r8);
       // __ push(r9);
-      __ increase_access_counter(r10 /*obj*/, r8 /*tmp1*/, r9 /*tmp2*/);
+      // __ increase_access_counter(r10 /*obj*/, r8 /*tmp1*/, r9 /*tmp2*/);
       // __ pop(r9);
       // __ pop(r8);
 
