@@ -618,10 +618,7 @@ void ShenandoahBarrierSetAssembler::load_at(MacroAssembler* masm, DecoratorSet d
 
     BarrierSetAssembler::load_at(masm, decorators, type, dst, src, tmp1, tmp_thread);
 
-    // load_reference_barrier(masm, dst, src);
-    // save_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
-    // oop_increase_access_counter(masm, tmp1, r8, r9, r11);
-    // restore_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
+    load_reference_barrier(masm, dst, src);
 
     // Move loaded oop to final destination
     if (dst != result_dst) {
@@ -633,13 +630,11 @@ void ShenandoahBarrierSetAssembler::load_at(MacroAssembler* masm, DecoratorSet d
 
       dst = result_dst;
     }
-    load_reference_barrier(masm, dst, src);
     save_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
     __ pusha();
-    oop_increase_access_counter(masm, dst, r8, r9, r11);
+    oop_increase_access_counter(masm, dst, r8, r9, r10);
     __ popa();
     restore_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
-
   } else {
     BarrierSetAssembler::load_at(masm, decorators, type, dst, src, tmp1, tmp_thread);
   }
