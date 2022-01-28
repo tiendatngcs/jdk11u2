@@ -659,19 +659,19 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
       // obj is the address to the actual oop load oop to the same register
       __ movptr(r10, Address(tmp1, 0));
 
-      // __ pusha();
-      // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), tmp1);
-      // __ popa();
+      __ pusha();
+      __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), tmp1);
+      __ popa();
 
       // __ push(r8);
       // __ push(r9);
-      __ increase_access_counter(r10 /*obj*/, r8 /*tmp1*/, r9 /*tmp2*/);
+      // __ increase_access_counter(r10 /*obj*/, r8 /*tmp1*/, r9 /*tmp2*/);
       // __ pop(r9);
       // __ pop(r8);
 
-      // __ pusha();
-      // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), tmp1);
-      // __ popa();
+      __ pusha();
+      __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), tmp1);
+      __ popa();
       
       // restore value in tmp1
       // __ pop(r10);
