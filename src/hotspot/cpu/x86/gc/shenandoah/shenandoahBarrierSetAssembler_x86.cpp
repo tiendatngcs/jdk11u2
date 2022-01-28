@@ -678,7 +678,8 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
       __ movptr(r8, Address(r10, oopDesc::access_counter_offset_in_bytes()));
 
       // cmp r9 to static_gc_epoch if equal jmp to no_reset_values, 
-      __ movptr(r11, oopDesc::static_gc_epoch);
+      // __ movptr(r11, (intptr_t)oopDesc::static_gc_epoch);
+      __ movptr(r11, RuntimeAddress((address)(&oopDesc::static_gc_epoch)))
       __ pusha();
       __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_address), r11);
       __ popa();
