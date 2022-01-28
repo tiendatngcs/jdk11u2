@@ -678,8 +678,10 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
       __ cmpptr(r9, oopDesc::static_gc_epoch);
       __ jcc(Assembler::equal, no_reset_values);
       // Reset ac to 0 and gc_epoch to current gc_epoch
-      __ movptr(Address(r10, oopDesc::access_counter_offset_in_bytes()), (intptr_t)0);
-      __ movptr(Address(r10, oopDesc::gc_epoch_offset_in_bytes()), oopDesc::static_gc_epoch);
+      __ movptr(r11, (intptr_t)0);
+      __ movptr(Address(r10, oopDesc::access_counter_offset_in_bytes()), r11);
+      __ movptr(r11, oopDesc::static_gc_epoch);
+      __ movptr(Address(r10, oopDesc::gc_epoch_offset_in_bytes()), r11);
 
       __ bind(no_reset_values);
       // increment ac by 1
