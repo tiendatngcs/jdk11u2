@@ -620,7 +620,7 @@ void ShenandoahBarrierSetAssembler::load_at(MacroAssembler* masm, DecoratorSet d
 
     load_reference_barrier(masm, dst, src);
     save_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
-    oop_increase_access_counter(masm, dst, r8, r9, r10);
+    oop_increase_access_counter(masm, dst, r8, r9, r11);
     restore_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
 
     // Move loaded oop to final destination
