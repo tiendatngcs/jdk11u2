@@ -668,6 +668,9 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
       if (UseCompressedOops) {
         __ decode_heap_oop(r10);
       }
+      __ pusha();
+      __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), r10);
+      __ popa();
 
       // load obj gc_epoch to r9
       __ movptr(r9, Address(r10, oopDesc::gc_epoch_offset_in_bytes()));
@@ -690,10 +693,11 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
       if (UseCompressedOops) {
         __ encode_heap_oop(r10);
       }
+      
+      __ pusha();
+      __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), r10);
+      __ popa();
 
-      // __ pusha();
-      // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), r10);
-      // __ popa();
 
       // __ push(r8);
       // __ push(r9);
@@ -701,9 +705,6 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
       // __ pop(r9);
       // __ pop(r8);
 
-      // __ pusha();
-      // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), r10);
-      // __ popa();
       
       // restore value in tmp1
       // __ pop(r10);
