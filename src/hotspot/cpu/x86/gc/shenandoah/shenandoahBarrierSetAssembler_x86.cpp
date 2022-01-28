@@ -654,9 +654,9 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
 
     if (as_normal){
       // store what is in obj to stack
-      __ push(tmp1);
+      __ push(r10);
       // obj is the address to the actual oop load oop to the same register
-      __ movptr(tmp1, Address(tmp1, 0));
+      __ movptr(r10, Address(tmp1, 0));
 
       // __ pusha();
       // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), tmp1);
@@ -664,7 +664,7 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
 
       __ push(r8);
       __ push(r9);
-      __ increase_access_counter(tmp1 /*obj*/, r8 /*tmp1*/, r9 /*tmp2*/);
+      __ increase_access_counter(r10 /*obj*/, r8 /*tmp1*/, r9 /*tmp2*/);
       __ pop(r9);
       __ pop(r8);
 
@@ -673,7 +673,7 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
       // __ popa();
       
       // restore value in tmp1
-      __ pop(tmp1);
+      __ pop(r10);
 
     }
 
