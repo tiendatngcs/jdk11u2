@@ -677,14 +677,24 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
       // load obj ac to r8
       __ movptr(r8, Address(r10, oopDesc::access_counter_offset_in_bytes()));
 
-      // cmp tmp1 to static_gc_epoch if equal jmp to no_reset_values, 
-      __ cmpptr(r9, oopDesc::static_gc_epoch);
+      // cmp r9 to static_gc_epoch if equal jmp to no_reset_values, 
+      __ movptr(r11, oopDesc::static_gc_epoch);
+      __ pusha();
+      __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_address), r11);
+      __ popa();
+      
+      __ cmpptr(r9, r11);
       __ jcc(Assembler::equal, no_reset_values);
       // Reset ac to 0 and gc_epoch to current gc_epoch
-      __ movptr(r11, (intptr_t)0);
-      __ movptr(Address(r10, oopDesc::access_counter_offset_in_bytes()), r11);
-      __ movptr(r11, oopDesc::static_gc_epoch);
       __ movptr(Address(r10, oopDesc::gc_epoch_offset_in_bytes()), r11);
+
+      __ movptr(r11, (intptr_t)0);
+      __ pusha();
+      __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_address), r11);
+      __ popa();
+
+      __ movptr(Address(r10, oopDesc::access_counter_offset_in_bytes()), r11);
+
 
       __ bind(no_reset_values);
       // increment ac by 1
@@ -696,6 +706,10 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
       
       __ pusha();
       __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), r10);
+      __ popa();
+
+      __ pusha();
+      __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_new_line));
       __ popa();
 
 
