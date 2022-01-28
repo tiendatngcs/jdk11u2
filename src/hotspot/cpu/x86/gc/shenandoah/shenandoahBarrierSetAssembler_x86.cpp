@@ -635,7 +635,7 @@ void ShenandoahBarrierSetAssembler::load_at(MacroAssembler* masm, DecoratorSet d
     // oop_increase_access_counter(masm, dst, r8, r9, r10);
     // __ popa();
     // restore_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
-    assert(dst == rax, "Dst is reax?");
+    // assert(dst == rax, "Dst is reax?");
 
     __ pusha();
     __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), dst);
