@@ -402,7 +402,6 @@ void ShenandoahBarrierSetAssembler::shenandoah_write_barrier_post(MacroAssembler
 
 void ShenandoahBarrierSetAssembler::oop_increase_access_counter(MacroAssembler* masm, Register obj, Register temp1, Register temp2, Register temp3) {
   assert_different_registers(obj, temp1, temp2, temp3);
-  save_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
   Label oop_is_null, no_reset_values;
   __ cmpptr(obj, 0);
   __ jcc(Assembler::equal, oop_is_null);
@@ -458,7 +457,6 @@ void ShenandoahBarrierSetAssembler::oop_increase_access_counter(MacroAssembler* 
 
 
   __ bind(oop_is_null);
-  restore_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
 }
 
 void ShenandoahBarrierSetAssembler::load_reference_barrier_not_null(MacroAssembler* masm, Register dst, Address src) {
@@ -632,9 +630,9 @@ void ShenandoahBarrierSetAssembler::load_at(MacroAssembler* masm, DecoratorSet d
 
       dst = result_dst;
     }
-    save_machine_state(masm, /* handle_gpr = */ false, /* handle_fp = */ true);
+    save_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
     oop_increase_access_counter(masm, dst, r8, r9, r10);
-    restore_machine_state(masm, /* handle_gpr = */ false, /* handle_fp = */ true);
+    restore_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
   } else {
     BarrierSetAssembler::load_at(masm, decorators, type, dst, src, tmp1, tmp_thread);
   }
