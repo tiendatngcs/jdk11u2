@@ -663,9 +663,9 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
       __ cmpptr(r10, 0);
       __ jcc(Assembler::equal, oop_is_null);
 
-      __ pusha();
-      __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), r10);
-      __ popa();
+      // __ pusha();
+      // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), r10);
+      // __ popa();
 
       // __ push(r8);
       // __ push(r9);
@@ -673,9 +673,9 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
       // __ pop(r9);
       // __ pop(r8);
 
-      __ pusha();
-      __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), r10);
-      __ popa();
+      // __ pusha();
+      // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), r10);
+      // __ popa();
       
       // restore value in tmp1
       // __ pop(r10);
