@@ -719,7 +719,7 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
 
     if (as_normal){
 
-      oop_increase_access_counter(tmp1, r8, r9, r10);
+      oop_increase_access_counter(masm, tmp1, r8, r9, r10);
       // save_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
       // Label oop_is_null, no_reset_values;
       // // store what is in obj to stack
