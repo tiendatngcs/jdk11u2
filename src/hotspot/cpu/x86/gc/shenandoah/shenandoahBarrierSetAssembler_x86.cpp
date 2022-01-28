@@ -654,11 +654,14 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
 
     if (as_normal){
       save_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
+      Label oop_is_null;
       // store what is in obj to stack
       // __ push(r10);
       // obj is the address to the actual oop load oop to the same register
       // __ load_heap_(r10, Address(tmp1, 0));load_heap_oop
       __ load_heap_oop(r10, Address(tmp1, 0), noreg, noreg, AS_RAW);
+      __ cmpptr(r10, 0);
+      __ jcc(Assembler::equal, oop_is_null);
 
       __ pusha();
       __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), r10);
@@ -676,6 +679,7 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
       
       // restore value in tmp1
       // __ pop(r10);
+      __ bind(oop_is_null);
       restore_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
 
     }
