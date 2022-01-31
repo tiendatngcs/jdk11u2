@@ -350,7 +350,7 @@ static void oop_increase_access_counter(InterpreterMacroAssembler* _masm,
     __ popa();
 
     __ pusha();
-    __ call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_new_line));
+    __ call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_newline));
     __ popa();
     if (UseCompressedOops) {
       __ encode_heap_oop(obj);
