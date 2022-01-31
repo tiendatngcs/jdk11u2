@@ -400,7 +400,7 @@ void ShenandoahBarrierSetAssembler::shenandoah_write_barrier_post(MacroAssembler
   restore_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
 }
 
-void ShenandoahBarrierSetAssembler::oop_increase_access_counter(MacroAssembler* masm, Register obj, Register temp1, Register temp2, Register temp3) {
+void ShenandoahBarrierSetAssembler::oop_increase_access_counter(MacroAssembler* masm, Register obj, Register temp1, Register temp3temp2, Register temp3) {
   assert_different_registers(obj, temp1, temp2, temp3);
   Label oop_is_null, no_reset_values;
   __ cmpptr(obj, 0);
@@ -411,49 +411,50 @@ void ShenandoahBarrierSetAssembler::oop_increase_access_counter(MacroAssembler* 
   if (UseCompressedOops) {
     __ decode_heap_oop(obj);
   }
-  // __ pusha();
-  // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), obj);
-  // __ popa();
+  __ pusha();
+  __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), obj);
+  __ popa();
 
-  // load obj gc_epoch to r9
-  __ movptr(temp1, Address(obj, oopDesc::gc_epoch_offset_in_bytes()));
+  // load obj gc_epoch to temp3
+  // __ movptr(temp1, Address(obj, oopDesc::gc_epoch_offset_in_bytes()));
   // load obj ac to r8
-  __ movptr(temp2, Address(obj, oopDesc::access_counter_offset_in_bytes()));
+  // __ movptr(temp2, Address(obj, oopDesc::access_counter_offset_in_bytes()));
 
-  // cmp r9 to static_gc_epoch if equal jmp to no_reset_values, 
+  // cmp temp3 to static_gc_epoch if equal jmp to no_reset_values, 
   __ movptr(temp3, InternalAddress((address)(&oopDesc::static_gc_epoch)));
-  // __ pusha();
-  // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_address), temp3);
-  // __ popa();
+  __ pusha();
+  __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_address), temp3);
+  __ popa();
   
-  __ cmpptr(temp1, temp3);
+  __ cmpptr(temp3, Address(obj, oopDesc::gc_epoch_offset_in_bytes()));
   __ jcc(Assembler::equal, no_reset_values);
   // Reset ac to 0 and gc_epoch to current gc_epoch
   __ movptr(Address(obj, oopDesc::gc_epoch_offset_in_bytes()), temp3);
 
-  __ movptr(temp3, (intptr_t)0); // illegal use but works for this situation
-  // __ pusha();
-  // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_address), temp3);
-  // __ popa();
+  // __ movptr(temp3, );
+  __ pusha();
+  __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_address), temp3);
+  __ popa();
 
-  __ movptr(Address(obj, oopDesc::access_counter_offset_in_bytes()), temp3);
+  __ movptr(Address(obj, oopDesc::access_counter_offset_in_bytes()), (intptr_t)0); // illegal use but works for this situation
 
 
   __ bind(no_reset_values);
   // increment ac by 1
-  __ increment(temp2);
-  __ movptr(Address(obj, oopDesc::access_counter_offset_in_bytes()), temp2);
+  __ movptr(temp3, Address(obj, oopDesc::access_counter_offset_in_bytes()));
+  __ increment(temp3);
+  __ movptr(Address(obj, oopDesc::access_counter_offset_in_bytes()), temp3);
   if (UseCompressedOops) {
     __ encode_heap_oop(obj);
   }
   
-  // __ pusha();
-  // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), obj);
-  // __ popa();
+  __ pusha();
+  __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), obj);
+  __ popa();
 
-  // __ pusha();
-  // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_new_line));
-  // __ popa();
+  __ pusha();
+  __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_new_line));
+  __ popa();
 
 
   __ bind(oop_is_null);
@@ -664,17 +665,17 @@ void ShenandoahBarrierSetAssembler::load_at(MacroAssembler* masm, DecoratorSet d
     restore_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
   }
 
-  Label oop_is_null;
-  __ cmpptr(dst, 0);
-  __ jcc(Assembler::equal, oop_is_null);
-  __ pusha();
-  __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), dst);
-  __ popa();
+  // Label oop_is_null;
+  // __ cmpptr(dst, 0);
+  // __ jcc(Assembler::equal, oop_is_null);
+  // __ pusha();
+  // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), dst);
+  // __ popa();
 
-  __ pusha();
-  __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_new_line));
-  __ popa();
-  __ bind(oop_is_null);
+  // __ pusha();
+  // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_new_line));
+  // __ popa();
+  // __ bind(oop_is_null);
 }
 
 void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet decorators, BasicType type,
