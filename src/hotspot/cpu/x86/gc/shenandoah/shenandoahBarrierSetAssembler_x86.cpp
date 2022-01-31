@@ -663,7 +663,7 @@ void ShenandoahBarrierSetAssembler::load_at(MacroAssembler* masm, DecoratorSet d
 
     restore_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
   }
-  
+
   Label oop_is_null;
   __ cmpptr(dst, 0);
   __ jcc(Assembler::equal, oop_is_null);
@@ -674,7 +674,7 @@ void ShenandoahBarrierSetAssembler::load_at(MacroAssembler* masm, DecoratorSet d
   __ pusha();
   __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_new_line));
   __ popa();
-  __ bind(oop_is_null)
+  __ bind(oop_is_null);
 }
 
 void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet decorators, BasicType type,
