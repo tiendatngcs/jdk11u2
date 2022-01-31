@@ -1066,11 +1066,11 @@ JRT_LEAF(void, InterpreterRuntime::print_oop(oopDesc* obj))
   tty->print_cr("oop @ %p | ac = %lu | gc_epoch = %lu", obj, obj->access_counter(), obj->gc_epoch());
 JRT_END
 
-JRT_LEAF(void, InterpreterRuntime::print_newline(oopDesc* obj))
+JRT_LEAF(void, InterpreterRuntime::print_newline())
   tty->print_cr("\n");
 JRT_END
 
-void InterpreterRuntime::print_narrow_oop_entry() {
+void InterpreterRuntime::print_narrow_oop_entry(oopDesc* obj) {
   tty->print_cr("Narrow oop entry -----------------------------------------------------------------");
   obj->increase_access_counter();
 }
