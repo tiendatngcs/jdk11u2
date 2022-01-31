@@ -400,7 +400,7 @@ void ShenandoahBarrierSetAssembler::shenandoah_write_barrier_post(MacroAssembler
   restore_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
 }
 
-void ShenandoahBarrierSetAssembler::oop_increase_access_counter(MacroAssembler* masm, Register obj, Register temp1, Register temp3temp2, Register temp3) {
+void ShenandoahBarrierSetAssembler::oop_increase_access_counter(MacroAssembler* masm, Register obj, Register temp1, Register temp2, Register temp3) {
   assert_different_registers(obj, temp1, temp2, temp3);
   Label oop_is_null, no_reset_values;
   __ cmpptr(obj, 0);
