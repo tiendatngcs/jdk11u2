@@ -5503,51 +5503,51 @@ void MacroAssembler::store_heap_oop_null(Address dst) {
   access_store_at(T_OBJECT, IN_HEAP, dst, noreg, noreg, noreg);
 }
 
-void MacroAssembler::load_oop_barrier(Register oop) {
-  pusha();                      // push registers
-  // if (count == c_rarg0) {
-  //   if (addr == c_rarg1) {
-  //     // exactly backwards!!
-  //     xchgptr(c_rarg1, c_rarg0);
-  //   } else {
-  //     movptr(c_rarg1, count);
-  //     movptr(c_rarg0, addr);
-  //   }
-  // } else {
-  //   movptr(c_rarg0, addr);
-  //   movptr(c_rarg1, count);
-  // }
-  movptr(c_rarg0, oop);
-  if (UseCompressedOops) {
-    call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_narrow_oop_entry), 1);
-  } else {
-    call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_oop_entry), 1);
-  }
-  popa();
-}
+// void MacroAssembler::load_oop_barrier(Register oop) {
+//   pusha();                      // push registers
+//   // if (count == c_rarg0) {
+//   //   if (addr == c_rarg1) {
+//   //     // exactly backwards!!
+//   //     xchgptr(c_rarg1, c_rarg0);
+//   //   } else {
+//   //     movptr(c_rarg1, count);
+//   //     movptr(c_rarg0, addr);
+//   //   }
+//   // } else {
+//   //   movptr(c_rarg0, addr);
+//   //   movptr(c_rarg1, count);
+//   // }
+//   movptr(c_rarg0, oop);
+//   if (UseCompressedOops) {
+//     call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_narrow_oop_entry), 1);
+//   } else {
+//     call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_oop_entry), 1);
+//   }
+//   popa();
+// }
 
-void MacroAssembler::store_oop_barrier(Register oop) {
-  pusha();                      // push registers
-  // if (count == c_rarg0) {
-  //   if (addr == c_rarg1) {
-  //     // exactly backwards!!
-  //     xchgptr(c_rarg1, c_rarg0);
-  //   } else {
-  //     movptr(c_rarg1, count);
-  //     movptr(c_rarg0, addr);
-  //   }
-  // } else {
-  //   movptr(c_rarg0, addr);
-  //   movptr(c_rarg1, count);
-  // }
-  movptr(c_rarg0, oop);
-  if (UseCompressedOops) {
-    call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_narrow_oop_entry), 1);
-  } else {
-    call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_oop_entry), 1);
-  }
-  popa();
-}
+// void MacroAssembler::store_oop_barrier(Register oop) {
+//   pusha();                      // push registers
+//   // if (count == c_rarg0) {
+//   //   if (addr == c_rarg1) {
+//   //     // exactly backwards!!
+//   //     xchgptr(c_rarg1, c_rarg0);
+//   //   } else {
+//   //     movptr(c_rarg1, count);
+//   //     movptr(c_rarg0, addr);
+//   //   }
+//   // } else {
+//   //   movptr(c_rarg0, addr);
+//   //   movptr(c_rarg1, count);
+//   // }
+//   movptr(c_rarg0, oop);
+//   if (UseCompressedOops) {
+//     call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_narrow_oop_entry), 1);
+//   } else {
+//     call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_oop_entry), 1);
+//   }
+//   popa();
+// }
 
 void MacroAssembler::increase_access_counter(Register obj, Register tmp1, Register tmp2) {
   assert_different_registers(obj, tmp1, tmp2);

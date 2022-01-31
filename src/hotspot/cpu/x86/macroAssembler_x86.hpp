@@ -330,8 +330,8 @@ class MacroAssembler: public Assembler {
   void store_heap_oop(Address dst, Register src, Register tmp1 = noreg,
                       Register tmp2 = noreg, DecoratorSet decorators = 0);
 
-  void load_oop_barrier(Register oop);
-  void store_oop_barrier(Register oop);
+  // void load_oop_barrier(Register oop);
+  // void store_oop_barrier(Register oop);
 
   void increase_access_counter(Register oop, Register tmp1, Register tmp2);
 
