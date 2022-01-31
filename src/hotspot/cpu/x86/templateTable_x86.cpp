@@ -346,11 +346,11 @@ static void oop_increase_access_counter(InterpreterMacroAssembler* _masm,
 
 
     __ pusha();
-    __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), obj);
+    __ call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_oop), obj);
     __ popa();
 
     __ pusha();
-    __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_new_line));
+    __ call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_new_line));
     __ popa();
     if (UseCompressedOops) {
       __ encode_heap_oop(obj);
