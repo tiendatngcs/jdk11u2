@@ -618,13 +618,13 @@ void ShenandoahBarrierSetAssembler::load_at(MacroAssembler* masm, DecoratorSet d
 
     // save_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
     // // __ pusha();
-    if (use_tmp1_for_dst) {
-      __ push(tmp1);
-      oop_increase_access_counter(masm, tmp1, r8);
-      __ pop(tmp1);
-    } else {
-      oop_increase_access_counter(masm, dst, r8);
-    }
+    // if (use_tmp1_for_dst) {
+    //   __ push(tmp1);
+    //   oop_increase_access_counter(masm, tmp1, r8);
+    //   __ pop(tmp1);
+    // } else {
+    //   oop_increase_access_counter(masm, dst, r8);
+    // }
     // // __ popa();
     // restore_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
 
