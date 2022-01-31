@@ -1387,7 +1387,7 @@ void TemplateTable::aastore() {
   __ movptr(r9, rdx);
   __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
   __ pusha();
-  oop_increase_access_counter(_masm, r9, r8, _bs->kind(), IS_ARRAY);
+  oop_increase_access_counter(_masm, r9, r8, _bs->kind());
   __ popa();
   // Dat mod ends
 
