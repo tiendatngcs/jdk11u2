@@ -302,8 +302,6 @@ static void oop_increase_access_counter(InterpreterMacroAssembler* _masm,
                           Register obj,
                           Register temp1,
                           BarrierSet::Name barrier) {
-  bool is_array = (decorators & IS_ARRAY) != 0;
-  assert(is_array, "must be arrayoop");
   if (barrier == BarrierSet::ShenandoahBarrierSet){
     assert_different_registers(obj, temp1);
     Label oop_is_null, no_reset_values;
