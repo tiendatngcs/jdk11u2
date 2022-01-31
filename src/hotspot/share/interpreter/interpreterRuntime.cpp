@@ -1062,11 +1062,11 @@ IRT_LEAF(void, InterpreterRuntime::print_not_as_raw())
 }
 IRT_END
 
-JRT_LEAF(void, ShenandoahRuntime::print_oop(oopDesc* obj))
+JRT_LEAF(void, InterpreterRuntime::print_oop(oopDesc* obj))
   tty->print_cr("oop @ %p | ac = %lu | gc_epoch = %lu", obj, obj->access_counter(), obj->gc_epoch());
 JRT_END
 
-JRT_LEAF(void, ShenandoahRuntime::print_newline(oopDesc* obj))
+JRT_LEAF(void, InterpreterRuntime::print_newline(oopDesc* obj))
   tty->print_cr("\n");
 JRT_END
 
