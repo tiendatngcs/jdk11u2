@@ -1064,6 +1064,11 @@ IRT_END
 
 JRT_LEAF(void, InterpreterRuntime::print_oop(oopDesc* obj))
   tty->print_cr("oop @ %p | ac = %lu | gc_epoch = %lu", obj, obj->access_counter(), obj->gc_epoch());
+  if (obj->is_forwarded()) {
+    tty->print_cr("oop is forwarded");
+  } else {
+    tty->print_cr("oop is not forwarded");
+  }
 JRT_END
 
 JRT_LEAF(void, InterpreterRuntime::print_newline())

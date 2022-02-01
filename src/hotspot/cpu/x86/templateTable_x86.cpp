@@ -313,12 +313,11 @@ static void oop_increase_access_counter(InterpreterMacroAssembler* _masm,
     if (UseCompressedOops) {
       __ decode_heap_oop(obj);
     }
-    // __ pusha();
-    // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), obj);
-    // __ popa();
+    __ pusha();
+    __ call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_oop), obj);
+    __ popa();
 
     // load obj gc_epoch to temp1
-    // __ movptr(temp1, Address(obj, oopDesc::gc_epoch_offset_in_bytes()));
 
     // cmp temp1 to static_gc_epoch if equal jmp to no_reset_values, 
     __ movptr(temp1, InternalAddress((address)(&oopDesc::static_gc_epoch)));
