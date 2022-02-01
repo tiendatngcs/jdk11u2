@@ -1050,10 +1050,10 @@ void TemplateTable::aaload() {
   // // assuming that r9 will not be altered
   __ movptr(r9, rdx);
   // // Dat mod ends
-  // __ pusha();
-  // // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
-  // oop_increase_access_counter(_masm, r9, r8, _bs->kind());
-  // __ popa();
+  __ pusha();
+  // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
+  oop_increase_access_counter(_masm, r9, r8, _bs->kind());
+  __ popa();
   do_oop_load(_masm,
               Address(rdx, rax,
                       UseCompressedOops ? Address::times_4 : Address::times_ptr,
