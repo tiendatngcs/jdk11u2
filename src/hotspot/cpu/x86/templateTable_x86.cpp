@@ -1050,10 +1050,10 @@ void TemplateTable::aaload() {
   // // assuming that r9 will not be altered
   __ movptr(r9, rdx);
   // // Dat mod ends
-  __ pusha();
-  // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
-  oop_increase_access_counter(_masm, r9, r8, _bs->kind());
-  __ popa();
+  // __ pusha();
+  // // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
+  // oop_increase_access_counter(_masm, r9, r8, _bs->kind());
+  // __ popa();
   do_oop_load(_masm,
               Address(rdx, rax,
                       UseCompressedOops ? Address::times_4 : Address::times_ptr,
@@ -3241,10 +3241,10 @@ void TemplateTable::getfield_or_static(int byte_no, bool is_static, RewriteContr
   __ cmpl(flags, atos);
   __ jcc(Assembler::notEqual, notObj);
   // atos
-  __ pusha();
-  // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
-  oop_increase_access_counter(_masm, r9, r8, _bs->kind());
-  __ popa();
+  // __ pusha();
+  // // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
+  // oop_increase_access_counter(_masm, r9, r8, _bs->kind());
+  // __ popa();
   do_oop_load(_masm, field, rax, _bs->kind());
   __ push(atos);
   if (!is_static && rc == may_rewrite) {
@@ -3878,10 +3878,10 @@ void TemplateTable::fast_accessfield(TosState state) {
   // access field
   switch (bytecode()) {
   case Bytecodes::_fast_agetfield:
-    __ pusha();
-    // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
-    oop_increase_access_counter(_masm, r9, r8, _bs->kind());
-    __ popa();
+    // __ pusha();
+    // // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
+    // oop_increase_access_counter(_masm, r9, r8, _bs->kind());
+    // __ popa();
     do_oop_load(_masm, field, rax, _bs->kind());
     __ verify_oop(rax);
     break;
@@ -3950,10 +3950,10 @@ void TemplateTable::fast_xaccess(TosState state) {
     __ access_load_at(T_INT, IN_HEAP, rax, field, noreg, noreg);
     break;
   case atos:
-    __ pusha();
-    // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
-    oop_increase_access_counter(_masm, r9, r8, _bs->kind());
-    __ popa();
+    // __ pusha();
+    // // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
+    // oop_increase_access_counter(_masm, r9, r8, _bs->kind());
+    // __ popa();
     do_oop_load(_masm, field, rax, _bs->kind());
     __ verify_oop(rax);
     break;
