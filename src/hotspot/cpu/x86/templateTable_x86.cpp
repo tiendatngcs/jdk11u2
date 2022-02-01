@@ -3878,10 +3878,10 @@ void TemplateTable::fast_accessfield(TosState state) {
   // access field
   switch (bytecode()) {
   case Bytecodes::_fast_agetfield:
-    // __ pusha();
-    // // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
-    // oop_increase_access_counter(_masm, r9, r8, _bs->kind());
-    // __ popa();
+    __ pusha();
+    // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
+    oop_increase_access_counter(_masm, r9, r8, _bs->kind());
+    __ popa();
     do_oop_load(_masm, field, rax, _bs->kind());
     __ verify_oop(rax);
     break;
@@ -3950,10 +3950,10 @@ void TemplateTable::fast_xaccess(TosState state) {
     __ access_load_at(T_INT, IN_HEAP, rax, field, noreg, noreg);
     break;
   case atos:
-    // __ pusha();
-    // // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
-    // oop_increase_access_counter(_masm, r9, r8, _bs->kind());
-    // __ popa();
+    __ pusha();
+    // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
+    oop_increase_access_counter(_masm, r9, r8, _bs->kind());
+    __ popa();
     do_oop_load(_masm, field, rax, _bs->kind());
     __ verify_oop(rax);
     break;
