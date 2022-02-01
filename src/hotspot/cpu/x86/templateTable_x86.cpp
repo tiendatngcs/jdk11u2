@@ -1384,11 +1384,12 @@ void TemplateTable::aastore() {
   __ movptr(rdx, at_tos_p2()); // array
 
   // Dat mod
-  // __ movptr(r9, rdx);
-  __ push(rdx);
-  __ load_heap_oop(rdx, Address(rdx, 0), noreg, noreg, AS_RAW);
+  __ movptr(r9, rdx);
+  // Dat mod ends
+  __ pusha();
+  __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
   oop_increase_access_counter(_masm, r9, r8, _bs->kind());
-  __ pop(rdx);
+  __ popa();
   // Dat mod ends
 
   Address element_address(rdx, rcx,
