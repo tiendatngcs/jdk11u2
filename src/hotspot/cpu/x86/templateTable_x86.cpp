@@ -1048,11 +1048,12 @@ void TemplateTable::aaload() {
   index_check(rdx, rax); // kills rbx
   // // Dat mod
   // // assuming that r9 will not be altered
-  // __ movptr(r9, rdx);
+  __ movptr(r9, rdx);
   // // Dat mod ends
-  // __ pusha();
-  // array_load_barrier(_masm, rdx, _bs->kind(), IS_ARRAY);
-  // __ popa();
+  __ pusha();
+  // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
+  oop_increase_access_counter(_masm, r9, r8, _bs->kind());
+  __ popa();
   do_oop_load(_masm,
               Address(rdx, rax,
                       UseCompressedOops ? Address::times_4 : Address::times_ptr,
@@ -1438,7 +1439,10 @@ void TemplateTable::aastore() {
   // __ store_oop_barrier(r9);
 
   // Store a NULL
-  // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
+  __ pusha();
+  // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
+  oop_increase_access_counter(_masm, r9, r8, _bs->kind());
+  __ popa();
   do_oop_store(_masm, element_address, noreg, _bs->kind(), IS_ARRAY);
   // oop barrier
   // __ store_oop_barrier(r9);
@@ -3194,7 +3198,7 @@ void TemplateTable::getfield_or_static(int byte_no, bool is_static, RewriteContr
 
   // // Dat mod
   // // assuming that r9 will not be altered
-  // __ movptr(r9, obj);
+  __ movptr(r9, obj);
   // // Dat mod ends
 
   const Address field(obj, off, Address::times_1, 0*wordSize);
@@ -3237,6 +3241,10 @@ void TemplateTable::getfield_or_static(int byte_no, bool is_static, RewriteContr
   __ cmpl(flags, atos);
   __ jcc(Assembler::notEqual, notObj);
   // atos
+  __ pusha();
+  // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
+  oop_increase_access_counter(_masm, r9, r8, _bs->kind());
+  __ popa();
   do_oop_load(_masm, field, rax, _bs->kind());
   __ push(atos);
   if (!is_static && rc == may_rewrite) {
@@ -3462,7 +3470,7 @@ void TemplateTable::putfield_or_static(int byte_no, bool is_static, RewriteContr
 
 
   // Dat mod
-  // __ movptr(r9, obj);
+  __ movptr(r9, obj);
   // Dat mod ends
   // field addresses
   const Address field(obj, off, Address::times_1, 0*wordSize);
@@ -3512,6 +3520,10 @@ void TemplateTable::putfield_or_static(int byte_no, bool is_static, RewriteContr
     __ pop(atos);
     if (!is_static) pop_and_check_object(obj);
     // Store into the field
+    __ pusha();
+    // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
+    oop_increase_access_counter(_masm, r9, r8, _bs->kind());
+    __ popa();
     do_oop_store(_masm, field, rax, _bs->kind());
     // call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
     if (!is_static && rc == may_rewrite) {
@@ -3756,7 +3768,7 @@ void TemplateTable::fast_storefield(TosState state) {
   pop_and_check_object(rcx);
 
   // Dat mod
-  // __ movptr(r9, rcx);
+  __ movptr(r9, rcx);
   // Dat mod ends
 
   // field address
@@ -3765,6 +3777,10 @@ void TemplateTable::fast_storefield(TosState state) {
   // access field
   switch (bytecode()) {
   case Bytecodes::_fast_aputfield:
+    __ pusha();
+    // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
+    oop_increase_access_counter(_masm, r9, r8, _bs->kind());
+    __ popa();
     do_oop_store(_masm, field, rax, _bs->kind());
     // call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
     break;
@@ -3854,7 +3870,7 @@ void TemplateTable::fast_accessfield(TosState state) {
 
   // // Dat mod
   // // assuming that r9 will not be altered
-  // __ movptr(r9, rax);
+  __ movptr(r9, rax);
   // // Dat mod ends
 
   Address field(rax, rbx, Address::times_1);
@@ -3862,6 +3878,10 @@ void TemplateTable::fast_accessfield(TosState state) {
   // access field
   switch (bytecode()) {
   case Bytecodes::_fast_agetfield:
+    __ pusha();
+    // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
+    oop_increase_access_counter(_masm, r9, r8, _bs->kind());
+    __ popa();
     do_oop_load(_masm, field, rax, _bs->kind());
     __ verify_oop(rax);
     break;
@@ -3921,7 +3941,7 @@ void TemplateTable::fast_xaccess(TosState state) {
 
   // // Dat mod
   // // assuming that r9 will not be altered
-  // __ movptr(r9, rax);
+  __ movptr(r9, rax);
   // // Dat mod ends
 
   const Address field = Address(rax, rbx, Address::times_1, 0*wordSize);
@@ -3930,6 +3950,10 @@ void TemplateTable::fast_xaccess(TosState state) {
     __ access_load_at(T_INT, IN_HEAP, rax, field, noreg, noreg);
     break;
   case atos:
+    __ pusha();
+    // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
+    oop_increase_access_counter(_masm, r9, r8, _bs->kind());
+    __ popa();
     do_oop_load(_masm, field, rax, _bs->kind());
     __ verify_oop(rax);
     break;
