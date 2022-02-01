@@ -1386,10 +1386,6 @@ void TemplateTable::aastore() {
   // Dat mod
   __ movptr(r9, rdx);
   // Dat mod ends
-  __ pusha();
-  __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
-  oop_increase_access_counter(_masm, r9, r8, _bs->kind());
-  __ popa();
   // Dat mod ends
 
   Address element_address(rdx, rcx,
@@ -1424,6 +1420,10 @@ void TemplateTable::aastore() {
   __ movptr(rax, at_tos());
   __ movl(rcx, at_tos_p1()); // index
   // Now store using the appropriate barrier
+  __ pusha();
+  __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
+  oop_increase_access_counter(_masm, r9, r8, _bs->kind());
+  __ popa();
   do_oop_store(_masm, element_address, rax, _bs->kind(), IS_ARRAY);
   // call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
   // oop barrier
