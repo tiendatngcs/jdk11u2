@@ -3522,7 +3522,7 @@ void TemplateTable::putfield_or_static(int byte_no, bool is_static, RewriteContr
     // Store into the field
     __ pusha();
     // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
-    oop_increase_access_counter(_masm, r9, r8, _bs->kind());
+    oop_increase_access_counter(_masm, obj, r8, _bs->kind());
     __ popa();
     do_oop_store(_masm, field, rax, _bs->kind());
     // call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
