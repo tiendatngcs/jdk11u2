@@ -3777,10 +3777,10 @@ void TemplateTable::fast_storefield(TosState state) {
   // access field
   switch (bytecode()) {
   case Bytecodes::_fast_aputfield:
-    // __ pusha();
-    // // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
-    // oop_increase_access_counter(_masm, r9, r8, _bs->kind());
-    // __ popa();
+    __ pusha();
+    // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
+    oop_increase_access_counter(_masm, r9, r8, _bs->kind());
+    __ popa();
     do_oop_store(_masm, field, rax, _bs->kind());
     // call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
     break;
