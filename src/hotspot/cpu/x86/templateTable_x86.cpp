@@ -3241,10 +3241,10 @@ void TemplateTable::getfield_or_static(int byte_no, bool is_static, RewriteContr
   __ cmpl(flags, atos);
   __ jcc(Assembler::notEqual, notObj);
   // atos
-  // __ pusha();
-  // // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
-  // oop_increase_access_counter(_masm, r9, r8, _bs->kind());
-  // __ popa();
+  __ pusha();
+  // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
+  oop_increase_access_counter(_masm, r9, r8, _bs->kind());
+  __ popa();
   do_oop_load(_masm, field, rax, _bs->kind());
   __ push(atos);
   if (!is_static && rc == may_rewrite) {
