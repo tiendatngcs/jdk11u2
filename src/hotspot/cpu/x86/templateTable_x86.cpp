@@ -313,36 +313,36 @@ static void oop_increase_access_counter(InterpreterMacroAssembler* _masm,
     if (UseCompressedOops) {
       __ decode_heap_oop(obj);
     }
-    // // __ pusha();
-    // // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), obj);
-    // // __ popa();
+    // __ pusha();
+    // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), obj);
+    // __ popa();
 
-    // // load obj gc_epoch to temp1
-    // // __ movptr(temp1, Address(obj, oopDesc::gc_epoch_offset_in_bytes()));
+    // load obj gc_epoch to temp1
+    // __ movptr(temp1, Address(obj, oopDesc::gc_epoch_offset_in_bytes()));
 
-    // // cmp temp1 to static_gc_epoch if equal jmp to no_reset_values, 
-    // __ movptr(temp1, InternalAddress((address)(&oopDesc::static_gc_epoch)));
-    // // __ pusha();
-    // // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_address), temp1);
-    // // __ popa();
+    // cmp temp1 to static_gc_epoch if equal jmp to no_reset_values, 
+    __ movptr(temp1, InternalAddress((address)(&oopDesc::static_gc_epoch)));
+    // __ pusha();
+    // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_address), temp1);
+    // __ popa();
     
-    // __ cmpptr(temp1, Address(obj, oopDesc::gc_epoch_offset_in_bytes()));
-    // __ jcc(Assembler::equal, no_reset_values);
-    // // Reset ac to 0 and gc_epoch to current gc_epoch
-    // __ movptr(Address(obj, oopDesc::gc_epoch_offset_in_bytes()), temp1);
+    __ cmpptr(temp1, Address(obj, oopDesc::gc_epoch_offset_in_bytes()));
+    __ jcc(Assembler::equal, no_reset_values);
+    // Reset ac to 0 and gc_epoch to current gc_epoch
+    __ movptr(Address(obj, oopDesc::gc_epoch_offset_in_bytes()), temp1);
 
-    // // __ pusha();
-    // // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_address), temp1);
-    // // __ popa();
+    // __ pusha();
+    // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_address), temp1);
+    // __ popa();
 
-    // __ movptr(Address(obj, oopDesc::access_counter_offset_in_bytes()), (intptr_t)0); // illegal use but works for this situation
+    __ movptr(Address(obj, oopDesc::access_counter_offset_in_bytes()), (intptr_t)0); // illegal use but works for this situation
 
 
-    // __ bind(no_reset_values);
-    // // increment ac by 1
-    // __ movptr(temp1, Address(obj, oopDesc::access_counter_offset_in_bytes()));
-    // __ increment(temp1);
-    // __ movptr(Address(obj, oopDesc::access_counter_offset_in_bytes()), temp1);
+    __ bind(no_reset_values);
+    // increment ac by 1
+    __ movptr(temp1, Address(obj, oopDesc::access_counter_offset_in_bytes()));
+    __ increment(temp1);
+    __ movptr(Address(obj, oopDesc::access_counter_offset_in_bytes()), temp1);
 
 
     __ pusha();
@@ -1421,7 +1421,7 @@ void TemplateTable::aastore() {
   __ movl(rcx, at_tos_p1()); // index
   // Now store using the appropriate barrier
   __ pusha();
-  __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
+  // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
   oop_increase_access_counter(_masm, r9, r8, _bs->kind());
   __ popa();
   do_oop_store(_masm, element_address, rax, _bs->kind(), IS_ARRAY);
