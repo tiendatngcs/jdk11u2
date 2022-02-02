@@ -298,66 +298,66 @@ static void do_oop_load(InterpreterMacroAssembler* _masm,
   // }
 }
 
-static void oop_increase_access_counter(InterpreterMacroAssembler* _masm,
-                          Register obj,
-                          Register temp1,
-                          BarrierSet::Name barrier) {
-  if (barrier == BarrierSet::ShenandoahBarrierSet){
-    assert_different_registers(obj, temp1);
-    Label oop_is_null, no_reset_values;
-    __ cmpptr(obj, 0);
-    __ jcc(Assembler::equal, oop_is_null);
+// static void oop_increase_access_counter(InterpreterMacroAssembler* _masm,
+//                           Register obj,
+//                           Register temp1,
+//                           BarrierSet::Name barrier) {
+//   if (barrier == BarrierSet::ShenandoahBarrierSet){
+//     assert_different_registers(obj, temp1);
+//     Label oop_is_null, no_reset_values;
+//     __ cmpptr(obj, 0);
+//     __ jcc(Assembler::equal, oop_is_null);
 
 
 
-    if (UseCompressedOops) {
-      __ decode_heap_oop(obj);
-    }
-    // __ pusha();
-    // __ call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_oop), obj);
-    // __ popa();
+//     if (UseCompressedOops) {
+//       __ decode_heap_oop(obj);
+//     }
+//     // __ pusha();
+//     // __ call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_oop), obj);
+//     // __ popa();
 
-    // load obj gc_epoch to temp1
+//     // load obj gc_epoch to temp1
 
-    // cmp temp1 to static_gc_epoch if equal jmp to no_reset_values, 
-    __ movptr(temp1, InternalAddress((address)(&oopDesc::static_gc_epoch)));
-    // __ pusha();
-    // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_address), temp1);
-    // __ popa();
+//     // cmp temp1 to static_gc_epoch if equal jmp to no_reset_values, 
+//     __ movptr(temp1, InternalAddress((address)(&oopDesc::static_gc_epoch)));
+//     // __ pusha();
+//     // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_address), temp1);
+//     // __ popa();
     
-    __ cmpptr(temp1, Address(obj, oopDesc::gc_epoch_offset_in_bytes()));
-    __ jcc(Assembler::equal, no_reset_values);
-    // Reset ac to 0 and gc_epoch to current gc_epoch
-    __ movptr(Address(obj, oopDesc::gc_epoch_offset_in_bytes()), temp1);
+//     __ cmpptr(temp1, Address(obj, oopDesc::gc_epoch_offset_in_bytes()));
+//     __ jcc(Assembler::equal, no_reset_values);
+//     // Reset ac to 0 and gc_epoch to current gc_epoch
+//     __ movptr(Address(obj, oopDesc::gc_epoch_offset_in_bytes()), temp1);
 
-    // __ pusha();
-    // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_address), temp1);
-    // __ popa();
+//     // __ pusha();
+//     // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_address), temp1);
+//     // __ popa();
 
-    __ movptr(Address(obj, oopDesc::access_counter_offset_in_bytes()), (intptr_t)0); // illegal use but works for this situation
-
-
-    __ bind(no_reset_values);
-    // increment ac by 1
-    __ movptr(temp1, Address(obj, oopDesc::access_counter_offset_in_bytes()));
-    __ increment(temp1);
-    __ movptr(Address(obj, oopDesc::access_counter_offset_in_bytes()), temp1);
+//     __ movptr(Address(obj, oopDesc::access_counter_offset_in_bytes()), (intptr_t)0); // illegal use but works for this situation
 
 
-    // __ pusha();
-    // __ call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_oop), obj);
-    // __ popa();
+//     __ bind(no_reset_values);
+//     // increment ac by 1
+//     __ movptr(temp1, Address(obj, oopDesc::access_counter_offset_in_bytes()));
+//     __ increment(temp1);
+//     __ movptr(Address(obj, oopDesc::access_counter_offset_in_bytes()), temp1);
 
-    // __ pusha();
-    // __ call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_newline));
-    // __ popa();
-    if (UseCompressedOops) {
-      __ encode_heap_oop(obj);
-    }
+
+//     // __ pusha();
+//     // __ call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_oop), obj);
+//     // __ popa();
+
+//     // __ pusha();
+//     // __ call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_newline));
+//     // __ popa();
+//     if (UseCompressedOops) {
+//       __ encode_heap_oop(obj);
+//     }
     
-    __ bind(oop_is_null);
-  }
-}
+//     __ bind(oop_is_null);
+//   }
+// }
 
 // static void array_load_barrier(InterpreterMacroAssembler* _masm,
 //                           Register arrayoop,
@@ -1051,7 +1051,7 @@ void TemplateTable::aaload() {
   // // Dat mod ends
   __ pusha();
   // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
-  oop_increase_access_counter(_masm, r9, r8, _bs->kind());
+  // oop_increase_access_counter(_masm, r9, r8, _bs->kind());
   __ popa();
   do_oop_load(_masm,
               Address(rdx, rax,
@@ -1422,7 +1422,7 @@ void TemplateTable::aastore() {
   // Now store using the appropriate barrier
   __ pusha();
   // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
-  oop_increase_access_counter(_masm, r9, r8, _bs->kind());
+  // oop_increase_access_counter(_masm, r9, r8, _bs->kind());
   __ popa();
   do_oop_store(_masm, element_address, rax, _bs->kind(), IS_ARRAY);
   // call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
@@ -1440,7 +1440,7 @@ void TemplateTable::aastore() {
   // Store a NULL
   __ pusha();
   // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
-  oop_increase_access_counter(_masm, r9, r8, _bs->kind());
+  // oop_increase_access_counter(_masm, r9, r8, _bs->kind());
   __ popa();
   do_oop_store(_masm, element_address, noreg, _bs->kind(), IS_ARRAY);
   // oop barrier
@@ -3242,7 +3242,7 @@ void TemplateTable::getfield_or_static(int byte_no, bool is_static, RewriteContr
   // atos
   __ pusha();
   // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
-  oop_increase_access_counter(_masm, r9, r8, _bs->kind());
+  // oop_increase_access_counter(_masm, r9, r8, _bs->kind());
   __ popa();
   do_oop_load(_masm, field, rax, _bs->kind());
   __ push(atos);
@@ -3521,7 +3521,7 @@ void TemplateTable::putfield_or_static(int byte_no, bool is_static, RewriteContr
     // Store into the field
     __ pusha();
     // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
-    oop_increase_access_counter(_masm, obj, r8, _bs->kind());
+    // oop_increase_access_counter(_masm, obj, r8, _bs->kind());
     __ popa();
     do_oop_store(_masm, field, rax, _bs->kind());
     // call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
@@ -3778,7 +3778,7 @@ void TemplateTable::fast_storefield(TosState state) {
   case Bytecodes::_fast_aputfield:
     __ pusha();
     // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
-    oop_increase_access_counter(_masm, r9, r8, _bs->kind());
+    // oop_increase_access_counter(_masm, r9, r8, _bs->kind());
     __ popa();
     do_oop_store(_masm, field, rax, _bs->kind());
     // call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
@@ -3879,7 +3879,7 @@ void TemplateTable::fast_accessfield(TosState state) {
   case Bytecodes::_fast_agetfield:
     __ pusha();
     // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
-    oop_increase_access_counter(_masm, r9, r8, _bs->kind());
+    // oop_increase_access_counter(_masm, r9, r8, _bs->kind());
     __ popa();
     do_oop_load(_masm, field, rax, _bs->kind());
     __ verify_oop(rax);
@@ -3951,7 +3951,7 @@ void TemplateTable::fast_xaccess(TosState state) {
   case atos:
     __ pusha();
     // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
-    oop_increase_access_counter(_masm, r9, r8, _bs->kind());
+    // oop_increase_access_counter(_masm, r9, r8, _bs->kind());
     __ popa();
     do_oop_load(_masm, field, rax, _bs->kind());
     __ verify_oop(rax);
