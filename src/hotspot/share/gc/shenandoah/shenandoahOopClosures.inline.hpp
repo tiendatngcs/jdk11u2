@@ -34,10 +34,9 @@ inline void ShenandoahMarkRefsSuperClosure::work(T *p) {
 
 template <class T>
 inline void ShenandoahUpdateHeapRefsClosure::do_oop_work(T* p) {
-  ResourceMark rm;
   // tty->print_cr("oop @ %p | ac = %lu | gc_epoch = %lu | name = %s", (oopDesc*)p, fwd->access_counter(), fwd->gc_epoch(), fwd->klass()->internal_name());
   oop fwd = _heap->maybe_update_with_forwarded(p);
-  tty->print_cr("updated ref oop @ %p | ac = %lu | gc_epoch = %lu | name = %s", (oopDesc*)fwd, fwd->access_counter(), fwd->gc_epoch(), fwd->klass()->internal_name());
+  tty->print_cr("updated ref oop @ %p | ac = %lu | gc_epoch = %lu", (oopDesc*)fwd, fwd->access_counter(), fwd->gc_epoch());
   tty->print_cr("");
 
 }
