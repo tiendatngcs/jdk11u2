@@ -106,6 +106,8 @@ inline oop ShenandoahHeap::maybe_update_with_forwarded(T* p) {
   T o = RawAccess<>::oop_load(p);
   if (!CompressedOops::is_null(o)) {
     oop obj = CompressedOops::decode_not_null(o);
+    // tty->print_cr("updated ref oop @ %p | ac = %lu | gc_epoch = %lu", (oopDesc*)obj, obj->access_counter(), obj->gc_epoch());
+    // tty->print_cr("");
     return maybe_update_with_forwarded_not_null(p, obj);
   } else {
     return NULL;
