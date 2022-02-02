@@ -269,7 +269,7 @@ inline oop ShenandoahHeap::evacuate_object(oop p, Thread* thread) {
     // This thread went through the OOM during evac protocol and it is safe to return
     // the forward pointer. It must not attempt to evacuate any more.
     oop fwd = ShenandoahBarrierSet::resolve_forwarded(p);
-    tty->print_cr("Returning oop @ %p fwd oop @ %p| ac = %lu | gc_epoch = %lu | name = %s", p, (oopDesc*)fwd, fwd->access_counter(), fwd->gc_epoch(), fwd->klass()->internal_name());
+    tty->print_cr("Returning oop @ %p fwd oop @ %p| ac = %lu | gc_epoch = %lu | name = %s", (oopDesc*)p, (oopDesc*)fwd, fwd->access_counter(), fwd->gc_epoch(), fwd->klass()->internal_name());
     return fwd;
   }
 
