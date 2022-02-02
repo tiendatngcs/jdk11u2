@@ -1401,6 +1401,7 @@ public:
 
   void do_object(oop p) {
     shenandoah_assert_marked(NULL, p);
+    ResourceMark rm;
     if (!p->is_forwarded()) {
       tty->print_cr("p is not forwarded @ %p | ac = %lu | gc_epoch = %lu | name = %s", (oopDesc*)p, p->access_counter(), p->gc_epoch(), p->klass()->internal_name());
       oop fwd = _heap->evacuate_object(p, _thread);

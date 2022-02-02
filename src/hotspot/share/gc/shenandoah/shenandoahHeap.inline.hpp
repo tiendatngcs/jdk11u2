@@ -261,6 +261,7 @@ inline HeapWord* ShenandoahHeap::allocate_from_gclab(Thread* thread, size_t size
 }
 
 inline oop ShenandoahHeap::evacuate_object(oop p, Thread* thread) {
+  ResourceMark rm;
   if (p->access_counter() == 0 && p->gc_epoch() == 0){
     tty->print_cr("Invalid oop @ %p | ac = %lu | gc_epoch = %lu | name = %s", (oopDesc*)p, p->access_counter(), p->gc_epoch(), p->klass()->internal_name());
   }
