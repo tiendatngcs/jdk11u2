@@ -63,11 +63,11 @@ uintptr_t oopDesc::true_access_counter() {
   return _access_counter;
 }
 
-void oopDesc::increase_access_counter(uintptr_t increment) {
+void oopDesc::increase_access_counter() {
   uintptr_t ac = true_access_counter();
   // code below prevents overflow
-  if (UINTPTR_MAX - increment > ac){
-    set_access_counter(ac + increment);
+  if (UINTPTR_MAX - 1 > ac){
+    set_access_counter(ac + 1);
   }
   else {
     printf("Access Counter reaches UINTPTR_MAX\n");
