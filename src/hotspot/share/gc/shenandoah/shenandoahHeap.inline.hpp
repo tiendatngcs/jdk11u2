@@ -108,13 +108,15 @@ inline oop ShenandoahHeap::maybe_update_with_forwarded(T* p) {
     oop obj = CompressedOops::decode_not_null(o);
     // tty->print_cr("org oop @ %p | ac = %lu | gc_epoch = %lu", (oopDesc*)obj, obj->access_counter(), obj->gc_epoch());
     oop fwd = maybe_update_with_forwarded_not_null(p, obj);
+    increase_hotness_size(fwd);
+    update_histogram(fwd);
 
-    if (fwd->access_counter() == 0 && fwd->gc_epoch() == 0 && oopDesc::static_gc_epoch > 0) {
-      ResourceMark rm;
-      tty->print_cr("org oop @ %p | ac = %lu | gc_epoch = %lu | name = %s", (oopDesc*)fwd, fwd->access_counter(), fwd->gc_epoch(), fwd->klass()->internal_name());
-      tty->print_cr("updated oop @ %p | ac = %lu | gc_epoch = %lu | name = %s", (oopDesc*)fwd, fwd->access_counter(), fwd->gc_epoch(), fwd->klass()->internal_name());
-      tty->print_cr("");
-    }
+    // if (fwd->access_counter() == 0 && fwd->gc_epoch() == 0 && oopDesc::static_gc_epoch > 0) {
+    //   ResourceMark rm;
+    //   tty->print_cr("org oop @ %p | ac = %lu | gc_epoch = %lu | name = %s", (oopDesc*)fwd, fwd->access_counter(), fwd->gc_epoch(), fwd->klass()->internal_name());
+    //   tty->print_cr("updated oop @ %p | ac = %lu | gc_epoch = %lu | name = %s", (oopDesc*)fwd, fwd->access_counter(), fwd->gc_epoch(), fwd->klass()->internal_name());
+    //   tty->print_cr("");
+    // }
     return fwd;
   } else {
     return NULL;
