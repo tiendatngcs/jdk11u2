@@ -261,10 +261,16 @@ inline HeapWord* ShenandoahHeap::allocate_from_gclab(Thread* thread, size_t size
 }
 
 inline oop ShenandoahHeap::evacuate_object(oop p, Thread* thread) {
+  if (p->access_counter() == 0 && p->gc_epoch() == 0){
+    tty->print_cr("Invalid oop @ %p | ac = %lu | gc_epoch = %lu | name = %s", p, p->access_counter(), p->gc_epoch() p->klass()->internal_name());
+  }
   if (ShenandoahThreadLocalData::is_oom_during_evac(Thread::current())) {
+    tty->print_cr("oop @ %p Went through OOM", p);
     // This thread went through the OOM during evac protocol and it is safe to return
     // the forward pointer. It must not attempt to evacuate any more.
-    return ShenandoahBarrierSet::resolve_forwarded(p);
+    oop fwd = ShenandoahBarrierSet::resolve_forwarded(p);
+    tty->print_cr("Returning oop @ %p fwd oop @ %p| ac = %lu | gc_epoch = %lu | name = %s", p, fwd, fwd->access_counter(), fwd->gc_epoch() fwd->klass()->internal_name());
+    return fwd;
   }
 
   assert(ShenandoahThreadLocalData::is_evac_allowed(thread), "must be enclosed in oom-evac scope");
@@ -301,7 +307,8 @@ inline oop ShenandoahHeap::evacuate_object(oop p, Thread* thread) {
 
     _oom_evac_handler.handle_out_of_memory_during_evacuation();
 
-    return ShenandoahBarrierSet::resolve_forwarded(p);
+    oop fwd = ShenandoahBarrierSet::resolve_forwarded(p);
+    return fwd;
   }
 
   // Copy the object:
