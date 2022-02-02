@@ -508,8 +508,8 @@ public:
 
   void do_object(oop obj) {
     obj->oop_iterate(_cl);
-    tty->print_cr("updated ref oop @ %p | ac = %lu | gc_epoch = %lu", (oopDesc*)fwd, fwd->access_counter(), fwd->gc_epoch());
-    tty->print_cr("");
+    // tty->print_cr("updated ref oop @ %p | ac = %lu | gc_epoch = %lu", (oopDesc*)fwd, fwd->access_counter(), fwd->gc_epoch());
+    // tty->print_cr("");
   }
 };
 
