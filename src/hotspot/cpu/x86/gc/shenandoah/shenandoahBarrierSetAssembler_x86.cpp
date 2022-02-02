@@ -640,11 +640,11 @@ void ShenandoahBarrierSetAssembler::load_at(MacroAssembler* masm, DecoratorSet d
 
       dst = result_dst;
     }
-    save_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
-    // __ pusha();
-    oop_increase_access_counter(masm, dst, r8);
-    // __ popa();
-    restore_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
+    // save_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
+    // // __ pusha();
+    // oop_increase_access_counter(masm, dst, r8);
+    // // __ popa();
+    // restore_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
     // assert(dst == rax, "Dst is reax?");
 
   } else {
@@ -738,11 +738,11 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
     }
 
     if (as_normal){
-      save_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
-      // obj is the address to the actual oop load oop to the same register
-      __ load_heap_oop(tmp1, Address(tmp1, 0), noreg, noreg, AS_RAW);
-      oop_increase_access_counter(masm, tmp1, r8);
-      restore_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
+      // save_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
+      // // obj is the address to the actual oop load oop to the same register
+      // __ load_heap_oop(tmp1, Address(tmp1, 0), noreg, noreg, AS_RAW);
+      // oop_increase_access_counter(masm, tmp1, r8);
+      // restore_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
 
       // save_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
       // Label oop_is_null, no_reset_values;
