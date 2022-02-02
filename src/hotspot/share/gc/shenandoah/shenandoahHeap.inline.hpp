@@ -106,9 +106,11 @@ inline oop ShenandoahHeap::maybe_update_with_forwarded(T* p) {
   T o = RawAccess<>::oop_load(p);
   if (!CompressedOops::is_null(o)) {
     oop obj = CompressedOops::decode_not_null(o);
-    // tty->print_cr("updated ref oop @ %p | ac = %lu | gc_epoch = %lu", (oopDesc*)obj, obj->access_counter(), obj->gc_epoch());
-    // tty->print_cr("");
-    return maybe_update_with_forwarded_not_null(p, obj);
+    tty->print_cr("org oop @ %p | ac = %lu | gc_epoch = %lu", (oopDesc*)obj, obj->access_counter(), obj->gc_epoch());
+    oop fwd = maybe_update_with_forwarded_not_null(p, obj);
+    tty->print_cr("updated oop @ %p | ac = %lu | gc_epoch = %lu", (oopDesc*)fwd, fwd->access_counter(), fwd->gc_epoch());
+    tty->print_cr("");
+    return fwd;
   } else {
     return NULL;
   }
@@ -268,11 +270,11 @@ inline oop ShenandoahHeap::evacuate_object(oop p, Thread* thread) {
     tty->print_cr("Invalid oop @ %p | ac = %lu | gc_epoch = %lu", (oopDesc*)p, p->access_counter(), p->gc_epoch());
   }
   if (ShenandoahThreadLocalData::is_oom_during_evac(Thread::current())) {
-    tty->print_cr("oop @ %p Went through OOM", (oopDesc*)p);
+    // tty->print_cr("oop @ %p Went through OOM", (oopDesc*)p);
     // This thread went through the OOM during evac protocol and it is safe to return
     // the forward pointer. It must not attempt to evacuate any more.
     oop fwd = ShenandoahBarrierSet::resolve_forwarded(p);
-    tty->print_cr("Returning oop @ %p fwd oop @ %p| ac = %lu | gc_epoch = %lu", (oopDesc*)p, (oopDesc*)fwd, fwd->access_counter(), fwd->gc_epoch());
+    // tty->print_cr("Returning oop @ %p fwd oop @ %p| ac = %lu | gc_epoch = %lu", (oopDesc*)p, (oopDesc*)fwd, fwd->access_counter(), fwd->gc_epoch());
     return fwd;
   }
 
@@ -326,8 +328,8 @@ inline oop ShenandoahHeap::evacuate_object(oop p, Thread* thread) {
   if (result == copy_val) {
     // Successfully evacuated. Our copy is now the public one!
     shenandoah_assert_correct(NULL, copy_val);
-    increase_hotness_size(copy_val);
-    update_histogram(copy_val);
+    // increase_hotness_size(copy_val);
+    // update_histogram(copy_val);
     // printf("result: ac %lu gc_epoch %lu region %lu\n", result->access_counter(), result->gc_epoch(), heap_region_index_containing(result));
     return copy_val;
   }  else {
@@ -349,8 +351,8 @@ inline oop ShenandoahHeap::evacuate_object(oop p, Thread* thread) {
       shenandoah_assert_correct(NULL, copy_val);
     }
     shenandoah_assert_correct(NULL, result);
-    increase_hotness_size(result);
-    update_histogram(result);
+    // increase_hotness_size(result);
+    // update_histogram(result);
 
     // printf("result: ac %lu gc_epoch %lu region %lu\n", result->access_counter(), result->gc_epoch(), heap_region_index_containing(result));
     return result;
