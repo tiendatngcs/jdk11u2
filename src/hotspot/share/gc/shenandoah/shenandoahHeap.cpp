@@ -1402,11 +1402,11 @@ public:
   void do_object(oop p) {
     shenandoah_assert_marked(NULL, p);
     if (!p->is_forwarded()) {
-      tty->print_cr("p is not forwarded @ %p | ac = %lu | gc_epoch = %lu | name = %s", p, p->access_counter(), p->gc_epoch() p->klass()->internal_name());
+      tty->print_cr("p is not forwarded @ %p | ac = %lu | gc_epoch = %lu | name = %s", p, p->access_counter(), p->gc_epoch(), p->klass()->internal_name());
       oop fwd = _heap->evacuate_object(p, _thread);
-      tty->print_cr("fwd oop @ %p | ac = %lu | gc_epoch = %lu | name = %s", fwd, fwd->access_counter(), fwd->gc_epoch() fwd->klass()->internal_name());
+      tty->print_cr("fwd oop @ %p | ac = %lu | gc_epoch = %lu | name = %s", fwd, fwd->access_counter(), fwd->gc_epoch(), fwd->klass()->internal_name());
     } else {
-      tty->print_cr("p is forwarded @ %p | ac = %lu | gc_epoch = %lu | name = %s", p, p->access_counter(), p->gc_epoch() p->klass()->internal_name());
+      tty->print_cr("p is forwarded @ %p | ac = %lu | gc_epoch = %lu | name = %s", p, p->access_counter(), p->gc_epoch(), p->klass()->internal_name());
     }
     tty->print_cr("");
   }
