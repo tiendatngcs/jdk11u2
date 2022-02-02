@@ -110,7 +110,9 @@ inline oop ShenandoahHeap::maybe_update_with_forwarded(T* p) {
     oop fwd = maybe_update_with_forwarded_not_null(p, obj);
 
     if (fwd->access_counter() == 0 && fwd->gc_epoch() == 0 && oopDesc::static_gc_epoch > 0) {
-      tty->print_cr("updated oop @ %p | ac = %lu | gc_epoch = %lu", (oopDesc*)fwd, fwd->access_counter(), fwd->gc_epoch());
+      ResourceMark rm;
+      tty->print_cr("org oop @ %p | ac = %lu | gc_epoch = %lu | name = %s", (oopDesc*)fwd, fwd->access_counter(), fwd->gc_epoch(), fwd->klass()->internal_name());
+      tty->print_cr("updated oop @ %p | ac = %lu | gc_epoch = %lu | name = %s", (oopDesc*)fwd, fwd->access_counter(), fwd->gc_epoch(), fwd->klass()->internal_name());
       tty->print_cr("");
     }
     return fwd;
@@ -269,9 +271,9 @@ inline HeapWord* ShenandoahHeap::allocate_from_gclab(Thread* thread, size_t size
 
 inline oop ShenandoahHeap::evacuate_object(oop p, Thread* thread) {
   // ResourceMark rm;
-  if (p->access_counter() == 0 && p->gc_epoch() == 0){
-    tty->print_cr("Invalid oop @ %p | ac = %lu | gc_epoch = %lu", (oopDesc*)p, p->access_counter(), p->gc_epoch());
-  }
+  // if (p->access_counter() == 0 && p->gc_epoch() == 0){
+  //   tty->print_cr("Invalid oop @ %p | ac = %lu | gc_epoch = %lu", (oopDesc*)p, p->access_counter(), p->gc_epoch());
+  // }
   if (ShenandoahThreadLocalData::is_oom_during_evac(Thread::current())) {
     // tty->print_cr("oop @ %p Went through OOM", (oopDesc*)p);
     // This thread went through the OOM during evac protocol and it is safe to return
