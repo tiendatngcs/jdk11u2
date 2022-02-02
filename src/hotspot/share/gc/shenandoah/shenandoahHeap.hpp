@@ -282,7 +282,6 @@ public:
 
   const size_t* histogram()   const;
   const size_t* size_histogram() const;
-  // std::string histogram_in_string() const;
 
   // uintptr_t gc_epoch() const;
 
