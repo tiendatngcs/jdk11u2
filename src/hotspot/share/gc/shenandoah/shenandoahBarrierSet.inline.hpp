@@ -42,7 +42,7 @@ inline void ShenandoahBarrierSet::oop_increase_access_counter(oop p) {
     // if (heap != NULL){
     //   heap->oop_check_to_reset_access_counter(p);
     // }
-    p->increase_access_counter(1);
+    p->increase_access_counter();
   }
 }
 
@@ -67,6 +67,8 @@ inline oop ShenandoahBarrierSet::load_reference_barrier_mutator(oop obj, T* load
   assert(ShenandoahLoadRefBarrier, "should be enabled");
   shenandoah_assert_in_cset(load_addr, obj);
 
+  obj->increase_access_counter();
+
   oop fwd = resolve_forwarded_not_null_mutator(obj);
   if (obj == fwd) {
     // Dat mod ends
@@ -82,7 +84,7 @@ inline oop ShenandoahBarrierSet::load_reference_barrier_mutator(oop obj, T* load
     ShenandoahHeap::cas_oop(fwd, load_addr, obj);
   }
   // Dat mod
-  // oop_increase_access_counter(fwd);
+  fwd->increase_access_counter();
 
   return fwd;
 }

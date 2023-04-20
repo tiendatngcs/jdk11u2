@@ -181,6 +181,12 @@ private:
   size_t _hot_region_count;
   size_t _cold_region_count;
 
+  size_t _valid_size;
+  size_t _valid_count;
+
+  size_t _invalid_size;
+  size_t _invalid_count;
+
   size_t _histogram[30];
   size_t _size_histogram[30];
 
@@ -240,6 +246,9 @@ public:
   void decrease_region_count(size_t num, ShenandoahRegionAccessRate access_rate);
   void set_region_count(size_t num, ShenandoahRegionAccessRate access_rate);
 
+  void set_oop_stats(bool is_valid, bool is_count, size_t new_value);
+  void increase_oop_stats(bool is_valid, bool is_count, size_t increment);
+
   void update_histogram(oop obj);
   void reset_histogram();
 
@@ -269,9 +278,10 @@ public:
   size_t hot_region_count()   const;
   size_t cold_region_count()  const;
 
+  size_t oop_stats(bool is_valid, bool is_count) const;
+
   const size_t* histogram()   const;
   const size_t* size_histogram() const;
-  // std::string histogram_in_string() const;
 
   // uintptr_t gc_epoch() const;
 
@@ -365,7 +375,7 @@ public:
   char gc_state() const;
   static address gc_state_addr();
 
-  static ShenandoahRegionAccessRate get_access_rate_from_access_counter(uintptr_t ac);
+  static ShenandoahRegionAccessRate get_access_rate_from_access_counter(intptr_t ac);
 
   void set_concurrent_mark_in_progress(bool in_progress);
   void set_evacuation_in_progress(bool in_progress);

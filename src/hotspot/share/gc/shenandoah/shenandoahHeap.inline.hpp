@@ -106,7 +106,18 @@ inline oop ShenandoahHeap::maybe_update_with_forwarded(T* p) {
   T o = RawAccess<>::oop_load(p);
   if (!CompressedOops::is_null(o)) {
     oop obj = CompressedOops::decode_not_null(o);
-    return maybe_update_with_forwarded_not_null(p, obj);
+    // tty->print_cr("org oop @ %p | ac = %lu | gc_epoch = %lu", (oopDesc*)obj, obj->access_counter(), obj->gc_epoch());
+    oop fwd = maybe_update_with_forwarded_not_null(p, obj);
+    increase_hotness_size(fwd);
+    update_histogram(fwd);
+
+    // if (fwd->access_counter() == 0 && fwd->gc_epoch() == 0 && oopDesc::static_gc_epoch > 0) {
+    //   ResourceMark rm;
+    //   tty->print_cr("org oop @ %p | ac = %lu | gc_epoch = %lu | name = %s", (oopDesc*)fwd, fwd->access_counter(), fwd->gc_epoch(), fwd->klass()->internal_name());
+    //   tty->print_cr("updated oop @ %p | ac = %lu | gc_epoch = %lu | name = %s", (oopDesc*)fwd, fwd->access_counter(), fwd->gc_epoch(), fwd->klass()->internal_name());
+    //   tty->print_cr("");
+    // }
+    return fwd;
   } else {
     return NULL;
   }
@@ -261,10 +272,17 @@ inline HeapWord* ShenandoahHeap::allocate_from_gclab(Thread* thread, size_t size
 }
 
 inline oop ShenandoahHeap::evacuate_object(oop p, Thread* thread) {
+  // ResourceMark rm;
+  // if (p->access_counter() == 0 && p->gc_epoch() == 0){
+  //   tty->print_cr("Invalid oop @ %p | ac = %lu | gc_epoch = %lu", (oopDesc*)p, p->access_counter(), p->gc_epoch());
+  // }
   if (ShenandoahThreadLocalData::is_oom_during_evac(Thread::current())) {
+    // tty->print_cr("oop @ %p Went through OOM", (oopDesc*)p);
     // This thread went through the OOM during evac protocol and it is safe to return
     // the forward pointer. It must not attempt to evacuate any more.
-    return ShenandoahBarrierSet::resolve_forwarded(p);
+    oop fwd = ShenandoahBarrierSet::resolve_forwarded(p);
+    // tty->print_cr("Returning oop @ %p fwd oop @ %p| ac = %lu | gc_epoch = %lu", (oopDesc*)p, (oopDesc*)fwd, fwd->access_counter(), fwd->gc_epoch());
+    return fwd;
   }
 
   assert(ShenandoahThreadLocalData::is_evac_allowed(thread), "must be enclosed in oom-evac scope");
@@ -301,7 +319,8 @@ inline oop ShenandoahHeap::evacuate_object(oop p, Thread* thread) {
 
     _oom_evac_handler.handle_out_of_memory_during_evacuation();
 
-    return ShenandoahBarrierSet::resolve_forwarded(p);
+    oop fwd = ShenandoahBarrierSet::resolve_forwarded(p);
+    return fwd;
   }
 
   // Copy the object:
@@ -310,13 +329,15 @@ inline oop ShenandoahHeap::evacuate_object(oop p, Thread* thread) {
   // Try to install the new forwarding pointer.
   oop copy_val = oop(copy);
   // copy_val->set_access_counter(0);
+  // printf("p: ac %lu gc_epoch %lu region %lu | copy_val: ac %lu gc_epoch %lu region %lu\n", p->access_counter(), p->gc_epoch(), heap_region_index_containing(p), copy_val->access_counter(), copy_val->gc_epoch(), heap_region_index_containing(copy_val));
   oop result = ShenandoahForwarding::try_update_forwardee(p, copy_val);
   // increase_hotness_size(copy_val->size(), access_rate);
   if (result == copy_val) {
     // Successfully evacuated. Our copy is now the public one!
     shenandoah_assert_correct(NULL, copy_val);
-    increase_hotness_size(copy_val);
-    update_histogram(copy_val);
+    // increase_hotness_size(copy_val);
+    // update_histogram(copy_val);
+    // printf("result: ac %lu gc_epoch %lu region %lu\n", result->access_counter(), result->gc_epoch(), heap_region_index_containing(result));
     return copy_val;
   }  else {
     // Failed to evacuate. We need to deal with the object that is left behind. Since this
@@ -337,8 +358,10 @@ inline oop ShenandoahHeap::evacuate_object(oop p, Thread* thread) {
       shenandoah_assert_correct(NULL, copy_val);
     }
     shenandoah_assert_correct(NULL, result);
-    increase_hotness_size(result);
-    update_histogram(result);
+    // increase_hotness_size(result);
+    // update_histogram(result);
+
+    // printf("result: ac %lu gc_epoch %lu region %lu\n", result->access_counter(), result->gc_epoch(), heap_region_index_containing(result));
     return result;
   }
 }
@@ -496,6 +519,8 @@ public:
 
   void do_object(oop obj) {
     obj->oop_iterate(_cl);
+    // tty->print_cr("updated ref oop @ %p | ac = %lu | gc_epoch = %lu", (oopDesc*)fwd, fwd->access_counter(), fwd->gc_epoch());
+    // tty->print_cr("");
   }
 };
 

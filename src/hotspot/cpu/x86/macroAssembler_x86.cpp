@@ -5503,6 +5503,87 @@ void MacroAssembler::store_heap_oop_null(Address dst) {
   access_store_at(T_OBJECT, IN_HEAP, dst, noreg, noreg, noreg);
 }
 
+// void MacroAssembler::load_oop_barrier(Register oop) {
+//   pusha();                      // push registers
+//   // if (count == c_rarg0) {
+//   //   if (addr == c_rarg1) {
+//   //     // exactly backwards!!
+//   //     xchgptr(c_rarg1, c_rarg0);
+//   //   } else {
+//   //     movptr(c_rarg1, count);
+//   //     movptr(c_rarg0, addr);
+//   //   }
+//   // } else {
+//   //   movptr(c_rarg0, addr);
+//   //   movptr(c_rarg1, count);
+//   // }
+//   movptr(c_rarg0, oop);
+//   if (UseCompressedOops) {
+//     call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_narrow_oop_entry), 1);
+//   } else {
+//     call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_oop_entry), 1);
+//   }
+//   popa();
+// }
+
+// void MacroAssembler::store_oop_barrier(Register oop) {
+//   pusha();                      // push registers
+//   // if (count == c_rarg0) {
+//   //   if (addr == c_rarg1) {
+//   //     // exactly backwards!!
+//   //     xchgptr(c_rarg1, c_rarg0);
+//   //   } else {
+//   //     movptr(c_rarg1, count);
+//   //     movptr(c_rarg0, addr);
+//   //   }
+//   // } else {
+//   //   movptr(c_rarg0, addr);
+//   //   movptr(c_rarg1, count);
+//   // }
+//   movptr(c_rarg0, oop);
+//   if (UseCompressedOops) {
+//     call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_narrow_oop_entry), 1);
+//   } else {
+//     call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_oop_entry), 1);
+//   }
+//   popa();
+// }
+
+void MacroAssembler::increase_access_counter(Register obj, Register tmp1, Register tmp2) {
+  assert_different_registers(obj, tmp1, tmp2);
+  Label no_reset_values, done;
+
+  //is obj null?
+  cmpptr(obj, 0);
+  jcc(Assembler::equal, done);
+
+  // obj now should have the oop, decide if we need to decompressed
+  if (UseCompressedOops) {
+    decode_heap_oop(obj);
+  }
+
+  // load obj gc_epoch to tmp1
+  movptr(tmp1, Address(obj, oopDesc::gc_epoch_offset_in_bytes()));
+  // load obj ac to tmp2
+  movptr(tmp2, Address(obj, oopDesc::access_counter_offset_in_bytes()));
+
+  // cmp tmp1 to static_gc_epoch if equal jmp to no_reset_values, 
+  cmpptr(tmp1, oopDesc::static_gc_epoch);
+  jcc(Assembler::equal, no_reset_values);
+  // Reset ac to 0 and gc_epoch to current gc_epoch
+  movptr(Address(obj, oopDesc::access_counter_offset_in_bytes()), (intptr_t)0);
+  movptr(Address(obj, oopDesc::gc_epoch_offset_in_bytes()), oopDesc::static_gc_epoch);
+
+  bind(no_reset_values);
+  // increment ac by 1
+  increment(tmp2);
+  movptr(Address(obj, oopDesc::access_counter_offset_in_bytes()), tmp2);
+  if (UseCompressedOops) {
+    encode_heap_oop(obj);
+  }
+  bind(done);
+}
+
 #ifdef _LP64
 void MacroAssembler::store_klass_gap(Register dst, Register src) {
   if (UseCompressedClassPointers) {

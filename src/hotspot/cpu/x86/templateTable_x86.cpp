@@ -156,55 +156,90 @@ static void do_oop_store(InterpreterMacroAssembler* _masm,
   assert(val == noreg || val == rax, "parameter is just for looks");
   bool is_array = (decorators & IS_ARRAY) != 0;
 
-  if (val == noreg){
-    __ store_heap_oop(dst, val, rdx, rbx, decorators);
-    return;
-  } 
+  // if (barrier == BarrierSet::ShenandoahBarrierSet) {
 
-  // this point onward, val is rax
-    
-  // if (!is_array) __ movptr(c_rarg0, dst.base());
-  // if (barrier == BarrierSet::ShenandoahBarrierSet && !is_array) {
-  //   __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), dst.base());
+  //   if (dst.index() == noreg && dst.disp() == 0) {
+  //     if (dst.base() != rdx) {
+  //       __ movptr(rdx, dst.base());
+  //     }
+  //   } else {
+  //     __ lea(rdx, dst);
+  //   }
+
+  //   __ store_oop_barrier(rdx);
+
+  //   // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), rdx);
+
+  //   // Register new_val = val;
+  //   // if (UseCompressedOops) {
+  //   //   new_val = rbx;
+  //   //   __ movptr(new_val, val);
+  //   // }
+  //   // __ pusha();
+  //   __ store_heap_oop(Address(rdx, 0), val, rdx, rbx, decorators);
+  //   // __ popa();
+  //   // __ store_oop_barrier(rdx);
+
+  // } else {
+  //   __ store_heap_oop(dst, val, rdx, rbx, decorators);
   // }
+
+
+
+
+
+  // __ movptr(r8, dst);
   __ store_heap_oop(dst, val, rdx, rbx, decorators);
+  // if (val == noreg) return;
 
-  Label oop_is_null;
-  // __ cmpptr(dst.base(), 0);
-  // __ jcc(Assembler::equal, oop_is_null);
+  // Label oop_is_null, assertion, done;
+  // // __ cmpptr(dst.base(), 0);
+  // // __ jcc(Assembler::equal, oop_is_null);
 
-  if (barrier == BarrierSet::ShenandoahBarrierSet) {
-    // flatten object address if needed
-    // if (dst.index() == noreg && dst.disp() == 0) {
-    //   if (dst.base() != r8) {
-    //     __ movq(r8, dst.base());
-    //   }
-    // } else {
-    //   __ leaq(r8, dst);
-    // }
+  // if (barrier == BarrierSet::ShenandoahBarrierSet) {
+  //   // flatten object address if needed
+  //   // if (dst.index() == noreg && dst.disp() == 0) {
+  //   //   if (dst.base() != r8) {
+  //   //     __ movq(r8, dst.base());
+  //   //   }
+  //   // } else {
+  //   //   __ leaq(r8, dst);
+  //   // }
 
-    // __ cmpptr(r8, 0);
-    // __ jcc(Assembler::equal, oop_is_null);
-    // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), r8);
+  //   // __ cmpptr(r8, 0);
+  //   // __ jcc(Assembler::equal, oop_is_null);
+  //   // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), r8);
 
 
-    if (!is_array || (dst.index() == noreg && dst.disp() == 0)) {
-      __ cmpptr(dst.base(), 0);
-      __ jcc(Assembler::equal, oop_is_null);
-      __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), dst.base());
-    } else { // is_array
-      // dst.base(), which is rdx, could have been altered. Therefore, arrayoop is saved to r9 in aastore
-      __ cmpptr(r9, 0);
-      __ jcc(Assembler::equal, oop_is_null);
-      __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), r9);
+  //   if (!is_array || (dst.index() == noreg && dst.disp() == 0)) {
+  //     // __ cmpptr(r9, dst.base());
+  //     // __ jcc(Assembler::equal, assertion);
+  //     // assert(false, "Assertion failed");
+  //     // __ jmp(done);
+
+  //     // __ bind(assertion);
+  //     // r9 = obj containing this field
+  //     __ cmpptr(dst.base(), 0);
+  //     __ jcc(Assembler::equal, oop_is_null);
+  //     __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), dst.base());
       
-      __ lea(r9, dst);
-      __ cmpptr(r9, 0);
-      __ jcc(Assembler::equal, oop_is_null);
-      __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), r9);
-    }
-  }
-  __ bind(oop_is_null);
+  //   } else { // is_array
+  //     // dst.base(), which is rdx, could have been altered. Therefore, arrayoop is saved to r9 in aastore
+  //     __ cmpptr(r9, 0);
+  //     __ jcc(Assembler::equal, oop_is_null);
+  //     __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), r9);
+      
+  //     // __ lea(r9, dst);
+  //     // __ cmpptr(r9, 0);
+  //     // __ jcc(Assembler::equal, oop_is_null);
+  //     // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), r9);
+  //   }
+  // }
+
+  // __ bind(oop_is_null);
+
+  // __ bind(done);
+
 }
 
 static void do_oop_load(InterpreterMacroAssembler* _masm,
@@ -224,44 +259,122 @@ static void do_oop_load(InterpreterMacroAssembler* _masm,
   //   __ bind(oop_is_null);
   // }
   __ load_heap_oop(dst, src, rdx, rbx, decorators);
-  if (barrier == BarrierSet::ShenandoahBarrierSet){
-    Label oop_is_null;
-    __ cmpptr(dst, 0);
-    __ jcc(Assembler::equal, oop_is_null);
-    __ push_ptr(rax);
-    // __ pusha();
-    assert(dst == rax, "is dst = rax?");
-    __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::read_barrier), dst);
-    __ pop_ptr(rax);
+  // if (barrier == BarrierSet::ShenandoahBarrierSet){
+  //   Label oop_is_null;
+  //   __ cmpptr(dst, 0);
+  //   __ jcc(Assembler::equal, oop_is_null);
+  //   __ push_ptr(rax);
+  //   // __ pusha();
+  //   assert(dst == rax, "is dst = rax?");
+  //   __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::read_barrier), dst);
+  //   __ pop_ptr(rax);
 
-    // __ cmpptr(r9, 0);
-    // __ jcc(Assembler::equal, oop_is_null);
-    // __ push_ptr(rax);
-    // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::read_barrier), r9);
-    // __ pop_ptr(rax);
-    // if (!is_array){
-    //   __ cmpptr(dst, 0);
-    //   __ jcc(Assembler::equal, oop_is_null);
-    //   __ push_ptr(rax);
-    //   // __ pusha();
-    //   assert(dst == rax, "is dst = rax?");
-    //   __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::read_barrier), dst);
-    //   __ pop_ptr(rax);
-    //   // __ popa();
-    // }
-    // else {
-    //   __ cmpptr(dst, 0);
-    //   __ jcc(Assembler::equal, oop_is_null);
-    //   __ push_ptr(rax);
-    //   // __ pusha();
-    //   assert(dst == rax, "is dst = rax?");
-    //   __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::read_barrier), dst);
-    //   __ pop_ptr(rax);
-    //   // __ popa();
-    // }
-    __ bind(oop_is_null);
-  }
+  //   // __ cmpptr(r9, 0);
+  //   // __ jcc(Assembler::equal, oop_is_null);
+  //   // __ push_ptr(rax);
+  //   // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::read_barrier), r9);
+  //   // __ pop_ptr(rax);
+  //   // if (!is_array){
+  //   //   __ cmpptr(dst, 0);
+  //   //   __ jcc(Assembler::equal, oop_is_null);
+  //   //   __ push_ptr(rax);
+  //   //   // __ pusha();
+  //   //   assert(dst == rax, "is dst = rax?");
+  //   //   __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::read_barrier), dst);
+  //   //   __ pop_ptr(rax);
+  //   //   // __ popa();
+  //   // }
+  //   // else {
+  //   //   __ cmpptr(dst, 0);
+  //   //   __ jcc(Assembler::equal, oop_is_null);
+  //   //   __ push_ptr(rax);
+  //   //   // __ pusha();
+  //   //   assert(dst == rax, "is dst = rax?");
+  //   //   __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::read_barrier), dst);
+  //   //   __ pop_ptr(rax);
+  //   //   // __ popa();
+  //   // }
+  //   __ bind(oop_is_null);
+  // }
 }
+
+// static void oop_increase_access_counter(InterpreterMacroAssembler* _masm,
+//                           Register obj,
+//                           Register temp1,
+//                           BarrierSet::Name barrier) {
+//   if (barrier == BarrierSet::ShenandoahBarrierSet){
+//     assert_different_registers(obj, temp1);
+//     Label oop_is_null, no_reset_values;
+//     __ cmpptr(obj, 0);
+//     __ jcc(Assembler::equal, oop_is_null);
+
+
+
+//     if (UseCompressedOops) {
+//       __ decode_heap_oop(obj);
+//     }
+//     // __ pusha();
+//     // __ call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_oop), obj);
+//     // __ popa();
+
+//     // load obj gc_epoch to temp1
+
+//     // cmp temp1 to static_gc_epoch if equal jmp to no_reset_values, 
+//     __ movptr(temp1, InternalAddress((address)(&oopDesc::static_gc_epoch)));
+//     // __ pusha();
+//     // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_address), temp1);
+//     // __ popa();
+    
+//     __ cmpptr(temp1, Address(obj, oopDesc::gc_epoch_offset_in_bytes()));
+//     __ jcc(Assembler::equal, no_reset_values);
+//     // Reset ac to 0 and gc_epoch to current gc_epoch
+//     __ movptr(Address(obj, oopDesc::gc_epoch_offset_in_bytes()), temp1);
+
+//     // __ pusha();
+//     // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_address), temp1);
+//     // __ popa();
+
+//     __ movptr(Address(obj, oopDesc::access_counter_offset_in_bytes()), (intptr_t)0); // illegal use but works for this situation
+
+
+//     __ bind(no_reset_values);
+//     // increment ac by 1
+//     __ movptr(temp1, Address(obj, oopDesc::access_counter_offset_in_bytes()));
+//     __ increment(temp1);
+//     __ movptr(Address(obj, oopDesc::access_counter_offset_in_bytes()), temp1);
+
+
+//     // __ pusha();
+//     // __ call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_oop), obj);
+//     // __ popa();
+
+//     // __ pusha();
+//     // __ call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_newline));
+//     // __ popa();
+//     if (UseCompressedOops) {
+//       __ encode_heap_oop(obj);
+//     }
+    
+//     __ bind(oop_is_null);
+//   }
+// }
+
+// static void array_load_barrier(InterpreterMacroAssembler* _masm,
+//                           Register arrayoop,
+//                           BarrierSet::Name barrier,
+//                           DecoratorSet decorators = 0) {
+//   bool is_array = (decorators & IS_ARRAY) != 0;
+//   assert(is_array, "must be arrayoop");
+//   if (barrier == BarrierSet::ShenandoahBarrierSet){
+//     Label oop_is_null;
+//     __ cmpptr(arrayoop, 0);
+//     __ jcc(Assembler::equal, oop_is_null);
+//     __ pusha();
+//     __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_load_barrier));
+//     __ popa();
+//     __ bind(oop_is_null);
+//   }
+// }
 
 Address TemplateTable::at_bcp(int offset) {
   assert(_desc->uses_bcp(), "inconsistent uses_bcp information");
@@ -934,8 +1047,12 @@ void TemplateTable::aaload() {
   index_check(rdx, rax); // kills rbx
   // // Dat mod
   // // assuming that r9 will not be altered
-  // __ movptr(r9, rdx);
+  __ movptr(r9, rdx);
   // // Dat mod ends
+  __ pusha();
+  // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
+  // oop_increase_access_counter(_masm, r9, r8, _bs->kind());
+  __ popa();
   do_oop_load(_masm,
               Address(rdx, rax,
                       UseCompressedOops ? Address::times_4 : Address::times_ptr,
@@ -1266,6 +1383,11 @@ void TemplateTable::aastore() {
   __ movl(rcx, at_tos_p1()); // index
   __ movptr(rdx, at_tos_p2()); // array
 
+  // Dat mod
+  __ movptr(r9, rdx);
+  // Dat mod ends
+  // Dat mod ends
+
   Address element_address(rdx, rcx,
                           UseCompressedOops? Address::times_4 : Address::times_ptr,
                           arrayOopDesc::base_offset_in_bytes(T_OBJECT));
@@ -1274,9 +1396,6 @@ void TemplateTable::aastore() {
   __ testptr(rax, rax);
   __ jcc(Assembler::zero, is_null);
 
-  // Dat mod
-  __ movptr(r9, rdx);
-  // Dat mod ends
 
   // Move subklass into rbx
   __ load_klass(rbx, rax);
@@ -1296,21 +1415,36 @@ void TemplateTable::aastore() {
   // Come here on success
   __ bind(ok_is_subtype);
 
+
   // Get the value we will store
   __ movptr(rax, at_tos());
   __ movl(rcx, at_tos_p1()); // index
   // Now store using the appropriate barrier
+  __ pusha();
+  // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
+  // oop_increase_access_counter(_masm, r9, r8, _bs->kind());
+  __ popa();
   do_oop_store(_masm, element_address, rax, _bs->kind(), IS_ARRAY);
   // call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
+  // oop barrier
+  // __ store_oop_barrier(r9);
   __ jmp(done);
 
   // Have a NULL in rax, rdx=array, ecx=index.  Store NULL at ary[idx]
   __ bind(is_null);
   __ profile_null_seen(rbx);
 
+  // oop barrier
+  // __ store_oop_barrier(r9);
+
   // Store a NULL
-  // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
+  __ pusha();
+  // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
+  // oop_increase_access_counter(_masm, r9, r8, _bs->kind());
+  __ popa();
   do_oop_store(_masm, element_address, noreg, _bs->kind(), IS_ARRAY);
+  // oop barrier
+  // __ store_oop_barrier(r9);
 
   // Pop stack arguments
   __ bind(done);
@@ -3063,7 +3197,7 @@ void TemplateTable::getfield_or_static(int byte_no, bool is_static, RewriteContr
 
   // // Dat mod
   // // assuming that r9 will not be altered
-  // __ movptr(r9, obj);
+  __ movptr(r9, obj);
   // // Dat mod ends
 
   const Address field(obj, off, Address::times_1, 0*wordSize);
@@ -3106,6 +3240,10 @@ void TemplateTable::getfield_or_static(int byte_no, bool is_static, RewriteContr
   __ cmpl(flags, atos);
   __ jcc(Assembler::notEqual, notObj);
   // atos
+  __ pusha();
+  // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
+  // oop_increase_access_counter(_masm, r9, r8, _bs->kind());
+  __ popa();
   do_oop_load(_masm, field, rax, _bs->kind());
   __ push(atos);
   if (!is_static && rc == may_rewrite) {
@@ -3381,6 +3519,10 @@ void TemplateTable::putfield_or_static(int byte_no, bool is_static, RewriteContr
     __ pop(atos);
     if (!is_static) pop_and_check_object(obj);
     // Store into the field
+    __ pusha();
+    // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
+    // oop_increase_access_counter(_masm, obj, r8, _bs->kind());
+    __ popa();
     do_oop_store(_masm, field, rax, _bs->kind());
     // call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
     if (!is_static && rc == may_rewrite) {
@@ -3634,6 +3776,10 @@ void TemplateTable::fast_storefield(TosState state) {
   // access field
   switch (bytecode()) {
   case Bytecodes::_fast_aputfield:
+    __ pusha();
+    // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
+    // oop_increase_access_counter(_masm, r9, r8, _bs->kind());
+    __ popa();
     do_oop_store(_masm, field, rax, _bs->kind());
     // call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_store_barrier));
     break;
@@ -3723,7 +3869,7 @@ void TemplateTable::fast_accessfield(TosState state) {
 
   // // Dat mod
   // // assuming that r9 will not be altered
-  // __ movptr(r9, rax);
+  __ movptr(r9, rax);
   // // Dat mod ends
 
   Address field(rax, rbx, Address::times_1);
@@ -3731,6 +3877,10 @@ void TemplateTable::fast_accessfield(TosState state) {
   // access field
   switch (bytecode()) {
   case Bytecodes::_fast_agetfield:
+    __ pusha();
+    // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
+    // oop_increase_access_counter(_masm, r9, r8, _bs->kind());
+    __ popa();
     do_oop_load(_masm, field, rax, _bs->kind());
     __ verify_oop(rax);
     break;
@@ -3790,7 +3940,7 @@ void TemplateTable::fast_xaccess(TosState state) {
 
   // // Dat mod
   // // assuming that r9 will not be altered
-  // __ movptr(r9, rax);
+  __ movptr(r9, rax);
   // // Dat mod ends
 
   const Address field = Address(rax, rbx, Address::times_1, 0*wordSize);
@@ -3799,6 +3949,10 @@ void TemplateTable::fast_xaccess(TosState state) {
     __ access_load_at(T_INT, IN_HEAP, rax, field, noreg, noreg);
     break;
   case atos:
+    __ pusha();
+    // __ load_heap_oop(r9, Address(r9, 0), noreg, noreg, AS_RAW);
+    // oop_increase_access_counter(_masm, r9, r8, _bs->kind());
+    __ popa();
     do_oop_load(_masm, field, rax, _bs->kind());
     __ verify_oop(rax);
     break;
@@ -4326,9 +4480,13 @@ void TemplateTable::_new() {
       __ pop(rcx);   // get saved klass back in the register.
       __ movptr(rbx, Address(rcx, Klass::prototype_header_offset()));
       __ movptr(Address(rax, oopDesc::mark_offset_in_bytes ()), rbx);
+      __ movptr(Address(rax, oopDesc::access_counter_offset_in_bytes ()), (intptr_t)0);
+      __ movptr(Address(rax, oopDesc::gc_epoch_offset_in_bytes ()), (intptr_t)0);
     } else {
       __ movptr(Address(rax, oopDesc::mark_offset_in_bytes ()),
                 (intptr_t)markOopDesc::prototype()); // header
+      __ movptr(Address(rax, oopDesc::access_counter_offset_in_bytes ()), (intptr_t)0);
+      __ movptr(Address(rax, oopDesc::gc_epoch_offset_in_bytes ()), (intptr_t)0);
       __ pop(rcx);   // get saved klass back in the register.
     }
 #ifdef _LP64

@@ -1041,17 +1041,42 @@ IRT_ENTRY(void, InterpreterRuntime::print_store_barrier(JavaThread* thread))
 }
 IRT_END
 
-IRT_LEAF(void, InterpreterRuntime::print_as_raw())
+IRT_LEAF(void, InterpreterRuntime::print_as_raw(oopDesc* obj))
 {
-  tty->print_cr("As raw");
+  tty->print_cr("As raw--------------------------------------------------------------------");
+  // assert(obj != 0, "Null oop");
+  bool is_oop = oopDesc::is_oop(obj);
+  if (is_oop) {
+    // tty->print_raw("wb: is oop\n");
+    // tty->print_cr("oop ac %lu | epoch %lu\n", obj->access_counter(), obj->gc_epoch());
+    obj->increase_access_counter();
+    return;
+  }
+  tty->print_cr("wb: is not oop");
 }
 IRT_END
 
 IRT_LEAF(void, InterpreterRuntime::print_not_as_raw())
 {
-  tty->print_cr("Not as raw");
+  tty->print_cr("Not as raw-----------------------------------------------------------------");
 }
 IRT_END
+
+JRT_LEAF(void, InterpreterRuntime::print_oop(oopDesc* obj))
+  tty->print_cr("oop @ %p | ac = %lu | gc_epoch = %lu", obj, obj->access_counter(), obj->gc_epoch());
+  if (obj->is_forwarded()) {
+    tty->print_cr("oop is forwarded");
+  }
+JRT_END
+
+JRT_LEAF(void, InterpreterRuntime::print_newline())
+  tty->print_cr("\n");
+JRT_END
+
+void InterpreterRuntime::print_narrow_oop_entry(oopDesc* obj) {
+  tty->print_cr("Narrow oop entry -----------------------------------------------------------------");
+  obj->increase_access_counter();
+}
 
 IRT_ENTRY(void, InterpreterRuntime::write_barrier(JavaThread* thread, oopDesc* obj))
 {
@@ -1061,11 +1086,11 @@ IRT_ENTRY(void, InterpreterRuntime::write_barrier(JavaThread* thread, oopDesc* o
   if (is_oop) {
     // tty->print_raw("wb: is oop\n");
     // tty->print_cr("oop ac %lu | epoch %lu\n", obj->access_counter(), obj->gc_epoch());
-    obj->increase_access_counter(1);
+    obj->increase_access_counter();
     return;
   }
   tty->print_cr("wb: is not oop");
-  // obj->increase_access_counter(1);
+  // obj->increase_access_counter();
 }
 IRT_END
 
@@ -1076,7 +1101,7 @@ IRT_ENTRY(void, InterpreterRuntime::read_barrier(JavaThread* thread, oopDesc* ob
   if (is_oop) {
     // tty->print_cr("rb: is oop");
     // tty->print_cr("oop ac %lu | epoch %lu\n", obj->access_counter(), obj->gc_epoch());
-    obj->increase_access_counter(1);
+    obj->increase_access_counter();
     return;
   }
   tty->print_cr("rb: is not oop");
@@ -1091,7 +1116,7 @@ IRT_END
 //   if (is_oop) {
 //     // tty->print_cr("rb: is oop");
 //     // tty->print_cr("oop ac %lu | epoch %lu\n", obj->access_counter(), obj->gc_epoch());
-//     obj->increase_access_counter(1);
+//     obj->increase_access_counter();
 //     return;
 //   }
 //   tty->print_cr("rb: is not oop");

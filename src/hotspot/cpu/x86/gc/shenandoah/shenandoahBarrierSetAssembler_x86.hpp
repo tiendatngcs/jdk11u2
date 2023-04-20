@@ -55,11 +55,15 @@ private:
                                     bool tosca_live,
                                     bool expand_call);
 
+  void shenandoah_write_barrier_post(MacroAssembler* masm, Register obj, Register temp1, Register temp2, Register temp3);
+
   void load_reference_barrier_not_null(MacroAssembler* masm, Register dst, Address src);
 
   void iu_barrier_impl(MacroAssembler* masm, Register dst, Register tmp);
 
   address generate_shenandoah_lrb(StubCodeGenerator* cgen);
+
+  void oop_increase_access_counter(MacroAssembler* masm, Register obj, Register temp1);
 
 public:
   static address shenandoah_lrb();

@@ -284,7 +284,7 @@
           "Many heuristics automatically enable this. This option is "      \
           "similar to global ExplicitGCInvokesConcurrent.")                 \
                                                                             \
-  experimental(uintx, ShenandoahHotnessThreshold, 1000,                     \
+  experimental(intx, ShenandoahHotnessThreshold, 1000,                     \
           "How many times an object should be accessed to be classified as  \
           hot.")                                                            \
                                                                             \

@@ -237,6 +237,19 @@ void ShenandoahBarrierSetAssembler::satb_write_barrier_pre(MacroAssembler* masm,
   // Do we need to load the previous value?
   if (obj != noreg) {
     __ load_heap_oop(pre_val, Address(obj, 0), noreg, noreg, AS_RAW);
+
+    //Dat mod
+    // change this to call vm leaf?
+
+    // if (c_rarg0 != obj) {
+    //   __ mov(c_rarg0, obj);
+    // }
+    // __ pusha();
+    // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::write_barrier_helper), obj);
+    // __ popa();
+    // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::write_barrier), obj);
+    // Dat mod ends
+
   }
 
   // Is the previous value null?
@@ -321,6 +334,127 @@ void ShenandoahBarrierSetAssembler::satb_write_barrier_pre(MacroAssembler* masm,
   if(tosca_live) __ pop(rax);
 
   __ bind(done);
+}
+
+void ShenandoahBarrierSetAssembler::shenandoah_write_barrier_post(MacroAssembler* masm, Register obj, Register temp1, Register temp2, Register temp3) {
+  save_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
+  Label oop_is_null, no_reset_values;
+  // store what is in obj to stack
+  // __ push(r10);
+  // obj is the address to the actual oop load oop to the same register
+  __ load_heap_oop(obj, Address(obj, 0), noreg, noreg, AS_RAW);
+  __ cmpptr(obj, 0);
+  __ jcc(Assembler::equal, oop_is_null);
+
+
+
+  if (UseCompressedOops) {
+    __ decode_heap_oop(obj);
+  }
+  __ pusha();
+  __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), obj);
+  __ popa();
+
+  // load obj gc_epoch to r9
+  __ movptr(temp1, Address(obj, oopDesc::gc_epoch_offset_in_bytes()));
+  // load obj ac to r8
+  __ movptr(temp2, Address(obj, oopDesc::access_counter_offset_in_bytes()));
+
+  // cmp r9 to static_gc_epoch if equal jmp to no_reset_values, 
+  __ movptr(temp3, InternalAddress((address)(&oopDesc::static_gc_epoch)));
+  __ pusha();
+  __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_address), temp3);
+  __ popa();
+  
+  __ cmpptr(temp1, temp3);
+  __ jcc(Assembler::equal, no_reset_values);
+  // Reset ac to 0 and gc_epoch to current gc_epoch
+  __ movptr(Address(obj, oopDesc::gc_epoch_offset_in_bytes()), temp3);
+
+  __ movptr(temp3, (intptr_t)0);
+  __ pusha();
+  __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_address), temp3);
+  __ popa();
+
+  __ movptr(Address(obj, oopDesc::access_counter_offset_in_bytes()), temp3);
+
+
+  __ bind(no_reset_values);
+  // increment ac by 1
+  __ increment(temp2);
+  __ movptr(Address(obj, oopDesc::access_counter_offset_in_bytes()), temp2);
+  if (UseCompressedOops) {
+    __ encode_heap_oop(obj);
+  }
+  
+  __ pusha();
+  __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), obj);
+  __ popa();
+
+  __ pusha();
+  __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_new_line));
+  __ popa();
+
+
+  __ bind(oop_is_null);
+  restore_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
+}
+
+void ShenandoahBarrierSetAssembler::oop_increase_access_counter(MacroAssembler* masm, Register obj, Register temp1) {
+  assert_different_registers(obj, temp1);
+  Label oop_is_null, no_reset_values;
+  __ cmpptr(obj, 0);
+  __ jcc(Assembler::equal, oop_is_null);
+
+
+
+  if (UseCompressedOops) {
+    __ decode_heap_oop(obj);
+  }
+  // __ pusha();
+  // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), obj);
+  // __ popa();
+
+  // load obj gc_epoch to temp1
+  // __ movptr(temp1, Address(obj, oopDesc::gc_epoch_offset_in_bytes()));
+
+  // cmp temp1 to static_gc_epoch if equal jmp to no_reset_values, 
+  __ movptr(temp1, InternalAddress((address)(&oopDesc::static_gc_epoch)));
+  // __ pusha();
+  // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_address), temp1);
+  // __ popa();
+  
+  __ cmpptr(temp1, Address(obj, oopDesc::gc_epoch_offset_in_bytes()));
+  __ jcc(Assembler::equal, no_reset_values);
+  // Reset ac to 0 and gc_epoch to current gc_epoch
+  __ movptr(Address(obj, oopDesc::gc_epoch_offset_in_bytes()), temp1);
+
+  // __ pusha();
+  // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_address), temp1);
+  // __ popa();
+
+  __ movptr(Address(obj, oopDesc::access_counter_offset_in_bytes()), (intptr_t)0); // illegal use but works for this situation
+
+
+  __ bind(no_reset_values);
+  // increment ac by 1
+  __ movptr(temp1, Address(obj, oopDesc::access_counter_offset_in_bytes()));
+  __ increment(temp1);
+  __ movptr(Address(obj, oopDesc::access_counter_offset_in_bytes()), temp1);
+  if (UseCompressedOops) {
+    __ encode_heap_oop(obj);
+  }
+  
+  // __ pusha();
+  // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), obj);
+  // __ popa();
+
+  // __ pusha();
+  // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_new_line));
+  // __ popa();
+
+
+  __ bind(oop_is_null);
 }
 
 void ShenandoahBarrierSetAssembler::load_reference_barrier_not_null(MacroAssembler* masm, Register dst, Address src) {
@@ -453,7 +587,6 @@ void ShenandoahBarrierSetAssembler::load_reference_barrier(MacroAssembler* masm,
 //
 void ShenandoahBarrierSetAssembler::load_at(MacroAssembler* masm, DecoratorSet decorators, BasicType type,
              Register dst, Address src, Register tmp1, Register tmp_thread) {
-  tty->print_cr("ShenandoahBarrierSetAssembler::load_at called\n");
   // 1: non-reference load, no additional barrier is needed
   if (!is_reference_type(type)) {
     BarrierSetAssembler::load_at(masm, decorators, type, dst, src, tmp1, tmp_thread);
@@ -483,6 +616,18 @@ void ShenandoahBarrierSetAssembler::load_at(MacroAssembler* masm, DecoratorSet d
 
     BarrierSetAssembler::load_at(masm, decorators, type, dst, src, tmp1, tmp_thread);
 
+    // save_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
+    // // __ pusha();
+    // if (use_tmp1_for_dst) {
+    //   __ push(tmp1);
+    //   oop_increase_access_counter(masm, tmp1, r8);
+    //   __ pop(tmp1);
+    // } else {
+    //   oop_increase_access_counter(masm, dst, r8);
+    // }
+    // // __ popa();
+    // restore_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
+
     load_reference_barrier(masm, dst, src);
 
     // Move loaded oop to final destination
@@ -495,8 +640,13 @@ void ShenandoahBarrierSetAssembler::load_at(MacroAssembler* masm, DecoratorSet d
 
       dst = result_dst;
     }
-    // // read barrier
-    // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::read_barrier), dst);
+    // save_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
+    // // __ pusha();
+    // oop_increase_access_counter(masm, dst, r8);
+    // // __ popa();
+    // restore_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
+    // assert(dst == rax, "Dst is reax?");
+
   } else {
     BarrierSetAssembler::load_at(masm, decorators, type, dst, src, tmp1, tmp_thread);
   }
@@ -523,6 +673,18 @@ void ShenandoahBarrierSetAssembler::load_at(MacroAssembler* masm, DecoratorSet d
 
     restore_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
   }
+
+  // Label oop_is_null;
+  // __ cmpptr(dst, 0);
+  // __ jcc(Assembler::equal, oop_is_null);
+  // __ pusha();
+  // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), dst);
+  // __ popa();
+
+  // __ pusha();
+  // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_new_line));
+  // __ popa();
+  // __ bind(oop_is_null);
 }
 
 void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet decorators, BasicType type,
@@ -569,10 +731,94 @@ void ShenandoahBarrierSetAssembler::store_at(MacroAssembler* masm, DecoratorSet 
       BarrierSetAssembler::store_at(masm, decorators, type, Address(tmp1, 0), val, noreg, noreg);
     } else {
       iu_barrier(masm, val, tmp3);
+
+      // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), val);
+      // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), val);
       BarrierSetAssembler::store_at(masm, decorators, type, Address(tmp1, 0), val, noreg, noreg);
     }
+
+    if (as_normal){
+      // save_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
+      // // obj is the address to the actual oop load oop to the same register
+      // __ load_heap_oop(tmp1, Address(tmp1, 0), noreg, noreg, AS_RAW);
+      // oop_increase_access_counter(masm, tmp1, r8);
+      // restore_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
+
+      // save_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
+      // Label oop_is_null, no_reset_values;
+      // // store what is in obj to stack
+      // // __ push(r10);
+      // // obj is the address to the actual oop load oop to the same register
+      // // __ load_heap_(r10, Address(tmp1, 0));load_heap_oop
+      // __ load_heap_oop(r10, Address(tmp1, 0), noreg, noreg, AS_RAW);
+      // __ cmpptr(r10, 0);
+      // __ jcc(Assembler::equal, oop_is_null);
+
+
+
+      // if (UseCompressedOops) {
+      //   __ decode_heap_oop(r10);
+      // }
+      // __ pusha();
+      // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), r10);
+      // __ popa();
+
+      // // load obj gc_epoch to r9
+      // __ movptr(r9, Address(r10, oopDesc::gc_epoch_offset_in_bytes()));
+      // // load obj ac to r8
+      // __ movptr(r8, Address(r10, oopDesc::access_counter_offset_in_bytes()));
+
+      // // cmp r9 to static_gc_epoch if equal jmp to no_reset_values, 
+      // // __ movptr(r11, (intptr_t)oopDesc::static_gc_epoch);
+      // __ movptr(r11, InternalAddress((address)(&oopDesc::static_gc_epoch)));
+      // __ pusha();
+      // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_address), r11);
+      // __ popa();
+      
+      // __ cmpptr(r9, r11);
+      // __ jcc(Assembler::equal, no_reset_values);
+      // // Reset ac to 0 and gc_epoch to current gc_epoch
+      // __ movptr(Address(r10, oopDesc::gc_epoch_offset_in_bytes()), r11);
+
+      // __ movptr(r11, (intptr_t)0);
+      // __ pusha();
+      // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_address), r11);
+      // __ popa();
+
+      // __ movptr(Address(r10, oopDesc::access_counter_offset_in_bytes()), r11);
+
+
+      // __ bind(no_reset_values);
+      // // increment ac by 1
+      // __ increment(r8);
+      // __ movptr(Address(r10, oopDesc::access_counter_offset_in_bytes()), r8);
+      // if (UseCompressedOops) {
+      //   __ encode_heap_oop(r10);
+      // }
+      
+      // __ pusha();
+      // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_oop), r10);
+      // __ popa();
+
+      // __ pusha();
+      // __ call_VM_leaf(CAST_FROM_FN_PTR(address, ShenandoahRuntime::print_new_line));
+      // __ popa();
+
+
+      // // __ push(r8);
+      // // __ push(r9);
+      // // __ increase_access_counter(r10 /*obj*/, r8 /*tmp1*/, r9 /*tmp2*/);
+      // // __ pop(r9);
+      // // __ pop(r8);
+
+      
+      // // restore value in tmp1
+      // // __ pop(r10);
+      // __ bind(oop_is_null);
+      // restore_machine_state(masm, /* handle_gpr = */ true, /* handle_fp = */ true);
+
+    }
     NOT_LP64(imasm->restore_bcp());
-    // __ call_VM(noreg, CAST_FROM_FN_PTR(address, InterpreterRuntime::print_something));
   } else {
     BarrierSetAssembler::store_at(masm, decorators, type, dst, val, tmp1, tmp2);
   }

@@ -250,6 +250,8 @@ void BarrierSetAssembler::tlab_allocate(MacroAssembler* masm,
   __ verify_tlab();
 
   __ movptr(obj, Address(thread, JavaThread::tlab_top_offset()));
+
+  // __ call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_not_as_raw));
   if (var_size_in_bytes == noreg) {
     __ lea(end, Address(obj, con_size_in_bytes));
   } else {
@@ -286,6 +288,7 @@ void BarrierSetAssembler::eden_allocate(MacroAssembler* masm,
     __ bind(retry);
     ExternalAddress heap_top((address) Universe::heap()->top_addr());
     __ movptr(obj, heap_top);
+    // __ call_VM_leaf(CAST_FROM_FN_PTR(address, InterpreterRuntime::print_as_raw));
     if (var_size_in_bytes == noreg) {
       __ lea(end, Address(obj, con_size_in_bytes));
     } else {
